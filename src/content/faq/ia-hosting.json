@@ -1,0 +1,6 @@
+{
+  "id": "ia-hosting",
+  "question": "Quelles options d'hébergement proposez-vous pour l'IA ?",
+  "answer": "Cloud privé, on-premise ou hybride. Le choix dépend de vos contraintes réglementaires, de la sensibilité des données et du volume d'usage. Nous discutons de l'architecture la plus adaptée lors de la phase de cadrage.",
+  "family": "ia"
+}

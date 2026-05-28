@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import TemplateCard from '~/components/cards/TemplateCard.astro';
+import EmptyState from '~/components/ui/EmptyState.astro';
+import FilterChips from '~/components/islands/FilterChips.tsx';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+import { NORMS } from '~/content.config';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const templates = (await getCollection('templates')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const filterOptions = [
+  { value: 'all', label: t(lang, 'norm.all') },
+  ...NORMS.map((n) => ({
+    value: n,
+    label: t(lang, `norm.${n}`),
+  })),
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/templates"
+  title={`${t(lang, 'family.templates')} — ${t(lang, 'templates.hero.title')}`}
+  description={t(lang, 'templates.hero.subtitle')}
+>
+  <Hero
+    variant="page"
+    family="templates"
+    kicker={t(lang, 'family.templates')}
+    title={t(lang, 'templates.hero.title')}
+    subtitle={t(lang, 'templates.hero.subtitle')}
+    ctaLabel={t(lang, 'nav.cart')}
+    ctaHref={localizeUrl('/panier', lang)}
+  />
+
+  <Section>
+    <div class="mb-8">
+      <FilterChips
+        client:idle
+        options={filterOptions}
+        targetSelector="[data-filter-card='template']"
+        emptySelector="#templates-empty"
+        ariaLabel={`${t(lang, 'templates.filter.label')} — filtrer par norme`}
+        accent="amber"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {templates.map((tpl) => (
+        <div data-filter-card="template" data-filter-value={tpl.data.norm}>
+          <TemplateCard
+            slug={tpl.id}
+            name={tpl.data.name}
+            summary={tpl.data.summary}
+            icon={tpl.data.icon}
+            priceEUR={tpl.data.priceEUR}
+            href={localizeUrl(`/templates/${tpl.id}`, lang)}
+            lang={lang}
+          />
+        </div>
+      ))}
+    </div>
+
+    <div id="templates-empty" style="display: none">
+      <EmptyState
+        title={t(lang, 'filter.empty.title')}
+        message={t(lang, 'filter.empty.message')}
+        ctaLabel={t(lang, 'cta.contact')}
+        ctaHref={localizeUrl('/contact', lang)}
+      />
+    </div>
+  </Section>
+</BaseLayout>

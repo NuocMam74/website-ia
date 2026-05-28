@@ -1,0 +1,39 @@
+---
+import Card from '~/components/ui/Card.astro';
+import Chip from '~/components/ui/Chip.astro';
+import type { Lang } from '~/lib/i18n';
+
+interface Props {
+  title: string;
+  excerpt: string;
+  href: string;
+  publishedAt: Date;
+  tags: string[];
+  lang: Lang;
+}
+
+const { title, excerpt, href, publishedAt, tags, lang } = Astro.props;
+const formattedDate = new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+}).format(publishedAt);
+---
+
+<Card href={href} interactive class="h-full">
+  <article class="p-6 h-full flex flex-col">
+    <time
+      datetime={publishedAt.toISOString().slice(0, 10)}
+      class="text-xs text-ink-500"
+    >
+      {formattedDate}
+    </time>
+    <h3 class="mt-2 text-h3 font-medium text-ink-50 leading-snug">{title}</h3>
+    <p class="mt-2 text-small text-ink-300 leading-relaxed flex-1">{excerpt}</p>
+    {tags.length > 0 && (
+      <div class="mt-4 flex flex-wrap gap-1.5">
+        {tags.slice(0, 3).map((tag) => <Chip>{tag}</Chip>)}
+      </div>
+    )}
+  </article>
+</Card>

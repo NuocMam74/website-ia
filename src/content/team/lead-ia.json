@@ -1,0 +1,9 @@
+{
+  "name": "[À renseigner — Lead IA]",
+  "role": "Architecte IA & Agents",
+  "bio": "Conçoit les architectures d'agents et de RAG souverains pour les contextes industriels confidentiels. Pratique de la mise en production, pas du prototype.",
+  "expertise": ["RAG", "Agents", "MLOps", "Sécurité données"],
+  "icon": "bot",
+  "accent": "coral",
+  "order": 2
+}

@@ -1,0 +1,64 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import PostCard from '~/components/cards/PostCard.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) =>
+    new Date(b.data.publishedAt).getTime() -
+    new Date(a.data.publishedAt).getTime(),
+);
+
+const allTags = Array.from(new Set(posts.flatMap((p) => p.data.tags)));
+---
+
+<BaseLayout
+  lang={lang}
+  path="/blog"
+  title={lang === 'fr' ? 'Blog & ressources' : 'Blog & resources'}
+  description={lang === 'fr'
+    ? 'Articles, retours d’expérience et bonnes pratiques en ingénierie qualité et IA industrielle.'
+    : 'Articles, feedback and best practices in quality engineering and industrial AI.'}
+>
+  <Hero
+    variant="page"
+    title={lang === 'fr' ? 'Ressources & articles' : 'Resources & articles'}
+    subtitle={lang === 'fr'
+      ? 'Retours d’expérience, méthodes et conseils sur la conformité, l’ingénierie et l’IA appliquée.'
+      : 'Feedback, methods and advice on compliance, engineering and applied AI.'}
+  />
+
+  <Section>
+    {allTags.length > 0 && (
+      <div class="mb-8 flex flex-wrap gap-2 text-small items-center">
+        <span class="text-ink-500 mr-2">Tags :</span>
+        {allTags.map((tag) => (
+          <span class="px-2.5 py-1 rounded-full border border-ink-700 text-ink-200">{tag}</span>
+        ))}
+      </div>
+    )}
+
+    {posts.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {posts.map((p) => (
+          <PostCard
+            title={p.data.title}
+            excerpt={p.data.excerpt}
+            href={localizeUrl(`/blog/${p.id}`, lang)}
+            publishedAt={p.data.publishedAt}
+            tags={p.data.tags}
+            lang={lang}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="text-base text-ink-300">
+        {lang === 'fr' ? 'Aucun article publié pour le moment.' : 'No article published yet.'}
+      </p>
+    )}
+  </Section>
+</BaseLayout>

@@ -1,0 +1,13 @@
+---
+/** Conteneur max 1200px, gouttière 24px (cf. brief §15). */
+interface Props {
+  class?: string;
+  as?: 'div' | 'section' | 'article' | 'header' | 'footer';
+}
+const { class: className = '', as = 'div' } = Astro.props;
+const Tag = as;
+---
+
+<Tag class:list={['mx-auto max-w-[1200px] px-6', className]}>
+  <slot />
+</Tag>

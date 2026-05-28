@@ -1,0 +1,69 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const sessionId = Astro.url.searchParams.get('session_id');
+---
+
+<BaseLayout
+  lang={lang}
+  path="/commande/succes"
+  title={lang === 'fr' ? 'Commande confirmée' : 'Order confirmed'}
+  description={lang === 'fr'
+    ? 'Votre commande de templates a bien été enregistrée.'
+    : 'Your template order is confirmed.'}
+  noindex
+>
+  <Hero
+    variant="page"
+    family="templates"
+    title={lang === 'fr' ? 'Merci pour votre commande' : 'Thank you for your order'}
+    subtitle={lang === 'fr'
+      ? 'Votre paiement est confirmé. Vous allez recevoir un email avec votre facture et vos liens de téléchargement sécurisés.'
+      : 'Your payment is confirmed. You will receive an email with your invoice and secure download links.'}
+  />
+
+  <Section>
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-ink-900 border border-ink-800 rounded-lg p-8 text-center">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-teal-500/10 text-teal-300 mb-4">
+          <Icon name="check" size={24} strokeWidth={2.5} />
+        </div>
+        <h2 class="text-h2 font-medium text-ink-50 mb-3">
+          {lang === 'fr' ? 'Paiement reçu' : 'Payment received'}
+        </h2>
+        <p class="text-base text-ink-300 mb-6">
+          {lang === 'fr'
+            ? 'Les liens de téléchargement seront envoyés à votre adresse email dans les minutes qui suivent.'
+            : 'The download links will be sent to your email address within a few minutes.'}
+        </p>
+
+        {sessionId && (
+          <p class="text-xs text-ink-500 mb-6">
+            {lang === 'fr' ? 'Référence' : 'Reference'} : <code>{sessionId}</code>
+          </p>
+        )}
+
+        <div class="flex flex-wrap justify-center gap-3">
+          <Button href={localizeUrl('/templates', lang)} variant="primary" family="templates">
+            {lang === 'fr' ? 'Continuer mes achats' : 'Continue shopping'}
+          </Button>
+          <Button href={localizeUrl('/contact', lang)} variant="secondary">
+            {lang === 'fr' ? 'Nous contacter' : 'Contact us'}
+          </Button>
+        </div>
+      </div>
+
+      <p class="mt-6 text-small text-ink-300 text-center">
+        {lang === 'fr'
+          ? 'Vous n’avez pas reçu votre email ? Vérifiez vos spams ou contactez-nous.'
+          : 'Didn’t receive your email? Check your spam folder or contact us.'}
+      </p>
+    </div>
+  </Section>
+</BaseLayout>

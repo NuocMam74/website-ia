@@ -1,0 +1,9 @@
+{
+  "name": "[À renseigner — Responsable Qualité]",
+  "role": "Responsable Conformité & Qualité",
+  "bio": "Accompagne les clients sur les audits ASPICE, ISO 26262 et ISO/SAE 21434. Ex-assesseur intern qualité dans un équipementier de rang 1.",
+  "expertise": ["ASPICE CL3", "ISO 26262", "ISO/SAE 21434", "Audits"],
+  "icon": "shield-check",
+  "accent": "amber",
+  "order": 3
+}

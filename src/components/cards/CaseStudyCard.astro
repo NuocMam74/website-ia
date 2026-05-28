@@ -1,0 +1,32 @@
+---
+import Card from '~/components/ui/Card.astro';
+import Chip from '~/components/ui/Chip.astro';
+import type { Family } from '~/content.config';
+
+interface Props {
+  title: string;
+  client: string;
+  sector: string;
+  href: string;
+  relatedFamily?: Family;
+  firstResult?: { value: string; label: string };
+}
+
+const { title, client, sector, href, relatedFamily, firstResult } = Astro.props;
+---
+
+<Card accent={relatedFamily} href={href} interactive class="h-full">
+  <article class="p-6 h-full flex flex-col">
+    <div class="flex items-center gap-2 mb-3">
+      <Chip>{sector}</Chip>
+      <Chip>{client}</Chip>
+    </div>
+    <h3 class="text-h3 font-medium text-ink-50 leading-snug">{title}</h3>
+    {firstResult && (
+      <div class="mt-auto pt-6 border-t border-ink-800">
+        <div class="text-h2 font-medium text-ink-50">{firstResult.value}</div>
+        <div class="text-xs text-ink-300">{firstResult.label}</div>
+      </div>
+    )}
+  </article>
+</Card>

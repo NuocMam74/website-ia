@@ -1,0 +1,54 @@
+---
+/**
+ * Mock éditeur de code — snippet Python qui invoque un agent IA.
+ * Donne une vibe développeur / API immédiatement reconnaissable.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class:list={['relative bg-ink-950 border border-ink-700 rounded-xl overflow-hidden card-shadow font-mono text-xs leading-relaxed', className]}>
+  {/* Tabs / window chrome */}
+  <div class="flex items-center border-b border-ink-800 bg-ink-900/60">
+    <div class="flex items-center gap-1.5 px-4 py-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
+    </div>
+    <div class="flex items-center gap-2 ml-2">
+      <div class="px-3 py-1.5 text-[10px] text-ink-100 bg-ink-950 border-t border-x border-ink-800 rounded-t flex items-center gap-1.5">
+        <span class="text-teal-300">●</span>
+        agent.py
+      </div>
+      <div class="px-3 py-1.5 text-[10px] text-ink-500">workflow.yaml</div>
+    </div>
+  </div>
+
+  <div class="p-5 text-ink-100">
+    <pre class="text-xs leading-relaxed"><code><span class="text-ink-500">1  </span><span class="text-coral-300">from</span> <span class="text-teal-200">brand_ai</span> <span class="text-coral-300">import</span> Agent, Tool
+<span class="text-ink-500">2  </span>
+<span class="text-ink-500">3  </span><span class="text-ink-500"># agent métier dot&eacute; de skills</span>
+<span class="text-ink-500">4  </span>agent = Agent(
+<span class="text-ink-500">5  </span>    <span class="text-amber-200">role</span>=<span class="text-teal-300">"ing&eacute;nieur qualit&eacute;"</span>,
+<span class="text-ink-500">6  </span>    <span class="text-amber-200">tools</span>=[Tool.<span class="text-coral-200">rag</span>(corpus=<span class="text-teal-300">"docs/"</span>),
+<span class="text-ink-500">7  </span>           Tool.<span class="text-coral-200">polarion</span>(),
+<span class="text-ink-500">8  </span>           Tool.<span class="text-coral-200">search</span>()],
+<span class="text-ink-500">9  </span>    <span class="text-amber-200">memory</span>=<span class="text-coral-200">True</span>,
+<span class="text-ink-500">10 </span>)
+<span class="text-ink-500">11 </span>
+<span class="text-ink-500">12 </span>result = <span class="text-coral-300">await</span> agent.<span class="text-coral-200">run</span>(
+<span class="text-ink-500">13 </span>    <span class="text-teal-300">"R&eacute;dige le rapport mensuel"</span>
+<span class="text-ink-500">14 </span>)<span class="inline-block w-1.5 h-3 ml-0.5 bg-teal-400 animate-pulse align-middle"></span></code></pre>
+  </div>
+
+  {/* Status bar */}
+  <div class="flex items-center justify-between px-4 py-2 border-t border-ink-800 bg-ink-900/40 text-[10px] text-ink-500">
+    <div class="flex items-center gap-3">
+      <span class="text-teal-300">● ready</span>
+      <span>Python 3.12</span>
+    </div>
+    <span class="font-mono">Ln 14, Col 6</span>
+  </div>
+</div>

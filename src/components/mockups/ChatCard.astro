@@ -1,0 +1,46 @@
+---
+/**
+ * Mock conversation chatbot RAG sourcé — Q/R interne avec citation
+ * de source. Sujet métier neutre (procédure interne), pas norme.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class:list={['relative bg-ink-900 border border-ink-700 rounded-xl overflow-hidden card-shadow', className]}>
+  <div class="flex items-center gap-2 px-4 py-2.5 border-b border-ink-800 bg-ink-950/60">
+    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-coral-400 to-coral-600 flex items-center justify-center text-[10px] font-bold text-ink-950">AI</div>
+    <span class="text-[10px] font-mono text-ink-400">assistant interne · base documentaire</span>
+  </div>
+
+  <div class="p-4 space-y-3">
+    {/* User question */}
+    <div class="flex justify-end">
+      <div class="max-w-[80%] px-3 py-2 rounded-lg rounded-tr-sm bg-ink-700 text-xs text-ink-100">
+        Quel est notre process d'onboarding pour un nouveau fournisseur ?
+      </div>
+    </div>
+
+    {/* AI response */}
+    <div class="flex justify-start">
+      <div class="max-w-[85%] px-3 py-2 rounded-lg rounded-tl-sm bg-coral-500/10 border border-coral-500/30 text-xs text-ink-100 leading-relaxed">
+        Le process comporte <strong class="text-coral-200">4 étapes</strong> : qualification commerciale, audit technique sur site, validation qualité (sample), puis intégration dans le PLM. Délai moyen : <strong class="text-coral-200">6 à 10 semaines</strong>.
+        <div class="mt-2 pt-2 border-t border-coral-500/20 flex flex-wrap gap-1">
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-coral-500/20 text-coral-200">📄 Procédure_Onboarding.pdf · p.12</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-coral-500/20 text-coral-200">📄 Guide_Qualité.docx · §3</span>
+        </div>
+      </div>
+    </div>
+
+    {/* Typing dots */}
+    <div class="flex justify-start">
+      <div class="flex items-center gap-1 px-3 py-2 rounded-lg bg-ink-800">
+        <span class="w-1.5 h-1.5 rounded-full bg-coral-300 animate-pulse-soft" style="animation-delay: 0s"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-coral-300 animate-pulse-soft" style="animation-delay: 0.2s"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-coral-300 animate-pulse-soft" style="animation-delay: 0.4s"></span>
+      </div>
+    </div>
+  </div>
+</div>

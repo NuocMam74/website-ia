@@ -1,0 +1,38 @@
+---
+import { type Lang, localizeUrl, LANG_LABELS } from '~/lib/i18n';
+
+interface Props {
+  lang: Lang;
+  /** Chemin SANS préfixe de langue. */
+  path: string;
+}
+
+const { lang, path } = Astro.props;
+
+const items = (['fr', 'en'] as const).map((code) => ({
+  code,
+  label: LANG_LABELS[code],
+  href: localizeUrl(path, code),
+  active: code === lang,
+}));
+---
+
+<nav aria-label="Langue" class="flex items-center gap-1 text-sm">
+  {items.map((it, i) => (
+    <>
+      {i > 0 && <span aria-hidden="true" class="text-ink-200">·</span>}
+      {it.active ? (
+        <span aria-current="true" class="px-1 text-ink-50">{it.code.toUpperCase()}</span>
+      ) : (
+        <a
+          href={it.href}
+          hreflang={it.code === 'fr' ? 'fr-FR' : 'en-US'}
+          class="px-1 text-ink-300 hover:text-ink-50 transition-colors"
+          aria-label={it.label}
+        >
+          {it.code.toUpperCase()}
+        </a>
+      )}
+    </>
+  ))}
+</nav>

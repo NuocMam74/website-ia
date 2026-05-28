@@ -1,0 +1,8 @@
+{
+  "name": "Polarion ALM",
+  "category": "technology",
+  "description": "Plateforme ALM de référence pour la gestion d'exigences, de tests et de la traçabilité. Nous configurons, intégrons et formons sur Polarion.",
+  "url": "https://polarion.plm.automation.siemens.com",
+  "icon": "settings-2",
+  "order": 1
+}

@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import type { Family } from '~/content.config';
+
+interface Props {
+  /** Filtrer par famille (sinon : toutes). */
+  family?: Family;
+  /** Inclure les placeholders draft (sinon ils sont masqués en prod). */
+  includeDraft?: boolean;
+  max?: number;
+}
+
+const { family, includeDraft = false, max = 3 } = Astro.props;
+const isProd = import.meta.env.PROD;
+const showDraft = includeDraft || !isProd;
+
+const all = await getCollection('testimonials', ({ data }) => {
+  if (!showDraft && data.draft) return false;
+  if (family && data.family !== family) return false;
+  return true;
+});
+
+const items = all.slice(0, max);
+---
+
+{items.length > 0 ? (
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {items.map((item) => (
+      <figure class="p-6 border border-ink-800 rounded-lg bg-ink-900">
+        {item.data.draft && (
+          <div class="mb-3 text-xs uppercase tracking-wide text-coral-300 bg-coral-500/10 px-2 py-0.5 rounded inline-block">
+            Placeholder
+          </div>
+        )}
+        <blockquote class="text-base text-ink-100 leading-relaxed">
+          “{item.data.quote}”
+        </blockquote>
+        <figcaption class="mt-4 text-small text-ink-300">
+          <span class="font-medium text-ink-50">{item.data.author}</span>
+          <span class="block">{item.data.role} — {item.data.company}</span>
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+) : null}

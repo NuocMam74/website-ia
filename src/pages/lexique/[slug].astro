@@ -1,0 +1,83 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import Button from '~/components/ui/Button.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import { breadcrumbLd, canonicalUrl } from '~/lib/seo';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+export async function getStaticPaths() {
+  const all = await getCollection('glossary');
+  return all.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const { Content } = await render(entry);
+
+const all = await getCollection('glossary');
+const related = entry.data.relatedSlugs
+  .map((slug) => all.find((e) => e.id === slug))
+  .filter((x): x is NonNullable<typeof x> => Boolean(x));
+
+const url = canonicalUrl(`/lexique/${entry.id}`, lang);
+---
+
+<BaseLayout
+  lang={lang}
+  path={`/lexique/${entry.id}`}
+  title={entry.data.seo?.title ?? `${entry.data.term} — Lexique`}
+  description={entry.data.seo?.description ?? entry.data.short}
+  jsonLd={breadcrumbLd([
+    { name: t(lang, 'brand'), url: canonicalUrl('/', lang) },
+    { name: lang === 'fr' ? 'Lexique' : 'Glossary', url: canonicalUrl('/lexique', lang) },
+    { name: entry.data.term, url },
+  ])}
+>
+  <Hero
+    variant="page"
+    kicker={entry.data.family}
+    title={entry.data.term}
+    subtitle={entry.data.short}
+  >
+    {entry.data.acronym && (
+      <p class="reveal mt-4 text-small text-ink-400">
+        {lang === 'fr' ? 'Acronyme' : 'Acronym'} : <strong class="text-ink-200 font-medium">{entry.data.acronym}</strong>
+      </p>
+    )}
+  </Hero>
+
+  <Section>
+    <article class="max-w-3xl prose prose-ink text-base text-ink-200 leading-relaxed [&>h2]:text-h2 [&>h2]:font-semibold [&>h2]:text-ink-50 [&>h2]:mt-12 [&>h2]:mb-4 [&>h3]:text-h3 [&>h3]:font-semibold [&>h3]:text-ink-50 [&>h3]:mt-10 [&>h3]:mb-3 [&>p]:mb-5 [&>ul]:mb-5 [&>ul]:pl-5 [&>ul]:list-disc [&>ol]:mb-5 [&>ol]:pl-5 [&>ol]:list-decimal [&_strong]:text-ink-50 [&_strong]:font-semibold [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:bg-ink-800 [&_code]:rounded [&_code]:text-teal-200 [&_code]:text-small">
+      <Content />
+    </article>
+
+    {related.length > 0 && (
+      <div class="mt-16 pt-10 border-t border-ink-800 max-w-3xl">
+        <h2 class="text-h3 font-semibold text-ink-50 mb-4">{lang === 'fr' ? 'Termes liés' : 'Related terms'}</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+          {related.map((r) => (
+            <Card href={localizeUrl(`/lexique/${r.id}`, lang)} interactive>
+              <div class="p-4 flex items-center justify-between">
+                <div>
+                  <div class="text-base font-medium text-ink-50">{r.data.term}</div>
+                  <div class="text-xs text-ink-400 mt-0.5">{r.data.short}</div>
+                </div>
+                <Icon name="arrow-right" size={16} class="text-ink-500" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="mt-12 max-w-3xl">
+      <Button href={localizeUrl('/lexique', lang)} variant="ghost" icon="arrow-left" iconPosition="leading">
+        {lang === 'fr' ? 'Retour au lexique' : 'Back to glossary'}
+      </Button>
+    </div>
+  </Section>
+</BaseLayout>

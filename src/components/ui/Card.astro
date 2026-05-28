@@ -1,0 +1,72 @@
+---
+import type { Family } from '~/content.config';
+
+interface Props {
+  /** Accent (border-top + glow au hover) par famille. */
+  accent?: Family;
+  href?: string;
+  class?: string;
+  /** Hover-lift et glow au survol. */
+  interactive?: boolean;
+  as?: 'div' | 'article' | 'li';
+  'aria-label'?: string;
+  /** Variante visuelle : glass (transparent flouté) ou solid (par défaut). */
+  variant?: 'solid' | 'glass';
+  /** Active le halo lumineux qui suit le curseur sur la carte. */
+  spotlight?: boolean;
+}
+
+const {
+  accent,
+  href,
+  class: className = '',
+  interactive = false,
+  as = 'div',
+  'aria-label': ariaLabel,
+  variant = 'solid',
+  spotlight = false,
+} = Astro.props;
+
+const spotlightVariant = spotlight && accent ? accent : spotlight ? 'true' : undefined;
+
+const accentBar: Record<Family, string> = {
+  solutions: 'before:bg-gradient-to-r before:from-teal-400/0 before:via-teal-400 before:to-teal-400/0',
+  ia: 'before:bg-gradient-to-r before:from-coral-400/0 before:via-coral-400 before:to-coral-400/0',
+  templates: 'before:bg-gradient-to-r before:from-amber-400/0 before:via-amber-400 before:to-amber-400/0',
+};
+
+const hoverGlow: Record<Family, string> = {
+  solutions: 'hover:shadow-[0_24px_48px_-16px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,217,255,0.25),0_0_40px_-8px_rgba(0,217,255,0.25)]',
+  ia: 'hover:shadow-[0_24px_48px_-16px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,61,127,0.25),0_0_40px_-8px_rgba(255,61,127,0.25)]',
+  templates: 'hover:shadow-[0_24px_48px_-16px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,176,0,0.25),0_0_40px_-8px_rgba(255,176,0,0.25)]',
+};
+
+const surfaceClass =
+  variant === 'glass'
+    ? 'bg-ink-900/60 backdrop-blur border border-ink-800/80'
+    : 'bg-ink-900 border border-ink-800';
+
+const baseClass = [
+  'relative rounded-xl overflow-hidden card-shadow',
+  surfaceClass,
+  accent &&
+    `pt-[2px] before:content-[""] before:absolute before:top-0 before:left-4 before:right-4 before:h-[2px] ${accentBar[accent]}`,
+  interactive && 'hover-lift',
+  interactive && accent && hoverGlow[accent],
+  interactive && !accent && 'hover:border-ink-600',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+
+const Tag = href ? 'a' : as;
+---
+
+<Tag
+  class={baseClass}
+  href={href}
+  aria-label={ariaLabel}
+  data-spotlight={spotlightVariant}
+>
+  <slot />
+</Tag>

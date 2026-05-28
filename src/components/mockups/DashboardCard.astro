@@ -1,0 +1,70 @@
+---
+/**
+ * Mock dashboard générique d'activité produit — moins normo-centré.
+ * Suggère un outil de pilotage moderne sans coller à un usage précis.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+
+const metrics = [
+  { label: 'Requêtes', value: '12.4k', delta: '+18%', color: 'teal' },
+  { label: 'Agents actifs', value: '7', delta: '+2', color: 'coral' },
+  { label: 'Latence p95', value: '142ms', delta: '-9%', color: 'teal' },
+];
+
+const sparklinePath = 'M 0 32 L 20 28 L 40 22 L 60 24 L 80 18 L 100 14 L 120 16 L 140 10 L 160 12 L 180 8 L 200 6';
+---
+
+<div class:list={['relative bg-ink-900 border border-ink-700 rounded-xl overflow-hidden card-shadow', className]}>
+  <div class="flex items-center justify-between px-4 py-2.5 border-b border-ink-800 bg-ink-950/60">
+    <div class="flex items-center gap-1.5">
+      <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
+    </div>
+    <span class="text-[10px] font-mono text-ink-500">console · production</span>
+    <span class="inline-flex items-center gap-1 text-[10px] text-teal-300 font-medium">
+      <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse-soft"></span>
+      Live
+    </span>
+  </div>
+
+  <div class="p-5">
+    <div class="grid grid-cols-3 gap-3 mb-5">
+      {metrics.map((m) => (
+        <div class="p-3 rounded-lg bg-ink-950/60 border border-ink-800">
+          <div class="text-[10px] uppercase tracking-wider text-ink-500 mb-1">{m.label}</div>
+          <div class="text-base font-semibold text-ink-50">{m.value}</div>
+          <div class:list={['text-[10px] font-medium mt-0.5', m.color === 'teal' ? 'text-teal-300' : 'text-coral-300']}>{m.delta}</div>
+        </div>
+      ))}
+    </div>
+
+    {/* Sparkline chart */}
+    <div class="p-3 rounded-lg bg-ink-950/60 border border-ink-800">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[10px] uppercase tracking-wider text-ink-500">Requêtes / heure</span>
+        <span class="text-[10px] text-ink-400 font-mono">24h</span>
+      </div>
+      <svg viewBox="0 0 200 40" class="w-full h-10" aria-hidden="true">
+        <defs>
+          <linearGradient id="spark-fill" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#00D9FF" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#00D9FF" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={`${sparklinePath} L 200 40 L 0 40 Z`} fill="url(#spark-fill)" />
+        <path d={sparklinePath} fill="none" stroke="#00D9FF" stroke-width="1.5" />
+        <circle cx="180" cy="8" r="3" fill="#00D9FF" />
+        <circle cx="180" cy="8" r="6" fill="#00D9FF" opacity="0.3" class="animate-pulse-soft" />
+      </svg>
+    </div>
+
+    <div class="mt-4 flex items-center justify-between text-[10px] text-ink-500">
+      <span class="font-mono">api.example.com/v1</span>
+      <span>uptime 99.97%</span>
+    </div>
+  </div>
+</div>

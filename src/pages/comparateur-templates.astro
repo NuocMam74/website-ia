@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import TemplateComparator from '~/components/islands/TemplateComparator.tsx';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const templates = await getCollection('templates');
+
+/* Mapping templates → tags de scoring pour le quiz */
+const fitByNorm: Record<string, string[]> = {
+  aspice: ['auto', 'aspice', 'process', 'tooling', 'polarion'],
+  iso26262: ['auto', 'iso26262', 'safety'],
+  iso21434: ['auto', 'iso21434', 'cyber'],
+  iso9001: ['iso9001', 'process'],
+  autre: [],
+};
+
+const comparatorData = templates.map((t) => ({
+  slug: t.id,
+  name: t.data.name,
+  norm: t.data.norm,
+  priceEUR: t.data.priceEUR,
+  summary: t.data.summary,
+  href: localizeUrl(`/templates/${t.id}`, lang),
+  domains: [t.data.norm],
+  fit: fitByNorm[t.data.norm] ?? [],
+}));
+---
+
+<BaseLayout
+  lang={lang}
+  path="/comparateur-templates"
+  title={lang === 'fr' ? 'Quel template pour vous ? — Comparateur' : 'Which template for you? — Comparator'}
+  description={lang === 'fr'
+    ? 'Trois questions pour trouver le template ASPICE, ISO 26262 ou ISO/SAE 21434 le plus adapté à votre projet.'
+    : 'Three questions to find the ASPICE, ISO 26262 or ISO/SAE 21434 template best suited to your project.'}
+>
+  <Hero
+    variant="page"
+    family="templates"
+    kicker={lang === 'fr' ? 'Comparateur' : 'Comparator'}
+    title={lang === 'fr' ? 'Quel template pour votre projet ?' : 'Which template for your project?'}
+    subtitle={lang === 'fr'
+      ? 'Trois questions pour vous orienter vers le bon pack — ou vers un cadrage sur-mesure si rien ne convient.'
+      : 'Three questions to point you to the right pack — or to a custom scoping if nothing fits.'}
+  />
+
+  <Section>
+    <div class="max-w-3xl mx-auto reveal">
+      <TemplateComparator client:load templates={comparatorData} lang={lang} />
+    </div>
+
+    <p class="mt-10 text-center text-small text-ink-400 max-w-xl mx-auto">
+      {lang === 'fr'
+        ? 'Aucune donnée n’est envoyée à un serveur. Le quiz tourne entièrement dans votre navigateur.'
+        : 'No data is sent to any server. The quiz runs entirely in your browser.'}
+    </p>
+  </Section>
+</BaseLayout>

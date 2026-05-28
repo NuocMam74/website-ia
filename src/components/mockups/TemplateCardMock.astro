@@ -1,0 +1,58 @@
+---
+/**
+ * Mock document templaté — preview d'un plan ASPICE structuré.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class:list={['relative bg-ink-900 border border-ink-700 rounded-xl overflow-hidden card-shadow', className]}>
+  <div class="flex items-center justify-between px-4 py-2.5 border-b border-ink-800 bg-ink-950/60">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-mono text-amber-300">📄</span>
+      <span class="text-[10px] font-mono text-ink-400">Template_ASPICE_CL3.docx</span>
+    </div>
+    <span class="text-[10px] text-ink-500">v1.0</span>
+  </div>
+
+  <div class="p-5">
+    <div class="text-h4 font-semibold text-ink-50 mb-1">Plan d'évaluation ASPICE</div>
+    <div class="text-xs text-ink-400 mb-4">Niveau de capacité 3 · 17 process areas</div>
+
+    <div class="space-y-2.5 text-xs">
+      <div class="flex items-start gap-2">
+        <span class="font-mono text-amber-300 w-8 shrink-0">1.0</span>
+        <span class="text-ink-200">Périmètre & objectifs de l'évaluation</span>
+      </div>
+      <div class="flex items-start gap-2">
+        <span class="font-mono text-amber-300 w-8 shrink-0">2.0</span>
+        <span class="text-ink-200">Méthode d'évaluation (PAM v3.1)</span>
+      </div>
+      <div class="flex items-start gap-2">
+        <span class="font-mono text-amber-300 w-8 shrink-0">3.0</span>
+        <span class="text-ink-100 font-medium">Process areas évalués</span>
+      </div>
+      <div class="ml-10 space-y-1.5 text-ink-400">
+        <div>3.1 SYS.1 — Requirements Elicitation</div>
+        <div>3.2 SYS.2 — System Requirements Analysis</div>
+        <div>3.3 SYS.3 — System Architectural Design</div>
+        <div class="text-ink-500 italic">… 14 autres</div>
+      </div>
+      <div class="flex items-start gap-2 pt-1">
+        <span class="font-mono text-amber-300 w-8 shrink-0">4.0</span>
+        <span class="text-ink-200">Collecte des preuves</span>
+      </div>
+      <div class="flex items-start gap-2">
+        <span class="font-mono text-amber-300 w-8 shrink-0">5.0</span>
+        <span class="text-ink-200">Constats & plan d'amélioration</span>
+      </div>
+    </div>
+
+    <div class="mt-5 pt-4 border-t border-ink-800 flex items-center justify-between text-xs">
+      <span class="text-ink-500">Prêt à l'import Polarion</span>
+      <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-200 font-medium">.xml · .docx</span>
+    </div>
+  </div>
+</div>

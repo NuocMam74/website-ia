@@ -1,0 +1,139 @@
+---
+/**
+ * Wrapper sur lucide-react. Permet d'utiliser une icône par son nom string
+ * (stocké dans le contenu : `icon: "route"`). Rendu statique côté serveur,
+ * pas de JS client envoyé.
+ *
+ * Si une icône inconnue est demandée, on affiche un span data-missing pour
+ * le repérer en QA sans casser le rendu.
+ */
+import {
+  // Solutions
+  Route,
+  Leaf,
+  ClipboardCheck,
+  HeartPulse,
+  // AI Products
+  Bot,
+  MessageSquareText,
+  FileSearch,
+  Network,
+  // Templates
+  FileText,
+  ShieldCheck,
+  LockKeyhole,
+  Settings2,
+  // Features
+  ClipboardList,
+  GitBranch,
+  Gauge,
+  FileOutput,
+  Building2,
+  Layers,
+  Milestone,
+  ListChecks,
+  Bell,
+  FolderOpen,
+  History,
+  Package,
+  // UI
+  ArrowRight,
+  ArrowLeft,
+  ChevronRight,
+  ChevronDown,
+  Menu,
+  X,
+  ShoppingCart,
+  ExternalLink,
+  Mail,
+  Send,
+  Check,
+  Plus,
+  Minus,
+  Trash2,
+  Globe,
+  Sparkles,
+  Wrench,
+  Cog,
+  type LucideIcon,
+} from 'lucide-react';
+
+const map: Record<string, LucideIcon> = {
+  route: Route,
+  leaf: Leaf,
+  'clipboard-check': ClipboardCheck,
+  'heart-pulse': HeartPulse,
+  bot: Bot,
+  'message-square-text': MessageSquareText,
+  'file-search': FileSearch,
+  network: Network,
+  'file-text': FileText,
+  'shield-check': ShieldCheck,
+  'lock-keyhole': LockKeyhole,
+  'settings-2': Settings2,
+  'clipboard-list': ClipboardList,
+  'git-branch': GitBranch,
+  gauge: Gauge,
+  'file-output': FileOutput,
+  'building-2': Building2,
+  layers: Layers,
+  milestone: Milestone,
+  'list-checks': ListChecks,
+  bell: Bell,
+  'folder-open': FolderOpen,
+  history: History,
+  package: Package,
+  'arrow-right': ArrowRight,
+  'arrow-left': ArrowLeft,
+  'chevron-right': ChevronRight,
+  'chevron-down': ChevronDown,
+  menu: Menu,
+  x: X,
+  'shopping-cart': ShoppingCart,
+  'external-link': ExternalLink,
+  mail: Mail,
+  send: Send,
+  check: Check,
+  plus: Plus,
+  minus: Minus,
+  'trash-2': Trash2,
+  globe: Globe,
+  sparkles: Sparkles,
+  wrench: Wrench,
+  cog: Cog,
+};
+
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+  'aria-label'?: string;
+  strokeWidth?: number;
+}
+
+const {
+  name,
+  size = 20,
+  class: className,
+  'aria-label': ariaLabel,
+  strokeWidth = 1.75,
+} = Astro.props;
+
+const Comp = map[name];
+const ariaProps = ariaLabel
+  ? { 'aria-label': ariaLabel, role: 'img' }
+  : { 'aria-hidden': 'true' as const };
+---
+
+{
+  Comp ? (
+    <Comp
+      size={size}
+      strokeWidth={strokeWidth}
+      className={className}
+      {...ariaProps}
+    />
+  ) : (
+    <span data-missing-icon={name} class={className} aria-hidden="true" />
+  )
+}

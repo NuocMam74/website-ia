@@ -1,0 +1,6 @@
+{
+  "id": "tpl-payment",
+  "question": "Comment se passe le paiement d'un template ?",
+  "answer": "Le paiement s'effectue via Stripe (carte bancaire). Aucune donnée carte ne transite par notre site. Vous recevez immédiatement votre facture par email ainsi qu'un lien de téléchargement sécurisé et expirant.",
+  "family": "templates"
+}

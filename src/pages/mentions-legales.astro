@@ -1,0 +1,57 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import LegalNotice from '~/components/ui/LegalNotice.astro';
+import { t, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+---
+
+<BaseLayout
+  lang={lang}
+  path="/mentions-legales"
+  title={lang === 'fr' ? 'Mentions légales' : 'Legal notice'}
+  description={lang === 'fr'
+    ? 'Mentions légales du site et informations sur l’éditeur.'
+    : 'Legal notice and information about the publisher.'}
+  noindex
+>
+  <Hero variant="page" title={lang === 'fr' ? 'Mentions légales' : 'Legal notice'} />
+  <Section>
+    <div class="max-w-3xl prose prose-ink text-base text-ink-200 leading-relaxed [&>h2]:text-h3 [&>h2]:font-medium [&>h2]:text-ink-50 [&>h2]:mt-8 [&>h2]:mb-3 [&>p]:mb-4">
+      <LegalNotice lang={lang} />
+
+      <h2>{lang === 'fr' ? 'Éditeur du site' : 'Publisher'}</h2>
+      <p>
+        {lang === 'fr' ? 'Société : ' : 'Company: '}
+        <strong>[Raison sociale]</strong> — [Forme juridique] au capital de [montant] €<br />
+        {lang === 'fr' ? 'Siège social : ' : 'Registered office: '} [adresse complète]<br />
+        SIREN : [numéro] — RCS [ville]<br />
+        {lang === 'fr' ? 'N° TVA intracommunautaire : ' : 'EU VAT number: '} [FRxx…]<br />
+        {lang === 'fr' ? 'Directeur de la publication : ' : 'Publishing director: '} [nom]<br />
+        Email : contact@example.com
+      </p>
+
+      <h2>{lang === 'fr' ? 'Hébergeur' : 'Hosting'}</h2>
+      <p>
+        Cloudflare, Inc. — 101 Townsend St, San Francisco, CA 94107, USA.<br />
+        cloudflare.com
+      </p>
+
+      <h2>{lang === 'fr' ? 'Propriété intellectuelle' : 'Intellectual property'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'L’ensemble des contenus (textes, visuels, logos, schémas) est protégé par le droit d’auteur. Toute reproduction sans autorisation préalable est interdite.'
+          : 'All content (text, visuals, logos, diagrams) is protected by copyright. Any reproduction without prior authorisation is prohibited.'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Responsabilité' : 'Liability'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Les informations diffusées sur ce site sont fournies à titre indicatif. L’éditeur s’efforce de les maintenir à jour mais ne saurait être tenu responsable d’éventuelles inexactitudes.'
+          : 'Information on this site is provided for guidance. The publisher strives to keep it up to date but cannot be held liable for any inaccuracies.'}
+      </p>
+    </div>
+  </Section>
+</BaseLayout>

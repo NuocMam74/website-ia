@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import CaseStudyCard from '~/components/cards/CaseStudyCard.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const isProd = import.meta.env.PROD;
+
+const cases = (await getCollection('caseStudies', ({ data }) => !isProd || !data.draft)).sort(
+  (a, b) => new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime(),
+);
+---
+
+<BaseLayout
+  lang={lang}
+  path="/references"
+  title={t(lang, 'nav.references')}
+  description={lang === 'fr'
+    ? 'Cas clients et retours d’expérience industriels.'
+    : 'Customer case studies and industrial feedback.'}
+>
+  <Hero
+    variant="page"
+    title={t(lang, 'nav.references')}
+    subtitle={lang === 'fr'
+      ? 'Des projets concrets : challenge, démarche, résultats. Cas anonymisés tant que l’accord client n’est pas publié.'
+      : 'Concrete projects: challenge, approach, results. Anonymised cases until client approval.'}
+  />
+
+  <Section>
+    {cases.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {cases.map((c) => (
+          <CaseStudyCard
+            title={c.data.title}
+            client={c.data.client}
+            sector={c.data.sector}
+            href={localizeUrl(`/references/${c.id}`, lang)}
+            relatedFamily={c.data.relatedFamily}
+            firstResult={c.data.results[0]}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="text-base text-ink-300">
+        {lang === 'fr'
+          ? 'Aucun cas client publié pour le moment.'
+          : 'No case study published yet.'}
+      </p>
+    )}
+  </Section>
+</BaseLayout>

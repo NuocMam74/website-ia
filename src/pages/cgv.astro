@@ -1,0 +1,82 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import LegalNotice from '~/components/ui/LegalNotice.astro';
+import type { Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+---
+
+<BaseLayout
+  lang={lang}
+  path="/cgv"
+  title={lang === 'fr' ? 'Conditions générales de vente' : 'Terms of sale'}
+  description={lang === 'fr'
+    ? 'CGV applicables aux ventes de templates.'
+    : 'Terms applicable to template sales.'}
+  noindex
+>
+  <Hero variant="page" title={lang === 'fr' ? 'Conditions générales de vente' : 'Terms of sale'} />
+  <Section>
+    <div class="max-w-3xl prose prose-ink text-base text-ink-200 leading-relaxed [&>h2]:text-h3 [&>h2]:font-medium [&>h2]:text-ink-50 [&>h2]:mt-8 [&>h2]:mb-3 [&>p]:mb-4 [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:mb-4">
+      <LegalNotice lang={lang} />
+
+      <h2>{lang === 'fr' ? 'Objet' : 'Purpose'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Les présentes CGV régissent la vente, via le site, de templates numériques (modèles de documents, configurations) à des professionnels.'
+          : 'These terms govern the sale, via the site, of digital templates (document models, configurations) to professional customers.'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Prix et paiement' : 'Price and payment'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Les prix sont indiqués en euros, TTC. Le paiement s’effectue exclusivement via Stripe (carte bancaire). La commande est confirmée à réception du paiement.'
+          : 'Prices are in euros, including taxes. Payment is processed exclusively via Stripe (credit card). Orders are confirmed upon receipt of payment.'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Livraison' : 'Delivery'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Les templates sont livrés sous forme de lien de téléchargement sécurisé et expirant, transmis par email immédiatement après la confirmation du paiement.'
+          : 'Templates are delivered via a secure, time-limited download link, sent by email immediately after payment confirmation.'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Licence' : 'License'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Licence mono-entreprise, usage interne. Le template peut être utilisé librement au sein de l’entreprise acheteuse, sur tous ses projets internes. La revente, la mise à disposition publique ou la diffusion en dehors de l’entreprise sont interdites.'
+          : 'Single-company license, internal use. The template may be used freely within the purchasing company, across all internal projects. Resale, public distribution or sharing outside the company is prohibited.'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Droit de rétractation' : 'Right of withdrawal'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'S’agissant de contenus numériques fournis immédiatement et acceptés par le client lors de la commande, le droit de rétractation ne s’applique pas (article L221-28, 13° du Code de la consommation).'
+          : 'For digital content delivered immediately and accepted by the customer at the time of order, the right of withdrawal does not apply (article L221-28, 13° of the French Consumer Code).'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Mises à jour' : 'Updates'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Les corrections mineures relatives à la version achetée sont fournies gratuitement. Les évolutions majeures (changement de version de norme) peuvent faire l’objet d’une mise à jour à tarif préférentiel.'
+          : 'Minor fixes to the purchased version are provided free. Major changes (standard version change) may be offered at a preferential price.'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Responsabilité' : 'Liability'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Les templates sont fournis « en l’état » comme aide structurelle. Ils ne constituent pas un avis juridique ni une garantie de conformité. Leur usage relève de la responsabilité du client.'
+          : 'Templates are provided “as is” as a structural aid. They do not constitute legal advice or a compliance guarantee. Their use is the customer’s responsibility.'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Droit applicable' : 'Applicable law'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Les présentes CGV sont soumises au droit français. Tout litige relève des tribunaux compétents de [ville].'
+          : 'These terms are governed by French law. Any dispute falls under the competent courts of [city].'}
+      </p>
+    </div>
+  </Section>
+</BaseLayout>

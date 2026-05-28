@@ -1,0 +1,37 @@
+---
+import type { Lang } from '~/lib/i18n';
+
+interface Stat {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  title?: string;
+  stats: Stat[];
+  norms?: string[];
+}
+
+const { title, stats, norms = [] } = Astro.props;
+---
+
+<div class="border border-ink-800 rounded-lg bg-ink-900 p-8">
+  {title && (
+    <h2 class="text-h3 font-medium text-ink-50 text-center mb-8">{title}</h2>
+  )}
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    {stats.map((s) => (
+      <div>
+        <div class="text-h1 font-medium text-ink-50">{s.value}</div>
+        <div class="text-xs text-ink-300 mt-1">{s.label}</div>
+      </div>
+    ))}
+  </div>
+
+  {norms.length > 0 && (
+    <div class="mt-8 pt-6 border-t border-ink-800 flex flex-wrap justify-center gap-x-8 gap-y-3 text-small text-ink-500">
+      {norms.map((n) => <span>{n}</span>)}
+    </div>
+  )}
+</div>

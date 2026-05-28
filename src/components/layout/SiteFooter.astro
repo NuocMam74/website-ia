@@ -1,0 +1,144 @@
+---
+import { type Lang, t, localizeUrl } from '~/lib/i18n';
+import Icon from '~/components/ui/Icon.astro';
+import LangSwitcher from './LangSwitcher.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const year = new Date().getFullYear();
+
+const families = [
+  { label: t(lang, 'nav.solutions'), href: localizeUrl('/solutions', lang) },
+  { label: t(lang, 'nav.ia'), href: localizeUrl('/ia', lang) },
+  { label: t(lang, 'nav.templates'), href: localizeUrl('/templates', lang) },
+];
+
+const resources = [
+  { label: t(lang, 'nav.blog'), href: localizeUrl('/blog', lang) },
+  { label: t(lang, 'nav.references'), href: localizeUrl('/references', lang) },
+  { label: t(lang, 'nav.glossary'), href: localizeUrl('/lexique', lang) },
+  { label: t(lang, 'nav.compare'), href: localizeUrl('/comparateur-templates', lang) },
+  { label: 'FAQ', href: localizeUrl('/faq', lang) },
+];
+
+const company = [
+  { label: t(lang, 'nav.about'), href: localizeUrl('/a-propos', lang) },
+  { label: t(lang, 'nav.team'), href: localizeUrl('/equipe', lang) },
+  { label: t(lang, 'nav.method'), href: localizeUrl('/methodologie', lang) },
+  { label: t(lang, 'nav.partners'), href: localizeUrl('/partenaires', lang) },
+  { label: t(lang, 'nav.contact'), href: localizeUrl('/contact', lang) },
+];
+
+const legal = [
+  {
+    label: lang === 'fr' ? 'Mentions légales' : 'Legal notice',
+    href: localizeUrl('/mentions-legales', lang),
+  },
+  {
+    label: lang === 'fr' ? 'Confidentialité' : 'Privacy',
+    href: localizeUrl('/confidentialite', lang),
+  },
+  {
+    label: lang === 'fr' ? 'CGV' : 'Terms of sale',
+    href: localizeUrl('/cgv', lang),
+  },
+  {
+    label: lang === 'fr' ? 'Cookies' : 'Cookies',
+    href: localizeUrl('/cookies', lang),
+  },
+];
+---
+
+<footer class="border-t border-ink-800 bg-ink-900 mt-24">
+  <div class="mx-auto max-w-[1200px] px-6 py-12">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div>
+        <h2 class="text-small font-medium text-ink-50 mb-3">{t(lang, 'footer.col.families')}</h2>
+        <ul class="space-y-2 text-small text-ink-300">
+          {families.map((f) => (
+            <li><a href={f.href} class="hover:text-ink-50 transition-colors">{f.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-small font-medium text-ink-50 mb-3">{t(lang, 'footer.col.resources')}</h2>
+        <ul class="space-y-2 text-small text-ink-300">
+          {resources.map((r) => (
+            <li><a href={r.href} class="hover:text-ink-50 transition-colors">{r.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-small font-medium text-ink-50 mb-3">{t(lang, 'footer.col.company')}</h2>
+        <ul class="space-y-2 text-small text-ink-300">
+          {company.map((c) => (
+            <li><a href={c.href} class="hover:text-ink-50 transition-colors">{c.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-small font-medium text-ink-50 mb-3">{t(lang, 'footer.col.legal')}</h2>
+        <ul class="space-y-2 text-small text-ink-300">
+          {legal.map((l) => (
+            <li><a href={l.href} class="hover:text-ink-50 transition-colors">{l.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-10 pt-6 border-t border-ink-800 grid md:grid-cols-2 gap-6 items-start">
+      <div>
+        <h2 class="text-small font-medium text-ink-50 mb-2">{t(lang, 'footer.newsletter.title')}</h2>
+        <form
+          action={localizeUrl('/api/newsletter', lang)}
+          method="post"
+          class="flex gap-2 max-w-md"
+        >
+          <label for="newsletter-email" class="sr-only">{t(lang, 'footer.newsletter.placeholder')}</label>
+          <input
+            id="newsletter-email"
+            type="email"
+            name="email"
+            required
+            placeholder={t(lang, 'footer.newsletter.placeholder')}
+            class="flex-1 px-3 py-2 text-small border border-ink-700 rounded-md focus:border-teal-400 focus:outline-none bg-ink-900"
+          />
+          <button
+            type="submit"
+            class="px-4 py-2 text-small font-medium text-ink-950 bg-ink-50 hover:bg-ink-100 rounded-md transition-colors"
+          >
+            {t(lang, 'footer.newsletter.cta')}
+          </button>
+        </form>
+        <p class="text-xs text-ink-300 mt-2">{t(lang, 'footer.newsletter.consent')}</p>
+      </div>
+
+      <div class="md:text-right space-y-3 text-small text-ink-300">
+        <a
+          href="https://example.com/creative-ai"
+          target="_blank"
+          rel="noopener nofollow"
+          class="inline-flex items-center gap-1.5 hover:text-ink-50 transition-colors"
+        >
+          {t(lang, 'footer.creative.label')}
+        </a>
+        <div>
+          <LangSwitcher lang={lang} path="/" />
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-10 pt-6 border-t border-ink-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-ink-500">
+      <p>
+        © {year} {t(lang, 'brand')}. {t(lang, 'footer.rights')}
+      </p>
+      <p class="italic">{t(lang, 'footer.tagline')}</p>
+    </div>
+  </div>
+</footer>

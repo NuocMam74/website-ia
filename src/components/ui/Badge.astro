@@ -1,0 +1,36 @@
+---
+import type { Family } from '~/content.config';
+
+interface Props {
+  family?: Family;
+  variant?: 'solid' | 'subtle';
+  class?: string;
+}
+
+const { family, variant = 'subtle', class: className = '' } = Astro.props;
+
+const familyClass: Record<Family, { subtle: string; solid: string }> = {
+  solutions: {
+    subtle: 'bg-teal-500/10 text-teal-300',
+    solid: 'bg-teal-400 text-white',
+  },
+  ia: {
+    subtle: 'bg-coral-500/10 text-coral-300',
+    solid: 'bg-coral-400 text-white',
+  },
+  templates: {
+    subtle: 'bg-amber-500/10 text-amber-300',
+    solid: 'bg-amber-400 text-white',
+  },
+};
+
+const colorClass = family
+  ? familyClass[family][variant]
+  : variant === 'solid'
+    ? 'bg-ink-50 text-ink-950'
+    : 'bg-ink-800 text-ink-100';
+---
+
+<span class:list={['inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium', colorClass, className]}>
+  <slot />
+</span>

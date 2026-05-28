@@ -1,0 +1,153 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import RelatedGrid from '~/components/sections/RelatedGrid.astro';
+import OfferCard from '~/components/cards/OfferCard.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import Chip from '~/components/ui/Chip.astro';
+import {
+  softwareApplicationLd,
+  breadcrumbLd,
+  canonicalUrl,
+} from '~/lib/seo';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+export async function getStaticPaths() {
+  const products = await getCollection('aiProducts');
+  return products.map((p) => ({
+    params: { slug: p.id },
+    props: { entry: p },
+  }));
+}
+
+const { entry } = Astro.props;
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const { Content } = await render(entry);
+
+const all = await getCollection('aiProducts');
+const related = (entry.data.relatedSlugs ?? [])
+  .map((slug) => all.find((p) => p.id === slug))
+  .filter((x): x is NonNullable<typeof x> => Boolean(x));
+
+const fallbackRelated =
+  related.length > 0
+    ? []
+    : all.filter((p) => p.id !== entry.id).slice(0, 2);
+
+const relatedFinal = related.length > 0 ? related : fallbackRelated;
+
+const url = canonicalUrl(`/ia/${entry.id}`, lang);
+
+const jsonLd: object[] = [
+  softwareApplicationLd({
+    name: entry.data.name,
+    description: entry.data.summary,
+    url,
+    category: 'BusinessApplication',
+  }),
+  breadcrumbLd([
+    { name: t(lang, 'brand'), url: canonicalUrl('/', lang) },
+    { name: t(lang, 'family.ia'), url: canonicalUrl('/ia', lang) },
+    { name: entry.data.name, url },
+  ]),
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path={`/ia/${entry.id}`}
+  title={`${entry.data.name} — ${entry.data.tagline}`}
+  description={entry.data.summary}
+  jsonLd={jsonLd}
+>
+  <Hero
+    variant="page"
+    family="ia"
+    kicker={t(lang, 'family.ia')}
+    title={entry.data.name}
+    subtitle={entry.data.tagline}
+    ctaLabel={t(lang, 'cta.demo')}
+    ctaHref={localizeUrl(`/contact?type=demo&product=${entry.id}`, lang)}
+    secondaryCtaLabel={t(lang, 'cta.contact')}
+    secondaryCtaHref={localizeUrl(`/contact?product=${entry.id}`, lang)}
+  />
+
+  <Section>
+    <div class="flex flex-wrap gap-2 mb-8">
+      <Chip>{t(lang, `capability.${entry.data.capability}`)}</Chip>
+    </div>
+    <p class="text-h4 text-ink-200 leading-relaxed max-w-3xl">{entry.data.summary}</p>
+  </Section>
+
+  <Section title={t(lang, 'detail.howItWorks')} family="ia" surface="muted">
+    <ol class="grid md:grid-cols-3 gap-6 list-none p-0">
+      {entry.data.howItWorks.map((step) => (
+        <li class="relative bg-ink-900 border border-ink-800 rounded-lg p-6">
+          <div class="absolute -top-3 left-6 w-7 h-7 rounded-full bg-coral-400 text-white flex items-center justify-center text-small font-medium">
+            {step.step}
+          </div>
+          <h3 class="mt-2 text-h4 font-medium text-ink-50 mb-2">{step.title}</h3>
+          <p class="text-small text-ink-300 leading-relaxed">{step.desc}</p>
+        </li>
+      ))}
+    </ol>
+  </Section>
+
+  <Section title={t(lang, 'detail.useCases')}>
+    <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {entry.data.useCases.map((uc) => (
+        <li class="flex items-start gap-3 p-4 border border-ink-800 rounded-md bg-ink-900">
+          <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-coral-400 shrink-0"></span>
+          <span class="text-base text-ink-100">{uc}</span>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  {entry.data.integrations && entry.data.integrations.length > 0 && (
+    <Section title={t(lang, 'detail.integrations')} surface="muted">
+      <div class="flex flex-wrap gap-3">
+        {entry.data.integrations.map((i) => (
+          <span class="inline-flex items-center px-4 py-2 border border-ink-700 rounded-md text-small text-ink-100 bg-ink-900">
+            {i}
+          </span>
+        ))}
+      </div>
+    </Section>
+  )}
+
+  <Section>
+    <div class="prose prose-ink max-w-3xl text-base text-ink-200 leading-relaxed">
+      <Content />
+    </div>
+  </Section>
+
+  {relatedFinal.length > 0 && (
+    <RelatedGrid title={t(lang, 'detail.related')}>
+      {relatedFinal.map((p) => (
+        <OfferCard
+          variant="ai"
+          name={p.data.name}
+          tagline={p.data.tagline}
+          icon={p.data.icon}
+          tags={[t(lang, `capability.${p.data.capability}`)]}
+          href={localizeUrl(`/ia/${p.id}`, lang)}
+        />
+      ))}
+    </RelatedGrid>
+  )}
+
+  <CTASection
+    title={lang === 'fr' ? 'Voir une démo en conditions réelles' : 'See a real-world demo'}
+    subtitle={lang === 'fr'
+      ? '30 à 45 minutes en visio, adaptées à votre contexte métier.'
+      : '30–45 minutes online, tailored to your business context.'}
+    family="ia"
+    ctaLabel={t(lang, 'cta.demo')}
+    ctaHref={localizeUrl(`/contact?type=demo&product=${entry.id}`, lang)}
+    secondaryCtaLabel={t(lang, 'cta.contact')}
+    secondaryCtaHref={localizeUrl('/contact', lang)}
+  />
+</BaseLayout>

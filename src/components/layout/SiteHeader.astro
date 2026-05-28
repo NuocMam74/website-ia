@@ -1,0 +1,91 @@
+---
+import { type Lang, t, localizeUrl, langHome } from '~/lib/i18n';
+import LangSwitcher from './LangSwitcher.astro';
+import Icon from '~/components/ui/Icon.astro';
+import CartBadge from '~/components/islands/CartBadge.tsx';
+import MobileMenu from '~/components/islands/MobileMenu.tsx';
+
+interface Props {
+  lang: Lang;
+  path: string;
+}
+
+const { lang, path } = Astro.props;
+
+const navItems = [
+  { label: t(lang, 'nav.solutions'), href: localizeUrl('/solutions', lang) },
+  { label: t(lang, 'nav.ia'), href: localizeUrl('/ia', lang) },
+  { label: t(lang, 'nav.templates'), href: localizeUrl('/templates', lang) },
+  { label: t(lang, 'nav.references'), href: localizeUrl('/references', lang) },
+  { label: t(lang, 'nav.blog'), href: localizeUrl('/blog', lang) },
+  { label: t(lang, 'nav.about'), href: localizeUrl('/a-propos', lang) },
+];
+
+function isActive(href: string): boolean {
+  const localizedPath = localizeUrl(path, lang);
+  if (href === langHome(lang)) return localizedPath === href;
+  return localizedPath === href || localizedPath.startsWith(href + '/');
+}
+---
+
+<header class="sticky top-0 z-40 glass border-b border-ink-800/80" transition:persist>
+  <div class="mx-auto max-w-[1200px] px-6 h-16 flex items-center justify-between gap-4">
+    <a
+      href={langHome(lang)}
+      class="group flex items-center gap-2.5 text-ink-50 font-semibold text-base tracking-tight"
+      aria-label={t(lang, 'brand')}
+    >
+      <span class="relative inline-flex w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 via-coral-400 to-amber-400 items-center justify-center text-ink-950 transition-transform group-hover:scale-105" aria-hidden="true">
+        <Icon name="sparkles" size={16} />
+        <span class="absolute inset-0 rounded-lg bg-gradient-to-br from-teal-400 via-coral-400 to-amber-400 opacity-50 blur-md -z-10"></span>
+      </span>
+      <span>{t(lang, 'brand')}</span>
+    </a>
+
+    <nav aria-label="Principale" class="hidden lg:flex items-center gap-6 text-sm">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            'text-ink-300 hover:text-ink-50 transition-colors py-2',
+            isActive(item.href) && 'text-ink-50',
+          ]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a
+        href={localizeUrl('/contact', lang)}
+        class="hidden md:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-ink-950 bg-ink-50 hover:bg-ink-100 rounded-md transition-colors"
+      >
+        {t(lang, 'nav.contact')}
+        <Icon name="arrow-right" size={14} />
+      </a>
+
+      <a
+        href={localizeUrl('/panier', lang)}
+        class="relative inline-flex items-center justify-center w-10 h-10 rounded-md text-ink-300 hover:text-ink-50 hover:bg-ink-800 transition-colors"
+        aria-label={t(lang, 'nav.cart')}
+      >
+        <Icon name="shopping-cart" size={18} aria-label={t(lang, 'nav.cart')} />
+        <CartBadge client:load />
+      </a>
+
+      <LangSwitcher lang={lang} path={path} />
+
+      <MobileMenu
+        client:idle
+        lang={lang}
+        items={navItems}
+        contactHref={localizeUrl('/contact', lang)}
+        contactLabel={t(lang, 'nav.contact')}
+        openLabel={t(lang, 'nav.menu')}
+        closeLabel={t(lang, 'nav.close')}
+      />
+    </div>
+  </div>
+</header>

@@ -1,0 +1,113 @@
+---
+import Button from '~/components/ui/Button.astro';
+import type { Family } from '~/content.config';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaHref?: string;
+  family?: Family;
+  /** `home` = grande version flagship, `page` = hero de page intérieure. */
+  variant?: 'home' | 'page';
+  /** Kicker au-dessus du titre (nom de famille, etc.). */
+  kicker?: string;
+  /** Désactive le motif blueprint si false (utile pour les pages très denses). */
+  pattern?: boolean;
+}
+
+const {
+  title,
+  subtitle,
+  ctaLabel,
+  ctaHref,
+  secondaryCtaLabel,
+  secondaryCtaHref,
+  family,
+  variant = 'page',
+  kicker,
+  pattern = true,
+} = Astro.props;
+
+const titleClass =
+  variant === 'home'
+    ? 'text-display md:text-hero'
+    : 'text-h1 md:text-display';
+
+const kickerDotClass: Record<Family, string> = {
+  solutions: 'bg-teal-400 shadow-[0_0_16px_2px_rgba(0,217,255,0.6)]',
+  ia: 'bg-coral-400 shadow-[0_0_16px_2px_rgba(255,61,127,0.6)]',
+  templates: 'bg-amber-400 shadow-[0_0_16px_2px_rgba(255,176,0,0.6)]',
+};
+const kickerTextClass: Record<Family, string> = {
+  solutions: 'text-teal-200',
+  ia: 'text-coral-200',
+  templates: 'text-amber-200',
+};
+
+const meshClass: Record<Family, string> = {
+  solutions:
+    'bg-[radial-gradient(at_20%_30%,rgba(0,217,255,0.18),transparent_45%),radial-gradient(at_85%_10%,rgba(0,217,255,0.10),transparent_45%)]',
+  ia:
+    'bg-[radial-gradient(at_25%_20%,rgba(255,61,127,0.18),transparent_45%),radial-gradient(at_80%_50%,rgba(255,61,127,0.10),transparent_45%)]',
+  templates:
+    'bg-[radial-gradient(at_20%_30%,rgba(255,176,0,0.16),transparent_45%),radial-gradient(at_80%_10%,rgba(255,176,0,0.10),transparent_45%)]',
+};
+const defaultMesh =
+  'bg-[radial-gradient(at_20%_20%,rgba(0,217,255,0.14),transparent_45%),radial-gradient(at_80%_30%,rgba(255,61,127,0.10),transparent_45%),radial-gradient(at_60%_80%,rgba(255,176,0,0.08),transparent_45%)]';
+---
+
+<section class="relative overflow-hidden">
+  {/* Couche 1 : gradient mesh diffus */}
+  <div class:list={['absolute inset-0 pointer-events-none', family ? meshClass[family] : defaultMesh]} aria-hidden="true"></div>
+
+  {/* Couche 2 : grille blueprint subtile */}
+  {pattern && (
+    <div class="absolute inset-0 bg-blueprint opacity-60 [mask-image:linear-gradient(to_bottom,#000_0%,#000_60%,transparent_100%)]" aria-hidden="true"></div>
+  )}
+
+  {/* Contenu */}
+  <div class="relative mx-auto max-w-[1200px] px-6 py-20 md:py-28">
+    {kicker && (
+      <p class:list={['reveal inline-flex items-center gap-2 text-small font-medium uppercase tracking-wider mb-5', family && kickerTextClass[family], !family && 'text-ink-300']} style="letter-spacing: 0.1em">
+        <span class:list={['inline-block w-1.5 h-1.5 rounded-full', family && kickerDotClass[family], !family && 'bg-ink-400']} aria-hidden="true"></span>
+        {kicker}
+      </p>
+    )}
+
+    <h1
+      class:list={[titleClass, 'reveal font-semibold tracking-tight max-w-4xl leading-[1.05]']}
+      style="--reveal-delay: 60ms"
+    >
+      {title}
+    </h1>
+
+    {subtitle && (
+      <p
+        class="reveal mt-6 text-base md:text-h3 text-ink-200 max-w-2xl leading-relaxed font-light"
+        style="--reveal-delay: 140ms"
+      >
+        {subtitle}
+      </p>
+    )}
+
+    {(ctaLabel && ctaHref) || (secondaryCtaLabel && secondaryCtaHref) ? (
+      <div class="reveal mt-10 flex flex-wrap gap-3" style="--reveal-delay: 220ms">
+        {ctaLabel && ctaHref && (
+          <Button href={ctaHref} variant="primary" family={family} icon="arrow-right" size="lg">
+            {ctaLabel}
+          </Button>
+        )}
+        {secondaryCtaLabel && secondaryCtaHref && (
+          <Button href={secondaryCtaHref} variant="secondary" size="lg">
+            {secondaryCtaLabel}
+          </Button>
+        )}
+      </div>
+    ) : null}
+
+    <slot />
+  </div>
+</section>

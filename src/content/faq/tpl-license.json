@@ -1,0 +1,6 @@
+{
+  "id": "tpl-license",
+  "question": "Quelle est la licence des templates ?",
+  "answer": "Licence mono-entreprise, usage interne. Le template peut être utilisé librement au sein de votre organisation, sur autant de projets que nécessaire, mais ne peut pas être revendu ou diffusé en dehors.",
+  "family": "templates"
+}

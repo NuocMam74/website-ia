@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import FAQAccordion from '~/components/sections/FAQAccordion.astro';
+import { faqLd } from '~/lib/seo';
+import { t, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const allFaq = await getCollection('faq');
+
+const groups = (['general', 'solutions', 'ia', 'templates'] as const).map((family) => ({
+  family,
+  label:
+    family === 'general'
+      ? lang === 'fr' ? 'Général' : 'General'
+      : t(lang, `family.${family}`),
+  items: allFaq.filter((f) => f.data.family === family).map((f) => f.data),
+}));
+---
+
+<BaseLayout
+  lang={lang}
+  path="/faq"
+  title={lang === 'fr' ? 'Questions fréquentes' : 'Frequently asked questions'}
+  description={lang === 'fr'
+    ? 'Vos questions sur les templates, l’IA, les solutions et la commande.'
+    : 'Your questions about templates, AI, solutions and ordering.'}
+  jsonLd={faqLd(allFaq.map((f) => ({ question: f.data.question, answer: f.data.answer })))}
+>
+  <Hero
+    variant="page"
+    title={lang === 'fr' ? 'Questions fréquentes' : 'Frequently asked questions'}
+    subtitle={lang === 'fr'
+      ? 'Une question rapide ? Vous trouverez probablement la réponse ici.'
+      : 'Quick question? You’ll likely find the answer here.'}
+  />
+
+  <Section>
+    <div class="space-y-12 max-w-3xl">
+      {groups.map((g) =>
+        g.items.length > 0 ? (
+          <div>
+            <h2 class="text-h2 font-medium text-ink-50 mb-4">{g.label}</h2>
+            <FAQAccordion items={g.items} />
+          </div>
+        ) : null,
+      )}
+    </div>
+  </Section>
+</BaseLayout>

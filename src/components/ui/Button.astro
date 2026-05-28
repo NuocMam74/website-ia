@@ -1,0 +1,86 @@
+---
+import Icon from './Icon.astro';
+import type { Family } from '~/content.config';
+
+interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  family?: Family;
+  icon?: string;
+  iconPosition?: 'leading' | 'trailing';
+  size?: 'sm' | 'md' | 'lg';
+  fullWidth?: boolean;
+  external?: boolean;
+  class?: string;
+  'aria-label'?: string;
+  disabled?: boolean;
+}
+
+const {
+  variant = 'primary',
+  href,
+  type = 'button',
+  family,
+  icon,
+  iconPosition = 'trailing',
+  size = 'md',
+  fullWidth = false,
+  external = false,
+  class: className = '',
+  'aria-label': ariaLabel,
+  disabled = false,
+} = Astro.props;
+
+/* Couleur de fond / texte par famille (variant primary uniquement) */
+const familyBg: Record<Family, string> = {
+  solutions: 'bg-teal-400 hover:bg-teal-300 text-ink-950 glow-teal',
+  ia: 'bg-coral-400 hover:bg-coral-300 text-ink-950 glow-coral',
+  templates: 'bg-amber-400 hover:bg-amber-300 text-ink-950 glow-amber',
+};
+
+const variantClass =
+  variant === 'primary'
+    ? family
+      ? familyBg[family]
+      : 'bg-ink-50 hover:bg-ink-100 text-ink-950 shadow-[0_8px_32px_-8px_rgba(255,255,255,0.25)]'
+    : variant === 'secondary'
+      ? 'bg-ink-900/60 backdrop-blur border border-ink-700 hover:border-ink-500 hover:bg-ink-800 text-ink-50'
+      : 'bg-transparent hover:bg-ink-800/60 text-ink-50';
+
+const sizeClass =
+  size === 'sm'
+    ? 'px-3 py-1.5 text-small gap-1.5'
+    : size === 'lg'
+      ? 'px-6 py-3 text-base gap-2'
+      : 'px-4 py-2 text-small gap-1.5';
+
+const baseClass =
+  'inline-flex items-center justify-center font-medium rounded-md transition-all duration-200 ease-out hover:-translate-y-px disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0';
+
+const widthClass = fullWidth ? 'w-full' : '';
+
+const composed = [baseClass, variantClass, sizeClass, widthClass, className]
+  .filter(Boolean)
+  .join(' ');
+
+const iconSize = size === 'lg' ? 18 : size === 'sm' ? 14 : 16;
+const externalAttrs = external
+  ? { target: '_blank', rel: 'noopener noreferrer' }
+  : {};
+---
+
+{href ? (
+  <a href={href} class={composed} aria-label={ariaLabel} {...externalAttrs}>
+    {icon && iconPosition === 'leading' && <Icon name={icon} size={iconSize} />}
+    <slot />
+    {icon && iconPosition === 'trailing' && <Icon name={icon} size={iconSize} />}
+    {external && <Icon name="external-link" size={iconSize - 2} />}
+  </a>
+) : (
+  <button type={type} class={composed} aria-label={ariaLabel} disabled={disabled}>
+    {icon && iconPosition === 'leading' && <Icon name={icon} size={iconSize} />}
+    <slot />
+    {icon && iconPosition === 'trailing' && <Icon name={icon} size={iconSize} />}
+  </button>
+)}

@@ -1,0 +1,7 @@
+{
+  "name": "[Réseau d'intégrateurs partenaires]",
+  "category": "integrator",
+  "description": "Cabinets et intégrateurs partenaires en France et en Europe, pour les déploiements multi-sites et les projets multi-équipes.",
+  "icon": "network",
+  "order": 4
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Config Polarion CL3",
+  "norm": "aspice",
+  "icon": "settings-2",
+  "summary": "Paramétrage Polarion prêt à importer pour un template ASPICE.",
+  "longDescription": "Configuration Polarion complète (types de work items, rôles de liens, workflows) prête à importer pour un projet ASPICE CL3. Inclut un guide d'import pas à pas.",
+  "contents": [
+    "workitem-link-role-enum.xml",
+    "Types de work items",
+    "Workflows configurés",
+    "Guide d'import (PDF)"
+  ],
+  "fileFormat": ".xml + guide .pdf",
+  "priceEUR": 290,
+  "order": 4,
+  "cta": "buy"
+}

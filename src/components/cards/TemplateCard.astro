@@ -1,0 +1,55 @@
+---
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import AddToCartButton from '~/components/islands/AddToCartButton.tsx';
+import { type Lang, t, formatPrice } from '~/lib/i18n';
+
+interface Props {
+  slug: string;
+  name: string;
+  summary: string;
+  icon: string;
+  priceEUR: number;
+  href: string;
+  lang: Lang;
+}
+
+const { slug, name, summary, icon, priceEUR, href, lang } = Astro.props;
+---
+
+<Card accent="templates" interactive spotlight class="h-full group">
+  <div class="p-6 h-full flex flex-col">
+    <div class="flex items-start justify-between mb-5">
+      <div class="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-gradient-to-br from-amber-400/30 to-amber-600/20 text-amber-200 ring-1 ring-amber-400/30">
+        <Icon name={icon} size={22} />
+      </div>
+      <a
+        href={href}
+        class="opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0 text-amber-300"
+        aria-label={`Voir le détail de ${name}`}
+      >
+        <Icon name="arrow-right" size={18} />
+      </a>
+    </div>
+
+    <h3 class="text-h3 font-semibold text-ink-50 mb-1.5 tracking-tight">
+      <a href={href} class="hover:text-amber-300 transition-colors">{name}</a>
+    </h3>
+    <p class="text-small text-ink-300 leading-relaxed flex-1">{summary}</p>
+
+    <div class="mt-6 pt-5 border-t border-ink-800 flex items-end justify-between gap-3">
+      <div>
+        <div class="text-xs text-ink-500 uppercase tracking-wider mb-0.5">{t(lang, 'template.priceLabel')}</div>
+        <div class="text-h2 font-semibold text-amber-200">{formatPrice(priceEUR, lang)}</div>
+      </div>
+      <AddToCartButton
+        client:load
+        slug={slug}
+        name={name}
+        priceEUR={priceEUR}
+        labelAdd={t(lang, 'cta.addToCart')}
+        labelAdded={lang === 'fr' ? 'Ajouté' : 'Added'}
+      />
+    </div>
+  </div>
+</Card>

@@ -1,0 +1,25 @@
+name = "site-ingenierie-ia"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"
+
+# Variables d'environnement par environnement (à définir dans le dashboard
+# Cloudflare ou via `wrangler pages secret put NAME`).
+# NE JAMAIS commit les valeurs réelles.
+#
+# Secrets attendus :
+#   - STRIPE_SECRET_KEY       (sk_live_… / sk_test_…)
+#   - STRIPE_WEBHOOK_SECRET   (whsec_…)
+#   - RESEND_API_KEY          (re_…)
+#   - SITE_URL                (https://…)
+#   - CONTACT_TO_EMAIL        (contact@…)
+#
+# Variables publiques (build-time) :
+[vars]
+# SITE_URL = "https://example.com"
+
+# KV namespace pour les sessions Astro (cf. warning de l'adapter Cloudflare).
+# À créer via : `wrangler kv namespace create SESSION`
+# [[kv_namespaces]]
+# binding = "SESSION"
+# id = "..."

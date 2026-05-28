@@ -1,0 +1,139 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import OfferCard from '~/components/cards/OfferCard.astro';
+import EmptyState from '~/components/ui/EmptyState.astro';
+import LayeredFilters from '~/components/islands/LayeredFilters.tsx';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+import { CAPABILITIES } from '~/content.config';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const products = (await getCollection('aiProducts')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+/* Mapping use cases → tags normalisés (utilisés pour le sous-filtre) */
+const useCaseTags: Record<string, string> = {
+  // Knowledge / docs
+  'Veille normative': 'knowledge',
+  'Capitalisation': 'knowledge',
+  'Analyse documentaire': 'knowledge',
+  'Recherche de procédure': 'knowledge',
+  'Support interne': 'support',
+  'Onboarding': 'support',
+  // Automation
+  'Génération de dossiers': 'automation',
+  'Automatisation de process': 'automation',
+  'Contrôles croisés': 'automation',
+  // Création
+  'Rédaction de livrables': 'creation',
+  'Préparation de revues': 'creation',
+  // Compliance (cas spécifique)
+  'Analyse de conformité': 'compliance',
+};
+
+function normalizeUseCases(useCases: string[]): string[] {
+  return Array.from(new Set(useCases.map((u) => useCaseTags[u] ?? 'automation')));
+}
+
+const primaryOptions = [
+  { value: 'all', label: t(lang, 'capability.all') },
+  ...CAPABILITIES.map((c) => ({
+    value: c,
+    label: t(lang, `capability.${c}`),
+  })),
+];
+
+/* Pour chaque cas d'usage normalisé, on calcule les capacités où il est
+ * présent → permet au sous-filtre de se restreindre dynamiquement. */
+const useCaseCapabilityMap = new Map<string, Set<string>>();
+products.forEach((p) => {
+  const tags = normalizeUseCases(p.data.useCases);
+  tags.forEach((tag) => {
+    const set = useCaseCapabilityMap.get(tag) ?? new Set<string>();
+    set.add(p.data.capability);
+    useCaseCapabilityMap.set(tag, set);
+  });
+});
+
+const useCaseKeys = ['knowledge', 'automation', 'analytics', 'support', 'compliance', 'creation'];
+const secondaryOptions = [
+  { value: 'all', label: t(lang, 'usecase.all') },
+  ...useCaseKeys
+    .filter((k) => useCaseCapabilityMap.has(k))
+    .map((k) => ({
+      value: k,
+      label: t(lang, `usecase.${k}`),
+      domains: Array.from(useCaseCapabilityMap.get(k) ?? []),
+    })),
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/ia"
+  title={`${t(lang, 'family.ia')} — ${t(lang, 'ia.hero.title')}`}
+  description={lang === 'fr'
+    ? 'Agents IA, chatbots sourcés, RAG documentaire, orchestration multi-agents — pour tous secteurs.'
+    : 'AI agents, grounded chatbots, document RAG, multi-agent orchestration — for any sector.'}
+>
+  <Hero
+    variant="page"
+    family="ia"
+    kicker={t(lang, 'family.ia')}
+    title={lang === 'fr' ? 'L’IA au cœur de vos produits métier' : 'AI at the core of your business products'}
+    subtitle={lang === 'fr'
+      ? 'Agents, RAG, multi-agents : nous concevons et déployons les briques IA qui rendent vos applications réellement intelligentes — pour tous métiers et secteurs.'
+      : 'Agents, RAG, multi-agents: we design and deploy the AI components that make your applications genuinely smart — for every function and sector.'}
+    ctaLabel={t(lang, 'cta.demo')}
+    ctaHref={localizeUrl('/contact?type=demo', lang)}
+    secondaryCtaLabel={t(lang, 'cta.contact')}
+    secondaryCtaHref={localizeUrl('/contact', lang)}
+  />
+
+  <Section>
+    <div class="mb-10">
+      <LayeredFilters
+        client:idle
+        primaryLabel={t(lang, 'ia.filter.label')}
+        primaryOptions={primaryOptions}
+        secondaryLabel={t(lang, 'usecase.label')}
+        secondaryOptions={secondaryOptions}
+        targetSelector="[data-filter-card='ai']"
+        emptySelector="#ia-empty"
+        accent="coral"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {products.map((p) => (
+        <div
+          data-filter-card="ai"
+          data-primary-value={p.data.capability}
+          data-secondary-value={normalizeUseCases(p.data.useCases).join(',')}
+        >
+          <OfferCard
+            variant="ai"
+            name={p.data.name}
+            tagline={p.data.tagline}
+            icon={p.data.icon}
+            tags={[t(lang, `capability.${p.data.capability}`)]}
+            href={localizeUrl(`/ia/${p.id}`, lang)}
+          />
+        </div>
+      ))}
+    </div>
+
+    <div id="ia-empty" style="display: none">
+      <EmptyState
+        title={t(lang, 'filter.empty.title')}
+        message={t(lang, 'filter.empty.message')}
+        ctaLabel={t(lang, 'cta.contact')}
+        ctaHref={localizeUrl('/contact', lang)}
+      />
+    </div>
+  </Section>
+</BaseLayout>

@@ -1,0 +1,16 @@
+{
+  "name": "Pack ISO 26262",
+  "norm": "iso26262",
+  "icon": "shield-check",
+  "summary": "Modèles de safety case et de plan de sécurité fonctionnelle.",
+  "longDescription": "Jeu de modèles pour structurer la sécurité fonctionnelle automobile selon ISO 26262 : safety case, plan de sécurité, matrice de traçabilité prête à compléter.",
+  "contents": [
+    "Modèle de safety case",
+    "Plan de sécurité fonctionnelle",
+    "Matrice de traçabilité"
+  ],
+  "fileFormat": ".docx",
+  "priceEUR": 390,
+  "order": 2,
+  "cta": "buy"
+}

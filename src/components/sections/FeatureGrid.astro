@@ -1,0 +1,37 @@
+---
+import Icon from '~/components/ui/Icon.astro';
+
+interface Feature {
+  title: string;
+  desc: string;
+  icon?: string;
+}
+
+interface Props {
+  features: Feature[];
+  /** Nb de colonnes desktop. */
+  columns?: 2 | 3 | 4;
+}
+
+const { features, columns = 3 } = Astro.props;
+const colsClass =
+  columns === 2
+    ? 'md:grid-cols-2'
+    : columns === 4
+      ? 'md:grid-cols-2 lg:grid-cols-4'
+      : 'md:grid-cols-2 lg:grid-cols-3';
+---
+
+<div class:list={['grid grid-cols-1 gap-x-8 gap-y-10', colsClass]}>
+  {features.map((f) => (
+    <div>
+      {f.icon && (
+        <div class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-ink-800 text-ink-100 mb-3">
+          <Icon name={f.icon} size={18} />
+        </div>
+      )}
+      <h3 class="text-h4 font-medium text-ink-50 mb-1">{f.title}</h3>
+      <p class="text-small text-ink-300 leading-relaxed">{f.desc}</p>
+    </div>
+  ))}
+</div>

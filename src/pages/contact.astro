@@ -1,0 +1,83 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import ContactForm from '~/components/islands/ContactForm.tsx';
+import Icon from '~/components/ui/Icon.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const typeParam = Astro.url.searchParams.get('type');
+const refParam =
+  Astro.url.searchParams.get('solution') ??
+  Astro.url.searchParams.get('product') ??
+  Astro.url.searchParams.get('template') ??
+  undefined;
+
+const initialType: 'projet' | 'demo' | 'template' | 'autre' =
+  typeParam === 'demo' || typeParam === 'template' || typeParam === 'autre'
+    ? typeParam
+    : 'projet';
+---
+
+<BaseLayout
+  lang={lang}
+  path="/contact"
+  title={t(lang, 'nav.contact')}
+  description={lang === 'fr'
+    ? 'Parlons de votre projet, demandez une démo, posez vos questions.'
+    : 'Tell us about your project, request a demo, ask your questions.'}
+>
+  <Hero
+    variant="page"
+    title={lang === 'fr' ? 'Parlons de votre projet' : 'Let’s talk about your project'}
+    subtitle={lang === 'fr'
+      ? 'Décrivez votre besoin. Nous revenons vers vous avec une première lecture sous 48 heures ouvrées.'
+      : 'Tell us about your need. We get back to you with a first read within 48 business hours.'}
+  />
+
+  <Section>
+    <div class="grid lg:grid-cols-[2fr_1fr] gap-12">
+      <ContactForm
+        client:load
+        lang={lang}
+        endpoint={localizeUrl('/api/contact', lang)}
+        initialType={initialType}
+        reference={refParam}
+      />
+
+      <aside class="space-y-6 text-small text-ink-200">
+        <div>
+          <h2 class="text-h4 font-medium text-ink-50 mb-2 flex items-center gap-2">
+            <Icon name="mail" size={18} class="text-ink-300" />
+            Email
+          </h2>
+          <p>contact@example.com</p>
+        </div>
+
+        <div>
+          <h2 class="text-h4 font-medium text-ink-50 mb-2">
+            {lang === 'fr' ? 'Réponses & confidentialité' : 'Response & privacy'}
+          </h2>
+          <p class="leading-relaxed">
+            {lang === 'fr'
+              ? 'Vos données sont utilisées uniquement pour traiter votre demande. Vous pouvez demander leur suppression à tout moment.'
+              : 'Your data is used only to handle your request. You can request its deletion at any time.'}
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-h4 font-medium text-ink-50 mb-2">
+            {lang === 'fr' ? 'Vous cherchez plutôt :' : 'You may also need:'}
+          </h2>
+          <ul class="space-y-1.5">
+            <li><a href={localizeUrl('/faq', lang)} class="text-ink-100 hover:underline">FAQ</a></li>
+            <li><a href={localizeUrl('/templates', lang)} class="text-ink-100 hover:underline">{t(lang, 'family.templates')}</a></li>
+            <li><a href={localizeUrl('/references', lang)} class="text-ink-100 hover:underline">{t(lang, 'nav.references')}</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </Section>
+</BaseLayout>

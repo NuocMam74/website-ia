@@ -1,0 +1,126 @@
+---
+/**
+ * "À quoi ça ressemble en vrai" — section qui présente 4 facettes
+ * concrètes du produit avec mini-mockups, pour casser l'effet
+ * « catalogue » et rendre le produit tangible.
+ */
+import DashboardCard from '~/components/mockups/DashboardCard.astro';
+import AgentCard from '~/components/mockups/AgentCard.astro';
+import ChatCard from '~/components/mockups/ChatCard.astro';
+import CodeSnippet from '~/components/mockups/CodeSnippet.astro';
+import Icon from '~/components/ui/Icon.astro';
+import type { Lang } from '~/lib/i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const items = [
+  {
+    title: lang === 'fr' ? 'Console temps réel' : 'Real-time console',
+    desc: lang === 'fr'
+      ? 'Pilotage en direct des requêtes, agents actifs, latence et SLA. Le tableau de bord que vos équipes auront sous les yeux.'
+      : 'Live monitoring of requests, active agents, latency and SLA. The dashboard your teams will keep open.',
+    accent: 'teal',
+    icon: 'gauge',
+  },
+  {
+    title: lang === 'fr' ? 'Orchestration multi-agents' : 'Multi-agent orchestration',
+    desc: lang === 'fr'
+      ? 'Plusieurs agents qui se passent le relais — researcher, writer, reviewer — pour traiter des tâches complexes.'
+      : 'Multiple agents handing off — researcher, writer, reviewer — to tackle complex tasks.',
+    accent: 'coral',
+    icon: 'network',
+  },
+  {
+    title: lang === 'fr' ? 'Assistant interne sourcé' : 'Grounded internal assistant',
+    desc: lang === 'fr'
+      ? 'Un chatbot connecté à vos documents internes, qui répond en citant ses sources. Pas d\'hallucination.'
+      : 'A chatbot connected to your internal documents, citing its sources. No hallucination.',
+    accent: 'coral',
+    icon: 'message-square-text',
+  },
+  {
+    title: lang === 'fr' ? 'API de bout en bout' : 'End-to-end API',
+    desc: lang === 'fr'
+      ? 'SDK Python/TypeScript, MCP tools, webhooks. Vos développeurs intègrent en quelques lignes.'
+      : 'Python/TypeScript SDK, MCP tools, webhooks. Your devs integrate in a few lines.',
+    accent: 'amber',
+    icon: 'wrench',
+  },
+];
+
+const accentText: Record<string, string> = {
+  teal: 'text-teal-300',
+  coral: 'text-coral-300',
+  amber: 'text-amber-300',
+};
+const accentBg: Record<string, string> = {
+  teal: 'bg-teal-500/10 ring-teal-400/30',
+  coral: 'bg-coral-500/10 ring-coral-400/30',
+  amber: 'bg-amber-500/10 ring-amber-400/30',
+};
+---
+
+<section class="relative py-20 md:py-28 overflow-hidden">
+  <div class="absolute inset-0 bg-dots opacity-20 pointer-events-none" aria-hidden="true"></div>
+
+  <div class="relative mx-auto max-w-[1200px] px-6">
+    {/* En-tête */}
+    <div class="reveal max-w-3xl mb-16">
+      <p class="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-ink-700 bg-ink-900/60 backdrop-blur text-xs uppercase tracking-[0.15em] text-ink-300">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-coral-400"></span>
+        {lang === 'fr' ? 'Le produit en vrai' : 'The product in reality'}
+      </p>
+      <h2 class="text-h1 md:text-display font-semibold tracking-tight leading-tight">
+        {lang === 'fr' ? (
+          <>Ce que vous <span class="text-gradient-cyan">manipulez au quotidien</span>.</>
+        ) : (
+          <>What you <span class="text-gradient-cyan">use daily</span>.</>
+        )}
+      </h2>
+      <p class="mt-5 text-base md:text-h4 text-ink-300 font-light max-w-2xl leading-relaxed">
+        {lang === 'fr'
+          ? 'Des interfaces sobres et pensées pour l\'ingénieur qualité, le chef de projet et l\'assesseur — pas pour la démo VC.'
+          : 'Sober interfaces designed for the quality engineer, project lead and assessor — not for the VC pitch.'}
+      </p>
+    </div>
+
+    {/* Grille de 4 facettes avec mockup */}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+      {items.map((item, i) => {
+        const Mockup = [DashboardCard, AgentCard, ChatCard, CodeSnippet][i];
+        return (
+          <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+            <div class="group relative h-full p-7 bg-ink-900/60 backdrop-blur border border-ink-800 rounded-xl overflow-hidden hover-lift hover:border-ink-700">
+              {/* Bord top accent */}
+              <div
+                class:list={[
+                  'absolute top-0 left-7 right-7 h-px bg-gradient-to-r from-transparent via-current to-transparent',
+                  accentText[item.accent],
+                ]}
+                aria-hidden="true"
+              ></div>
+
+              <div class="flex items-start gap-4 mb-6">
+                <div class:list={['inline-flex items-center justify-center w-11 h-11 rounded-lg ring-1', accentBg[item.accent], accentText[item.accent]]}>
+                  <Icon name={item.icon} size={22} />
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-h3 font-semibold text-ink-50 tracking-tight">{item.title}</h3>
+                  <p class="mt-1 text-small text-ink-300 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+
+              {/* Le mockup en lui-même */}
+              <div class="relative">
+                <Mockup />
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</section>

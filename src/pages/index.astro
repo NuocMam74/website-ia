@@ -1,0 +1,400 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Section from '~/components/ui/Section.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import OfferCard from '~/components/cards/OfferCard.astro';
+import PostCard from '~/components/cards/PostCard.astro';
+import StatsBand from '~/components/sections/StatsBand.astro';
+import Marquee from '~/components/sections/Marquee.astro';
+import HeroDashboard from '~/components/sections/HeroDashboard.astro';
+import ProductSurface from '~/components/sections/ProductSurface.astro';
+import AICapabilities from '~/components/sections/AICapabilities.astro';
+import FAQAccordion from '~/components/sections/FAQAccordion.astro';
+import Testimonials from '~/components/sections/Testimonials.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import { getEntry } from 'astro:content';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+import { organizationLd } from '~/lib/seo';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const solutions = await getCollection('solutions');
+const aiProducts = await getCollection('aiProducts');
+const posts = await getCollection('posts', ({ data }) => !data.draft);
+
+const featuredSolutions = solutions
+  .filter((s) => s.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+
+const featuredAi = aiProducts
+  .filter((p) => p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+
+const recentPosts = posts
+  .sort(
+    (a, b) =>
+      new Date(b.data.publishedAt).getTime() -
+      new Date(a.data.publishedAt).getTime(),
+  )
+  .slice(0, 3);
+
+const families = [
+  {
+    key: 'solutions' as const,
+    label: t(lang, 'family.solutions'),
+    desc: lang === 'fr'
+      ? 'Plateformes et apps web sur-mesure pour vos métiers : pilotage, automatisation, intégrations sur votre SI existant.'
+      : 'Custom web platforms and apps for your business: dashboards, automation, integrations on your existing stack.',
+    icon: 'wrench',
+    href: localizeUrl('/solutions', lang),
+    cta: t(lang, 'cta.contact'),
+  },
+  {
+    key: 'ia' as const,
+    label: t(lang, 'family.ia'),
+    desc: lang === 'fr'
+      ? 'Agents métier, chatbots sourcés, RAG documentaire, orchestration multi-agents.'
+      : 'Business agents, grounded chatbots, document RAG, multi-agent orchestration.',
+    icon: 'bot',
+    href: localizeUrl('/ia', lang),
+    cta: t(lang, 'cta.demo'),
+  },
+  {
+    key: 'templates' as const,
+    label: t(lang, 'family.templates'),
+    desc: lang === 'fr'
+      ? 'Boilerplates prêts à l’emploi pour démarrer un projet structuré : process, docs, configurations outillage.'
+      : 'Ready-to-use boilerplates to start a structured project: processes, docs, tooling configurations.',
+    icon: 'file-text',
+    href: localizeUrl('/templates', lang),
+    cta: t(lang, 'cta.buy'),
+  },
+];
+
+const norms = ['ASPICE', 'ISO 26262', 'ISO/SAE 21434', 'ISO 13485', 'ISO 9001', 'CSRD', 'IATF 16949', 'Polarion ALM'];
+
+const homeFaqIds = ['ia-data', 'tpl-payment', 'sol-demo', 'gen-languages'];
+const homeFaqAll = await Promise.all(
+  homeFaqIds.map((id) => getEntry('faq', id)),
+);
+const homeFaq = homeFaqAll
+  .filter((f): f is NonNullable<typeof f> => Boolean(f))
+  .map((f) => ({ question: f.data.question, answer: f.data.answer }));
+---
+
+<BaseLayout
+  lang={lang}
+  path="/"
+  title={t(lang, 'meta.defaultTitle')}
+  description={t(lang, 'meta.defaultDescription')}
+  jsonLd={organizationLd(t(lang, 'brand'))}
+>
+  {/* === HERO flagship === */}
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-blueprint opacity-40 [mask-image:radial-gradient(ellipse_at_center,#000_30%,transparent_70%)]" aria-hidden="true"></div>
+
+    <div class="relative mx-auto max-w-[1200px] px-6 py-24 md:py-32 grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center">
+      <div>
+        <p class="reveal inline-flex items-center gap-2 px-3 py-1 mb-8 rounded-full border border-ink-700 bg-ink-900/60 backdrop-blur text-xs uppercase tracking-[0.15em] text-ink-300">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse-soft" aria-hidden="true"></span>
+          {lang === 'fr' ? 'Software · IA · Agents' : 'Software · AI · Agents'}
+        </p>
+
+        <h1
+          class="reveal text-display md:text-hero font-semibold tracking-tight leading-[1.02] max-w-2xl"
+          style="--reveal-delay: 80ms"
+        >
+          {lang === 'fr' ? (
+            <>
+              <span>L'<span class="text-gradient-cyan">IA</span></span>
+              <span>, </span>
+              <span class="text-gradient-mix">vraiment</span>
+              <span> en production.</span>
+              <br />
+              <span>Pour des équipes qui livrent.</span>
+            </>
+          ) : (
+            <>
+              <span class="text-gradient-cyan">AI</span><span>, </span>
+              <span class="text-gradient-mix">actually</span>
+              <span> in production.</span>
+              <br />
+              <span>For teams that ship.</span>
+            </>
+          )}
+        </h1>
+
+        <p
+          class="reveal mt-7 text-base md:text-h3 text-ink-200 max-w-xl leading-relaxed font-light"
+          style="--reveal-delay: 160ms"
+        >
+          {lang === 'fr'
+            ? 'Nous concevons et déployons des produits logiciels et des agents IA pour les équipes techniques de l’industrie. Du prototype à la mise en prod, avec une exigence de fiabilité.'
+            : 'We design and deploy software products and AI agents for industrial engineering teams. From prototype to production, with a focus on reliability.'}
+        </p>
+
+        <div
+          class="reveal mt-10 flex flex-wrap gap-3"
+          style="--reveal-delay: 240ms"
+        >
+          <Button href={localizeUrl('/ia', lang)} variant="primary" family="ia" icon="arrow-right" size="lg">
+            {lang === 'fr' ? 'Découvrir nos agents IA' : 'Discover our AI agents'}
+          </Button>
+          <Button href={localizeUrl('/contact', lang)} variant="secondary" size="lg">
+            {t(lang, 'cta.contact')}
+          </Button>
+        </div>
+
+        <div
+          class="reveal mt-12 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-ink-400"
+          style="--reveal-delay: 320ms"
+        >
+          <span class="flex items-center gap-1.5"><Icon name="check" size={14} class="text-teal-400" />{lang === 'fr' ? 'Réponse sous 48h' : 'Reply in 48h'}</span>
+          <span class="flex items-center gap-1.5"><Icon name="check" size={14} class="text-teal-400" />{lang === 'fr' ? 'Données confidentielles' : 'Confidential data'}</span>
+          <span class="flex items-center gap-1.5"><Icon name="check" size={14} class="text-teal-400" />{lang === 'fr' ? 'On-premise possible' : 'On-premise possible'}</span>
+        </div>
+      </div>
+
+      <div class="reveal" style="--reveal-delay: 200ms">
+        <HeroDashboard />
+      </div>
+    </div>
+  </section>
+
+  {/* === Marquee tech === */}
+  <section class="py-12 relative">
+    <Marquee
+      label={lang === 'fr' ? 'Notre stack technique' : 'Our tech stack'}
+      items={['Python', 'TypeScript', 'PyTorch', 'LangChain', 'PostgreSQL', 'pgvector', 'Kubernetes', 'Next.js', 'React', 'Cloudflare', 'Stripe', 'Terraform']}
+    />
+  </section>
+
+  {/* === ProductSurface — "à quoi ça ressemble" === */}
+  <ProductSurface lang={lang} />
+
+  {/* === Capacités IA — vitrine des briques fondamentales === */}
+  <Section
+    title={lang === 'fr' ? 'Les briques IA que nous mettons en œuvre' : 'The AI building blocks we deploy'}
+    subtitle={lang === 'fr'
+      ? 'Pas de boîte noire. Des composants éprouvés, assemblés pour votre cas d’usage, en gardant la maîtrise sur vos données.'
+      : 'No black box. Battle-tested components, assembled for your use case, keeping control over your data.'}
+    family="ia"
+  >
+    <AICapabilities lang={lang} />
+  </Section>
+
+  {/* === 3 familles === */}
+  <Section
+    title={lang === 'fr' ? 'Trois façons de travailler avec nous' : 'Three ways to work with us'}
+    subtitle={lang === 'fr'
+      ? 'Logiciels métier sur-mesure, agents IA et templates structurants. Choisissez par où démarrer — ou combinez-les.'
+      : 'Custom business software, AI agents, and structuring templates. Pick where to start — or combine them.'}
+  >
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {families.map((f, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+          <Card accent={f.key} href={f.href} interactive spotlight class="h-full">
+            <div class="p-7 h-full flex flex-col">
+              <div
+                class:list={[
+                  'inline-flex items-center justify-center w-12 h-12 rounded-lg mb-5 ring-1',
+                  f.key === 'solutions' && 'bg-gradient-to-br from-teal-400/30 to-teal-600/20 text-teal-200 ring-teal-400/30',
+                  f.key === 'ia' && 'bg-gradient-to-br from-coral-400/30 to-coral-600/20 text-coral-200 ring-coral-400/30',
+                  f.key === 'templates' && 'bg-gradient-to-br from-amber-400/30 to-amber-600/20 text-amber-200 ring-amber-400/30',
+                ]}
+              >
+                <Icon name={f.icon} size={22} />
+              </div>
+              <h3 class="text-h3 font-semibold text-ink-50 mb-2 tracking-tight">{f.label}</h3>
+              <p class="text-small text-ink-300 leading-relaxed flex-1">{f.desc}</p>
+              <div
+                class:list={[
+                  'mt-7 inline-flex items-center gap-1.5 text-small font-medium',
+                  f.key === 'solutions' && 'text-teal-300',
+                  f.key === 'ia' && 'text-coral-300',
+                  f.key === 'templates' && 'text-amber-300',
+                ]}
+              >
+                {f.cta}
+                <Icon name="arrow-right" size={14} />
+              </div>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {/* === Stats band === */}
+  <Section>
+    <div class="reveal">
+      <StatsBand
+        title={lang === 'fr' ? 'Ce que nous mettons en production' : 'What we ship to production'}
+        stats={[
+          { value: 50, suffix: '+', label: lang === 'fr' ? 'projets livrés' : 'projects shipped', accent: 'teal' },
+          { value: 12, label: lang === 'fr' ? 'agents IA en production' : 'AI agents in production', accent: 'coral' },
+          { value: 99, suffix: '.9%', label: lang === 'fr' ? 'uptime moyen' : 'average uptime', accent: 'amber' },
+          { value: 48, suffix: 'h', label: lang === 'fr' ? 'délai de première lecture' : 'first reply window', accent: 'neutral' },
+        ]}
+      />
+    </div>
+  </Section>
+
+  {/* === Featured solutions === */}
+  {featuredSolutions.length > 0 && (
+    <Section
+      title={t(lang, 'home.featured.solutions')}
+      subtitle={lang === 'fr' ? 'Des solutions déployées dans l’industrie automobile et médicale.' : 'Solutions deployed in automotive and medical industries.'}
+      family="solutions"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {featuredSolutions.map((s, i) => (
+          <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+            <OfferCard
+              variant="solution"
+              name={s.data.name}
+              tagline={s.data.tagline}
+              icon={s.data.icon}
+              tags={s.data.domains.map((d) => t(lang, `domain.${d}`))}
+              href={localizeUrl(`/solutions/${s.id}`, lang)}
+            />
+          </div>
+        ))}
+      </div>
+      <div class="mt-12 text-center">
+        <Button href={localizeUrl('/solutions', lang)} variant="secondary" icon="arrow-right">
+          {lang === 'fr' ? 'Toutes les solutions' : 'All solutions'}
+        </Button>
+      </div>
+    </Section>
+  )}
+
+  {/* === Featured AI === */}
+  {featuredAi.length > 0 && (
+    <Section
+      title={t(lang, 'home.featured.ia')}
+      subtitle={lang === 'fr' ? 'L’IA comme cœur du produit — pas un gadget greffé après coup.' : 'AI as the core of the product — not a gadget bolted on afterwards.'}
+      family="ia"
+      surface="muted"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {featuredAi.map((p, i) => (
+          <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+            <OfferCard
+              variant="ai"
+              name={p.data.name}
+              tagline={p.data.tagline}
+              icon={p.data.icon}
+              tags={[t(lang, `capability.${p.data.capability}`)]}
+              href={localizeUrl(`/ia/${p.id}`, lang)}
+            />
+          </div>
+        ))}
+      </div>
+      <div class="mt-12 text-center">
+        <Button href={localizeUrl('/ia', lang)} variant="secondary" icon="arrow-right">
+          {lang === 'fr' ? 'Tous les produits IA' : 'All AI products'}
+        </Button>
+      </div>
+    </Section>
+  )}
+
+  {/* === Méthodologie teaser === */}
+  <Section
+    title={lang === 'fr' ? 'Notre méthode, en 4 étapes' : 'Our method, in 4 steps'}
+    subtitle={lang === 'fr'
+      ? 'Pas de promesse fumeuse. Un cadrage net, un POC frugal, puis une industrialisation maîtrisée.'
+      : 'No vague promises. A clear scoping, a frugal POC, then controlled industrialisation.'}
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      {[
+        { n: '01', title: lang === 'fr' ? 'Cadrage' : 'Scoping', desc: lang === 'fr' ? 'On qualifie le problème, le périmètre, les risques.' : 'We qualify the problem, scope, risks.' },
+        { n: '02', title: 'POC', desc: lang === 'fr' ? 'Une preuve de valeur frugale, mesurable, sur 2-6 semaines.' : 'A frugal, measurable proof of value over 2-6 weeks.' },
+        { n: '03', title: lang === 'fr' ? 'Industrialisation' : 'Industrialisation', desc: lang === 'fr' ? 'Mise en production, intégration, formation des équipes.' : 'Production rollout, integration, team training.' },
+        { n: '04', title: 'Support', desc: lang === 'fr' ? 'Suivi, mises à jour, accompagnement à la montée en maturité.' : 'Follow-up, updates, maturity coaching.' },
+      ].map((step, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card class="h-full">
+            <div class="p-6 h-full">
+              <div class="text-h2 font-light text-ink-600 tracking-tight mb-3">{step.n}</div>
+              <h3 class="text-h4 font-semibold text-ink-50 mb-2">{step.title}</h3>
+              <p class="text-small text-ink-300 leading-relaxed">{step.desc}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+    <div class="mt-12 text-center">
+      <Button href={localizeUrl('/methodologie', lang)} variant="ghost" icon="arrow-right">
+        {lang === 'fr' ? 'Voir la méthodologie complète' : 'See the full methodology'}
+      </Button>
+    </div>
+  </Section>
+
+  {/* === Témoignages === */}
+  <Section
+    title={t(lang, 'home.testimonials.title')}
+    subtitle={lang === 'fr' ? 'Industriels et bureaux d’études qui nous font confiance.' : 'Industrial and engineering teams who trust us.'}
+    surface="muted"
+  >
+    <Testimonials includeDraft />
+  </Section>
+
+  {/* === Derniers articles === */}
+  {recentPosts.length > 0 && (
+    <Section
+      title={t(lang, 'home.posts.title')}
+      subtitle={lang === 'fr' ? 'Retours d’expérience et bonnes pratiques.' : 'Feedback and best practices.'}
+    >
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {recentPosts.map((p, i) => (
+          <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+            <PostCard
+              title={p.data.title}
+              excerpt={p.data.excerpt}
+              href={localizeUrl(`/blog/${p.id}`, lang)}
+              publishedAt={p.data.publishedAt}
+              tags={p.data.tags}
+              lang={lang}
+            />
+          </div>
+        ))}
+      </div>
+    </Section>
+  )}
+
+  {/* === FAQ teaser === */}
+  {homeFaq.length > 0 && (
+    <Section
+      title={lang === 'fr' ? 'Les questions qu’on nous pose souvent' : 'Questions we often get'}
+      subtitle={lang === 'fr'
+        ? 'Confidentialité, paiement, licence, démo — l’essentiel ici. Le reste sur la page FAQ.'
+        : 'Confidentiality, payment, licensing, demo — the essentials here. The rest on the FAQ page.'}
+    >
+      <div class="max-w-3xl reveal">
+        <FAQAccordion items={homeFaq} />
+        <div class="mt-8">
+          <Button href={localizeUrl('/faq', lang)} variant="ghost" icon="arrow-right">
+            {lang === 'fr' ? 'Voir toutes les questions' : 'See all questions'}
+          </Button>
+        </div>
+      </div>
+    </Section>
+  )}
+
+  <CTASection
+    title={lang === 'fr' ? 'Un projet, une démo, une question ?' : 'A project, a demo, a question?'}
+    subtitle={lang === 'fr'
+      ? 'Décrivez votre besoin. Nous revenons vers vous avec une première lecture sous 48 heures ouvrées.'
+      : 'Tell us about your need. We get back to you with a first read within 48 business hours.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+    secondaryCtaLabel={t(lang, 'cta.demo')}
+    secondaryCtaHref={localizeUrl('/ia', lang)}
+  />
+</BaseLayout>

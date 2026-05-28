@@ -1,0 +1,39 @@
+---
+/**
+ * Marquee horizontal infini : utilisé pour défiler les normes,
+ * référentiels, intégrations.
+ *
+ * Pour un défilement continu sans coupure visible, on duplique le
+ * contenu côté serveur.
+ */
+interface Props {
+  items: string[];
+  label?: string;
+  /** Espace entre items en rem. */
+  gap?: number;
+}
+
+const { items, label, gap = 3 } = Astro.props;
+---
+
+<div class="relative">
+  {label && (
+    <p class="text-center text-xs uppercase tracking-[0.2em] text-ink-500 mb-6">{label}</p>
+  )}
+  <div class="marquee">
+    <div class="marquee-track" style={`gap: ${gap}rem; padding-right: ${gap}rem;`}>
+      {items.map((item) => (
+        <span class="shrink-0 text-h3 font-light text-ink-300 tracking-wide whitespace-nowrap">
+          {item}
+        </span>
+      ))}
+    </div>
+    <div class="marquee-track" style={`gap: ${gap}rem; padding-right: ${gap}rem;`} aria-hidden="true">
+      {items.map((item) => (
+        <span class="shrink-0 text-h3 font-light text-ink-300 tracking-wide whitespace-nowrap">
+          {item}
+        </span>
+      ))}
+    </div>
+  </div>
+</div>

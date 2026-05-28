@@ -1,0 +1,77 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const all = (await getCollection('glossary')).sort((a, b) => a.data.term.localeCompare(b.data.term));
+
+const families = Array.from(new Set(all.map((e) => e.data.family))).sort();
+
+const familyColor: Record<string, string> = {
+  'ASPICE': 'text-teal-300',
+  'Sécurité fonctionnelle': 'text-coral-300',
+  'Cybersécurité': 'text-coral-300',
+  'Qualité': 'text-amber-300',
+  'IA': 'text-coral-300',
+  'Outillage': 'text-ink-200',
+};
+---
+
+<BaseLayout
+  lang={lang}
+  path="/lexique"
+  title={lang === 'fr' ? 'Lexique — ASPICE, ISO 26262, RAG…' : 'Glossary — ASPICE, ISO 26262, RAG…'}
+  description={lang === 'fr'
+    ? 'Définitions claires et opérationnelles des termes clés d’ASPICE, ISO 26262, ISO/SAE 21434, RAG et autres.'
+    : 'Clear, operational definitions of key terms in ASPICE, ISO 26262, ISO/SAE 21434, RAG and more.'}
+>
+  <Hero
+    variant="page"
+    kicker={lang === 'fr' ? 'Lexique' : 'Glossary'}
+    title={lang === 'fr' ? 'Les termes clés, expliqués sans bullshit' : 'The key terms, no fluff'}
+    subtitle={lang === 'fr'
+      ? 'Définitions opérationnelles pour comprendre les normes et les architectures que vous croisez au quotidien.'
+      : 'Operational definitions to understand the standards and architectures you meet daily.'}
+  />
+
+  <Section>
+    {/* Index par famille */}
+    <div class="mb-12 flex flex-wrap gap-2 text-small">
+      {families.map((f) => (
+        <span class:list={['px-3 py-1 rounded-full border border-ink-800 bg-ink-900 font-medium', familyColor[f] ?? 'text-ink-200']}>
+          {f}
+        </span>
+      ))}
+    </div>
+
+    {/* Grille des termes */}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {all.map((e, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 50}ms`}>
+          <Card href={localizeUrl(`/lexique/${e.id}`, lang)} interactive class="h-full group">
+            <div class="p-6 h-full flex flex-col">
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <h3 class="text-h3 font-semibold text-ink-50 tracking-tight">
+                  {e.data.term}
+                  {e.data.acronym && <span class="ml-1 text-ink-500 font-light text-small">({e.data.acronym})</span>}
+                </h3>
+                <span class="text-ink-500 group-hover:text-ink-200 transition-colors">
+                  <Icon name="arrow-right" size={16} />
+                </span>
+              </div>
+              <p class:list={['text-xs font-medium uppercase tracking-wider mb-3', familyColor[e.data.family] ?? 'text-ink-400']}>
+                {e.data.family}
+              </p>
+              <p class="text-small text-ink-300 leading-relaxed">{e.data.short}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+</BaseLayout>

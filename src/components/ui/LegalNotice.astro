@@ -1,0 +1,21 @@
+---
+/**
+ * Encart « gabarit à valider juridiquement » affiché en tête des pages
+ * légales (cf. brief §20 : « le contenu juridique doit être rédigé /
+ * validé par un professionnel du droit avant publication »).
+ */
+import Icon from './Icon.astro';
+interface Props {
+  lang: 'fr' | 'en';
+}
+const { lang } = Astro.props;
+---
+
+<div class="not-prose mb-8 p-4 border border-amber-500/30 bg-amber-500/10 rounded-md text-small text-amber-200 flex items-start gap-3">
+  <Icon name="bell" size={18} class="text-amber-300 shrink-0 mt-0.5" />
+  <p>
+    {lang === 'fr'
+      ? 'Ceci est un gabarit à faire valider par un professionnel du droit avant publication. Le contenu réglementaire (RGPD, CGV, mentions) doit être adapté à votre forme juridique, votre périmètre d’activité et la liste exacte de vos traitements.'
+      : 'This is a template to be validated by a legal professional before publication. Regulatory content (GDPR, terms, notices) must be adapted to your legal form, scope, and the exact list of your data processing activities.'}
+  </p>
+</div>

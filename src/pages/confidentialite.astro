@@ -1,0 +1,73 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import LegalNotice from '~/components/ui/LegalNotice.astro';
+import type { Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+---
+
+<BaseLayout
+  lang={lang}
+  path="/confidentialite"
+  title={lang === 'fr' ? 'Politique de confidentialité' : 'Privacy policy'}
+  description={lang === 'fr'
+    ? 'Comment nous traitons vos données personnelles.'
+    : 'How we process your personal data.'}
+  noindex
+>
+  <Hero variant="page" title={lang === 'fr' ? 'Politique de confidentialité' : 'Privacy policy'} />
+  <Section>
+    <div class="max-w-3xl prose prose-ink text-base text-ink-200 leading-relaxed [&>h2]:text-h3 [&>h2]:font-medium [&>h2]:text-ink-50 [&>h2]:mt-8 [&>h2]:mb-3 [&>p]:mb-4 [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:mb-4">
+      <LegalNotice lang={lang} />
+
+      <h2>{lang === 'fr' ? 'Responsable de traitement' : 'Data controller'}</h2>
+      <p>[Raison sociale] — contact@example.com</p>
+
+      <h2>{lang === 'fr' ? 'Données collectées' : 'Data collected'}</h2>
+      <ul>
+        <li>{lang === 'fr' ? 'Formulaire de contact : nom, société, email, téléphone (optionnel), message.' : 'Contact form: name, company, email, phone (optional), message.'}</li>
+        <li>{lang === 'fr' ? 'Commande de templates : email, adresse de facturation, données de paiement (traitées par Stripe — nous ne les stockons pas).' : 'Template orders: email, billing address, payment data (handled by Stripe — we do not store them).'}</li>
+        <li>{lang === 'fr' ? 'Newsletter : email.' : 'Newsletter: email.'}</li>
+        <li>{lang === 'fr' ? 'Mesure d’audience : selon consentement, données techniques de navigation anonymisées.' : 'Analytics: subject to consent, anonymised technical browsing data.'}</li>
+      </ul>
+
+      <h2>{lang === 'fr' ? 'Finalités & bases légales' : 'Purposes & legal bases'}</h2>
+      <ul>
+        <li>{lang === 'fr' ? 'Répondre à vos demandes — intérêt légitime / exécution précontractuelle.' : 'Respond to your requests — legitimate interest / pre-contract performance.'}</li>
+        <li>{lang === 'fr' ? 'Exécuter votre commande — exécution du contrat.' : 'Process your order — contract performance.'}</li>
+        <li>{lang === 'fr' ? 'Vous informer (newsletter) — consentement (double opt-in).' : 'Inform you (newsletter) — consent (double opt-in).'}</li>
+        <li>{lang === 'fr' ? 'Mesurer l’audience — consentement.' : 'Measure traffic — consent.'}</li>
+      </ul>
+
+      <h2>{lang === 'fr' ? 'Durée de conservation' : 'Retention period'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Données de prospection : 3 ans après le dernier contact. Données de facturation : 10 ans (obligation légale). Données newsletter : jusqu’à désinscription.'
+          : 'Prospecting data: 3 years after last contact. Invoicing data: 10 years (legal obligation). Newsletter data: until unsubscription.'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Sous-traitants' : 'Subprocessors'}</h2>
+      <ul>
+        <li>Stripe (paiement) — Irlande / États-Unis.</li>
+        <li>Resend (emails transactionnels) — États-Unis.</li>
+        <li>Cloudflare (hébergement) — États-Unis / Union européenne.</li>
+      </ul>
+
+      <h2>{lang === 'fr' ? 'Vos droits' : 'Your rights'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Vous disposez d’un droit d’accès, de rectification, d’opposition, de suppression et de portabilité de vos données. Pour les exercer : contact@example.com. Vous pouvez également saisir la CNIL.'
+          : 'You have rights of access, rectification, objection, deletion and portability. Contact: contact@example.com. You may also complain to your local data protection authority.'}
+      </p>
+
+      <h2>{lang === 'fr' ? 'Traitement des données IA' : 'AI data processing'}</h2>
+      <p>
+        {lang === 'fr'
+          ? 'Les corpus clients utilisés par nos solutions IA sont traités dans un périmètre dédié et ne sont jamais utilisés pour entraîner des modèles tiers. Selon l’offre, le traitement peut être réalisé en local (on-premise) ou en cloud privé isolé.'
+          : 'Customer corpora used by our AI solutions are processed in a dedicated perimeter and are never used to train third-party models. Depending on the offer, processing can be performed locally (on-premise) or in an isolated private cloud.'}
+      </p>
+    </div>
+  </Section>
+</BaseLayout>

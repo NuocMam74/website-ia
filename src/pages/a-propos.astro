@@ -1,0 +1,312 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import Card from '~/components/ui/Card.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import StatsBand from '~/components/sections/StatsBand.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const values = [
+  {
+    icon: 'shield-check',
+    title: lang === 'fr' ? 'Sérieux d’ingénierie' : 'Engineering rigor',
+    accent: 'teal',
+    desc:
+      lang === 'fr'
+        ? 'Pas de promesse marketing creuse. Nous expliquons ce qui marche, ce qui ne marche pas encore, et ce qu’il faut prouver.'
+        : 'No empty marketing promises. We tell what works, what doesn’t yet, and what needs to be proven.',
+  },
+  {
+    icon: 'lock-keyhole',
+    title: lang === 'fr' ? 'Confidentialité par défaut' : 'Confidentiality by default',
+    accent: 'coral',
+    desc:
+      lang === 'fr'
+        ? 'Vos données et corpus ne sortent pas de votre périmètre. Pas d’entraînement sur vos documents.'
+        : 'Your data and corpora stay within your perimeter. No training on your documents.',
+  },
+  {
+    icon: 'wrench',
+    title: lang === 'fr' ? 'Outil + méthode' : 'Tool + method',
+    accent: 'amber',
+    desc:
+      lang === 'fr'
+        ? 'Un logiciel sans méthode n’a jamais résolu un problème de qualité. Nous livrons les deux.'
+        : 'Software without method has never solved a quality issue. We deliver both.',
+  },
+];
+
+const accentBg: Record<string, string> = {
+  teal: 'bg-teal-500/10 ring-teal-400/30 text-teal-300',
+  coral: 'bg-coral-500/10 ring-coral-400/30 text-coral-300',
+  amber: 'bg-amber-500/10 ring-amber-400/30 text-amber-300',
+};
+
+const expertise = [
+  { domain: lang === 'fr' ? 'Process' : 'Process', items: ['ASPICE (Automotive SPICE)', 'IATF 16949', 'ISO 9001'] },
+  { domain: lang === 'fr' ? 'Sécurité' : 'Safety', items: ['ISO 26262 — sécurité fonctionnelle', 'ISO/SAE 21434 — cybersécurité', 'ISO 13485 — médical'] },
+  { domain: lang === 'fr' ? 'Outillage' : 'Tooling', items: ['Polarion ALM', 'Jira / Confluence', 'Excel / Power BI'] },
+  { domain: 'IA', items: [lang === 'fr' ? 'Architectures RAG souveraines' : 'Sovereign RAG architectures', lang === 'fr' ? 'Agents métier multi-rôles' : 'Multi-role business agents', 'MLOps & observabilité'] },
+];
+
+const timeline = [
+  {
+    year: '2019',
+    title: lang === 'fr' ? 'Premiers projets ASPICE' : 'First ASPICE projects',
+    desc: lang === 'fr'
+      ? 'Mission d’accompagnement à l’évaluation chez un équipementier de rang 1 — le point de départ de la spécialisation conformité.'
+      : 'Assessment-support mission for a tier-1 supplier — the starting point of our compliance specialization.',
+  },
+  {
+    year: '2021',
+    title: lang === 'fr' ? 'Lancement d’ASPICE Navigator' : 'ASPICE Navigator launch',
+    desc: lang === 'fr'
+      ? 'Premier outil interne devenu produit suite à la demande répétée des clients : centraliser l’évaluation au lieu d’utiliser des tableurs.'
+      : 'First internal tool turned into a product after repeated client requests: centralise the assessment instead of using spreadsheets.',
+  },
+  {
+    year: '2023',
+    title: lang === 'fr' ? 'Ouverture du laboratoire IA' : 'AI lab opens',
+    desc: lang === 'fr'
+      ? 'Création de l’équipe IA dédiée — premiers déploiements de RAG documentaire pour des corpus normatifs internes.'
+      : 'Dedicated AI team is created — first deployments of document RAG for internal regulatory corpora.',
+  },
+  {
+    year: '2025',
+    title: lang === 'fr' ? 'Catalogue templates en self-service' : 'Templates catalogue, self-service',
+    desc: lang === 'fr'
+      ? 'Mise en ligne du catalogue de templates conformes ASPICE / ISO 26262 / ISO/SAE 21434 en achat direct.'
+      : 'Launch of the compliant templates catalogue (ASPICE / ISO 26262 / ISO/SAE 21434) for direct purchase.',
+  },
+];
+
+const sectors = [
+  { icon: 'wrench', label: lang === 'fr' ? 'Automobile' : 'Automotive' },
+  { icon: 'heart-pulse', label: lang === 'fr' ? 'Médical' : 'Medical' },
+  { icon: 'building-2', label: lang === 'fr' ? 'Bâtiment' : 'Building' },
+  { icon: 'sparkles', label: lang === 'fr' ? 'Énergie' : 'Energy' },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/a-propos"
+  title={t(lang, 'nav.about')}
+  description={lang === 'fr'
+    ? 'Qui nous sommes, comment nous travaillons, sur quoi nous nous engageons.'
+    : 'Who we are, how we work, what we commit to.'}
+>
+  <Hero
+    variant="page"
+    kicker={lang === 'fr' ? 'À propos' : 'About'}
+    title={lang === 'fr' ? 'Une équipe d’ingénieurs, pas une promesse marketing' : 'An engineering team, not a marketing pitch'}
+    subtitle={lang === 'fr'
+      ? 'Nous construisons des produits utilisés par des équipes qualité, R&D et conformité dans l’industrie. Notre rôle est de rendre les démarches sérieuses moins coûteuses, et les preuves plus solides.'
+      : 'We build products used by quality, R&D and compliance teams in industry. Our role is to make serious processes less costly, and proofs more solid.'}
+    ctaLabel={lang === 'fr' ? 'Rencontrer l’équipe' : 'Meet the team'}
+    ctaHref={localizeUrl('/equipe', lang)}
+    secondaryCtaLabel={lang === 'fr' ? 'Notre méthodologie' : 'Our methodology'}
+    secondaryCtaHref={localizeUrl('/methodologie', lang)}
+  />
+
+  {/* === Mission encadrée === */}
+  <Section>
+    <div class="reveal max-w-4xl mx-auto text-center">
+      <p class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-ink-700 bg-ink-900 text-xs uppercase tracking-[0.15em] text-ink-300">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+        {lang === 'fr' ? 'Notre mission' : 'Our mission'}
+      </p>
+      <p class="text-h2 md:text-h1 font-light text-ink-100 leading-snug tracking-tight">
+        {lang === 'fr' ? (
+          <>
+            « Rendre la <span class="text-gradient-cyan font-medium">conformité</span> moins coûteuse,
+            la <span class="text-gradient-mix font-medium">traçabilité</span> plus solide,
+            et l'<span class="text-gradient-cyan font-medium">IA</span> réellement utile en production. »
+          </>
+        ) : (
+          <>
+            "Make <span class="text-gradient-cyan font-medium">compliance</span> less costly,
+            <span class="text-gradient-mix font-medium"> traceability</span> more solid,
+            and <span class="text-gradient-cyan font-medium">AI</span> genuinely useful in production."
+          </>
+        )}
+      </p>
+    </div>
+  </Section>
+
+  {/* === Stats clés === */}
+  <Section surface="muted">
+    <StatsBand
+      stats={[
+        { value: 50, suffix: '+', label: lang === 'fr' ? 'projets livrés' : 'projects delivered', accent: 'teal' },
+        { value: 17, label: lang === 'fr' ? 'process areas ASPICE' : 'ASPICE process areas', accent: 'amber' },
+        { raw: '6+', value: 6, label: lang === 'fr' ? 'ans d’expertise' : 'years of expertise', accent: 'coral' },
+        { value: 100, suffix: '%', label: lang === 'fr' ? 'projets confidentialité-first' : 'privacy-first projects', accent: 'neutral' },
+      ]}
+    />
+  </Section>
+
+  {/* === Timeline === */}
+  <Section
+    title={lang === 'fr' ? 'Notre parcours' : 'Our journey'}
+    subtitle={lang === 'fr'
+      ? 'Quelques étapes qui ont structuré notre offre actuelle.'
+      : 'A few milestones that shaped our current offer.'}
+  >
+    <div class="relative max-w-4xl mx-auto">
+      {/* Ligne verticale */}
+      <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-ink-700 to-transparent" aria-hidden="true"></div>
+
+      <div class="space-y-12">
+        {timeline.map((step, i) => (
+          <div class:list={['reveal relative md:grid md:grid-cols-2 md:gap-12', i % 2 === 1 && 'md:[&>:first-child]:order-2']} style={`--reveal-delay: ${i * 100}ms`}>
+            {/* Point */}
+            <div class="absolute left-4 md:left-1/2 top-2 -translate-x-1/2 w-3 h-3 rounded-full bg-teal-400 ring-4 ring-ink-950" aria-hidden="true"></div>
+
+            <div class:list={['pl-12 md:pl-0', i % 2 === 0 ? 'md:text-right md:pr-8' : 'md:pl-8']}>
+              <span class="text-h2 font-light text-ink-600 tracking-tight">{step.year}</span>
+            </div>
+            <div class:list={['pl-12 md:pl-0 mt-1 md:mt-0', i % 2 === 0 ? 'md:pl-8' : 'md:text-right md:pr-8']}>
+              <h3 class="text-h3 font-semibold text-ink-50 tracking-tight">{step.title}</h3>
+              <p class="mt-2 text-small text-ink-300 leading-relaxed">{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Section>
+
+  {/* === Valeurs === */}
+  <Section
+    title={lang === 'fr' ? 'Nos valeurs' : 'Our values'}
+    surface="muted"
+  >
+    <div class="grid md:grid-cols-3 gap-6">
+      {values.map((v, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card class="h-full">
+            <div class="p-7">
+              <div class:list={['inline-flex items-center justify-center w-12 h-12 rounded-xl ring-1 mb-5', accentBg[v.accent]]}>
+                <Icon name={v.icon} size={22} />
+              </div>
+              <h3 class="text-h3 font-semibold text-ink-50 mb-2 tracking-tight">{v.title}</h3>
+              <p class="text-small text-ink-300 leading-relaxed">{v.desc}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {/* === Domaines d'expertise restructurés en 4 colonnes === */}
+  <Section
+    title={lang === 'fr' ? 'Nos domaines d’expertise' : 'Our areas of expertise'}
+    subtitle={lang === 'fr'
+      ? 'Quatre pôles complémentaires qui se renforcent sur chaque projet.'
+      : 'Four complementary disciplines that reinforce each other on every project.'}
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      {expertise.map((cat, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 70}ms`}>
+          <Card class="h-full">
+            <div class="p-6">
+              <h3 class="text-h4 font-semibold text-ink-50 mb-4 tracking-tight">{cat.domain}</h3>
+              <ul class="space-y-2.5">
+                {cat.items.map((item) => (
+                  <li class="flex items-start gap-2.5 text-small text-ink-200 leading-relaxed">
+                    <Icon name="check" size={14} class="text-teal-400 mt-1 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {/* === Secteurs adressés === */}
+  <Section
+    title={lang === 'fr' ? 'Secteurs adressés' : 'Sectors we serve'}
+    surface="muted"
+  >
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {sectors.map((s, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <div class="flex flex-col items-center justify-center p-8 rounded-xl border border-ink-800 bg-ink-900 hover-lift hover:border-ink-700">
+            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-ink-800 to-ink-900 ring-1 ring-ink-700 flex items-center justify-center text-teal-300 mb-4">
+              <Icon name={s.icon} size={26} />
+            </div>
+            <span class="text-base font-medium text-ink-100">{s.label}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {/* === Notre démarche détaillée === */}
+  <Section
+    title={lang === 'fr' ? 'Notre démarche' : 'Our approach'}
+  >
+    <div class="grid md:grid-cols-3 gap-6">
+      {[
+        {
+          icon: 'clipboard-list',
+          title: lang === 'fr' ? 'Comprendre, pas vendre' : 'Understand, don\'t sell',
+          desc: lang === 'fr'
+            ? 'Avant tout : comprendre le problème métier, pas pousser une techno. Un cadrage court clarifie ce qui doit changer (et ce qui ne doit pas).'
+            : 'First: understand the business problem, don\'t push tech. A short scoping clarifies what must change (and what must not).',
+        },
+        {
+          icon: 'wrench',
+          title: lang === 'fr' ? 'Proposer un parcours réaliste' : 'Propose a realistic path',
+          desc: lang === 'fr'
+            ? 'Produit existant, paramétrage, intégration ou sur-mesure. Si rien dans notre catalogue ne convient, nous le disons.'
+            : 'Existing product, configuration, integration or custom. If nothing in our catalogue fits, we say so.',
+        },
+        {
+          icon: 'history',
+          title: lang === 'fr' ? 'Rester en relation' : 'Stay involved',
+          desc: lang === 'fr'
+            ? 'La maturité d\'un produit logiciel ou d\'une démarche qualité se mesure dans la durée. Revues trimestrielles, mises à jour, accompagnement.'
+            : 'The maturity of a software product or quality approach is measured over time. Quarterly reviews, updates, coaching.',
+        },
+      ].map((step, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+          <Card class="h-full">
+            <div class="p-7">
+              <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400/30 to-teal-600/20 ring-1 ring-teal-400/30 text-teal-200 mb-5">
+                <Icon name={step.icon} size={22} />
+              </div>
+              <h3 class="text-h3 font-semibold text-ink-50 mb-2 tracking-tight">{step.title}</h3>
+              <p class="text-small text-ink-300 leading-relaxed">{step.desc}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-12 text-center">
+      <Button href={localizeUrl('/methodologie', lang)} variant="secondary" icon="arrow-right">
+        {lang === 'fr' ? 'Voir la méthodologie détaillée' : 'See the detailed methodology'}
+      </Button>
+    </div>
+  </Section>
+
+  <CTASection
+    title={lang === 'fr' ? 'Travaillons ensemble' : 'Let’s work together'}
+    subtitle={lang === 'fr'
+      ? 'Décrivez votre projet. Nous revenons vers vous sous 48 heures ouvrées.'
+      : 'Tell us about your project. We get back to you within 48 business hours.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+    secondaryCtaLabel={lang === 'fr' ? 'Voir les références' : 'See references'}
+    secondaryCtaHref={localizeUrl('/references', lang)}
+  />
+</BaseLayout>

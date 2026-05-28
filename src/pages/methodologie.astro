@@ -1,0 +1,176 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const steps = [
+  {
+    n: '01',
+    title: lang === 'fr' ? 'Cadrage' : 'Scoping',
+    duration: lang === 'fr' ? '1 à 2 semaines' : '1 to 2 weeks',
+    icon: 'clipboard-list',
+    accent: 'teal',
+    desc: lang === 'fr'
+      ? 'On qualifie le problème métier, le périmètre, les risques, et on définit des critères de succès mesurables. Pas de promesse vague — un livrable écrit qui sert de contrat.'
+      : 'We qualify the business problem, scope, risks, and define measurable success criteria. No vague promise — a written deliverable that serves as a contract.',
+    deliverables: lang === 'fr'
+      ? ['Note de cadrage', 'Plan d’action court', 'Estimation budgétaire']
+      : ['Scoping note', 'Short action plan', 'Budget estimate'],
+  },
+  {
+    n: '02',
+    title: lang === 'fr' ? 'POC' : 'POC',
+    duration: lang === 'fr' ? '2 à 6 semaines' : '2 to 6 weeks',
+    icon: 'wrench',
+    accent: 'coral',
+    desc: lang === 'fr'
+      ? 'Une preuve de valeur frugale, sur vos données réelles ou un échantillon représentatif. Objectif : démontrer ou réfuter la valeur avant l’industrialisation.'
+      : 'A frugal proof of value, on your real data or a representative sample. Goal: prove or disprove value before industrialisation.',
+    deliverables: lang === 'fr'
+      ? ['Prototype fonctionnel', 'Rapport de mesures', 'Décision Go / No-Go']
+      : ['Working prototype', 'Measurement report', 'Go / No-Go decision'],
+  },
+  {
+    n: '03',
+    title: lang === 'fr' ? 'Industrialisation' : 'Industrialisation',
+    duration: lang === 'fr' ? '2 à 6 mois' : '2 to 6 months',
+    icon: 'package',
+    accent: 'amber',
+    desc: lang === 'fr'
+      ? 'Mise en production avec intégrations, sécurité, observabilité, formation. La solution devient un outil quotidien fiable, pas un prototype maintenu en bénévolat.'
+      : 'Production rollout with integrations, security, observability, training. The solution becomes a reliable daily tool, not a prototype maintained on goodwill.',
+    deliverables: lang === 'fr'
+      ? ['Déploiement', 'Documentation utilisateur', 'Plan de formation', 'Run book']
+      : ['Deployment', 'User documentation', 'Training plan', 'Runbook'],
+  },
+  {
+    n: '04',
+    title: lang === 'fr' ? 'Support & maturité' : 'Support & maturity',
+    duration: lang === 'fr' ? 'En continu' : 'Continuous',
+    icon: 'shield-check',
+    accent: 'teal',
+    desc: lang === 'fr'
+      ? 'Mises à jour, suivi de l’usage réel, accompagnement à la montée en maturité du process et des équipes. Le vrai retour sur investissement se mesure sur 12-24 mois.'
+      : 'Updates, real-usage monitoring, coaching on process and team maturity. The real ROI is measured over 12-24 months.',
+    deliverables: lang === 'fr'
+      ? ['Revues trimestrielles', 'Roadmap partagée', 'Support technique']
+      : ['Quarterly reviews', 'Shared roadmap', 'Technical support'],
+  },
+];
+
+const accentBg: Record<string, string> = {
+  teal: 'bg-gradient-to-br from-teal-400/20 to-teal-600/10 text-teal-200 ring-teal-400/30',
+  coral: 'bg-gradient-to-br from-coral-400/20 to-coral-600/10 text-coral-200 ring-coral-400/30',
+  amber: 'bg-gradient-to-br from-amber-400/20 to-amber-600/10 text-amber-200 ring-amber-400/30',
+};
+
+const principles = [
+  {
+    icon: 'check',
+    title: lang === 'fr' ? 'Frugalité' : 'Frugality',
+    desc: lang === 'fr' ? 'On commence petit, on prouve la valeur, puis on industrialise. Pas l’inverse.' : 'Start small, prove value, then industrialise. Not the other way around.',
+  },
+  {
+    icon: 'lock-keyhole',
+    title: lang === 'fr' ? 'Confidentialité' : 'Confidentiality',
+    desc: lang === 'fr' ? 'Vos données ne sortent pas de votre périmètre. On-premise ou cloud privé, selon votre contrainte.' : 'Your data stays within your perimeter. On-premise or private cloud, depending on your constraint.',
+  },
+  {
+    icon: 'git-branch',
+    title: lang === 'fr' ? 'Traçabilité' : 'Traceability',
+    desc: lang === 'fr' ? 'Chaque décision, chaque livrable, chaque preuve est tracée. C’est ce qui distingue un projet sérieux d’un POC oublié.' : 'Every decision, deliverable, and proof is traced. That’s what distinguishes a serious project from a forgotten POC.',
+  },
+  {
+    icon: 'sparkles',
+    title: lang === 'fr' ? 'Transfert de compétences' : 'Skill transfer',
+    desc: lang === 'fr' ? 'On forme vos équipes pendant le projet. Vous restez autonomes après livraison.' : 'We train your teams during the project. You stay autonomous after delivery.',
+  },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/methodologie"
+  title={lang === 'fr' ? 'Notre méthodologie' : 'Our methodology'}
+  description={lang === 'fr'
+    ? 'Cadrage, POC, industrialisation, support : notre démarche en 4 étapes pour livrer un outil utilisé, pas un livrable rangé.'
+    : 'Scoping, POC, industrialisation, support: our 4-step approach to deliver a used tool, not a stored deliverable.'}
+>
+  <Hero
+    variant="page"
+    kicker={lang === 'fr' ? 'Méthodologie' : 'Methodology'}
+    title={lang === 'fr' ? 'Quatre étapes claires, des engagements écrits' : 'Four clear steps, written commitments'}
+    subtitle={lang === 'fr'
+      ? 'Notre méthode est volontairement classique : cadrage → POC → industrialisation → support. Ce qui change, c’est la rigueur sur chaque étape et la transparence sur les livrables attendus.'
+      : 'Our method is deliberately classic: scoping → POC → industrialisation → support. What changes is the rigor at each step and the transparency on expected deliverables.'}
+  />
+
+  <Section>
+    <div class="space-y-6">
+      {steps.map((step, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+          <Card class="overflow-hidden">
+            <div class="grid md:grid-cols-[1fr_2fr] gap-8 p-8">
+              <div>
+                <div class:list={['inline-flex items-center justify-center w-14 h-14 rounded-xl ring-1 mb-4', accentBg[step.accent]]}>
+                  <Icon name={step.icon} size={26} />
+                </div>
+                <div class="text-h2 font-light text-ink-600 tracking-tight">{step.n}</div>
+                <h3 class="text-h2 font-semibold text-ink-50 mt-1 tracking-tight">{step.title}</h3>
+                <p class="mt-2 text-small text-ink-400">{step.duration}</p>
+              </div>
+              <div>
+                <p class="text-base text-ink-200 leading-relaxed mb-6">{step.desc}</p>
+                <div>
+                  <p class="text-xs uppercase tracking-wider text-ink-500 mb-3 font-medium">{lang === 'fr' ? 'Livrables' : 'Deliverables'}</p>
+                  <ul class="space-y-2">
+                    {step.deliverables.map((d) => (
+                      <li class="flex items-start gap-2 text-small text-ink-200">
+                        <Icon name="check" size={14} class="text-teal-400 mt-1 shrink-0" />
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <Section
+    title={lang === 'fr' ? 'Nos principes de travail' : 'Our working principles'}
+    surface="muted"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {principles.map((p, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <div class="p-6 h-full border border-ink-800 rounded-xl bg-ink-900">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-ink-800 text-teal-300 mb-4">
+              <Icon name={p.icon} size={20} />
+            </div>
+            <h3 class="text-h4 font-semibold text-ink-50 mb-2">{p.title}</h3>
+            <p class="text-small text-ink-300 leading-relaxed">{p.desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <CTASection
+    title={lang === 'fr' ? 'On démarre par un cadrage ?' : 'Shall we start with a scoping?'}
+    subtitle={lang === 'fr'
+      ? 'Une visio de 45 minutes pour qualifier votre besoin. Sans engagement.'
+      : 'A 45-minute call to qualify your need. No commitment.'}
+    ctaLabel={lang === 'fr' ? 'Demander un cadrage' : 'Request a scoping'}
+    ctaHref={localizeUrl('/contact?type=projet', lang)}
+  />
+</BaseLayout>

@@ -1,0 +1,81 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Section from '~/components/ui/Section.astro';
+import Chip from '~/components/ui/Chip.astro';
+import Button from '~/components/ui/Button.astro';
+import { articleLd, breadcrumbLd, canonicalUrl } from '~/lib/seo';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  return posts.map((p) => ({ params: { slug: p.id }, props: { entry: p } }));
+}
+
+const { entry } = Astro.props;
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const { Content } = await render(entry);
+
+const author = await getEntry('authors', entry.data.author);
+const url = canonicalUrl(`/blog/${entry.id}`, lang);
+
+const formattedDate = new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+}).format(entry.data.publishedAt);
+---
+
+<BaseLayout
+  lang={lang}
+  path={`/blog/${entry.id}`}
+  title={entry.data.title}
+  description={entry.data.excerpt}
+  jsonLd={[
+    articleLd({
+      title: entry.data.title,
+      description: entry.data.excerpt,
+      url,
+      publishedAt: entry.data.publishedAt,
+      updatedAt: entry.data.updatedAt,
+      authorName: author?.data.name ?? 'L’équipe',
+    }),
+    breadcrumbLd([
+      { name: t(lang, 'brand'), url: canonicalUrl('/', lang) },
+      { name: t(lang, 'nav.blog'), url: canonicalUrl('/blog', lang) },
+      { name: entry.data.title, url },
+    ]),
+  ]}
+>
+  <article>
+    <header class="border-b border-ink-800 bg-ink-900">
+      <div class="mx-auto max-w-3xl px-6 py-16 md:py-20">
+        <p class="text-small text-ink-500 mb-4">
+          <time datetime={entry.data.publishedAt.toISOString().slice(0, 10)}>{formattedDate}</time>
+          {author && <> · {author.data.name}</>}
+        </p>
+        <h1 class="text-h1 md:text-display font-medium tracking-tight leading-tight">
+          {entry.data.title}
+        </h1>
+        <p class="mt-5 text-h4 text-ink-300 leading-relaxed">{entry.data.excerpt}</p>
+        {entry.data.tags.length > 0 && (
+          <div class="mt-6 flex flex-wrap gap-2">
+            {entry.data.tags.map((tag) => <Chip>{tag}</Chip>)}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <Section>
+      <div class="mx-auto max-w-3xl prose prose-ink text-base text-ink-100 leading-relaxed [&>h2]:text-h2 [&>h2]:font-medium [&>h2]:text-ink-50 [&>h2]:mt-12 [&>h2]:mb-4 [&>h3]:text-h3 [&>h3]:font-medium [&>h3]:text-ink-50 [&>h3]:mt-10 [&>h3]:mb-3 [&>p]:mb-5 [&>ul]:mb-5 [&>ul]:pl-5 [&>ul]:list-disc [&>ol]:mb-5 [&>ol]:pl-5 [&>ol]:list-decimal [&>blockquote]:border-l-2 [&>blockquote]:border-ink-700 [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:text-ink-300 [&>blockquote]:my-6">
+        <Content />
+      </div>
+
+      <div class="mx-auto max-w-3xl mt-16 pt-8 border-t border-ink-800">
+        <Button href={localizeUrl('/blog', lang)} variant="secondary" icon="arrow-left" iconPosition="leading">
+          {lang === 'fr' ? 'Retour au blog' : 'Back to blog'}
+        </Button>
+      </div>
+    </Section>
+  </article>
+</BaseLayout>

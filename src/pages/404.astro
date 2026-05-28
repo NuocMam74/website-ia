@@ -1,0 +1,27 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Section from '~/components/ui/Section.astro';
+import Button from '~/components/ui/Button.astro';
+import { t, localizeUrl, getLang } from '~/lib/i18n';
+
+const lang = getLang(Astro.url.pathname);
+---
+
+<BaseLayout
+  lang={lang}
+  path="/404"
+  title={t(lang, '404.title')}
+  description={t(lang, '404.message')}
+  noindex
+>
+  <Section>
+    <div class="max-w-md mx-auto text-center py-20">
+      <div class="text-display text-ink-200 mb-2">404</div>
+      <h1 class="text-h1 font-medium text-ink-50 mb-3">{t(lang, '404.title')}</h1>
+      <p class="text-base text-ink-300 mb-8">{t(lang, '404.message')}</p>
+      <Button href={localizeUrl('/', lang)} icon="arrow-right">
+        {t(lang, '404.back')}
+      </Button>
+    </div>
+  </Section>
+</BaseLayout>

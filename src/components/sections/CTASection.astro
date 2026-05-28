@@ -1,0 +1,42 @@
+---
+import Button from '~/components/ui/Button.astro';
+import type { Family } from '~/content.config';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  ctaLabel: string;
+  ctaHref: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaHref?: string;
+  family?: Family;
+}
+
+const {
+  title,
+  subtitle,
+  ctaLabel,
+  ctaHref,
+  secondaryCtaLabel,
+  secondaryCtaHref,
+  family,
+} = Astro.props;
+---
+
+<section class="relative">
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-ink-900/40 to-transparent backdrop-blur-sm" aria-hidden="true"></div>
+  <div class="relative mx-auto max-w-[1200px] px-6 py-20 md:py-28 text-center">
+    <h2 class="text-h1 font-medium tracking-tight max-w-2xl mx-auto">{title}</h2>
+    {subtitle && <p class="mt-4 text-base text-ink-300 max-w-2xl mx-auto">{subtitle}</p>}
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <Button href={ctaHref} variant="primary" family={family} icon="arrow-right" size="lg">
+        {ctaLabel}
+      </Button>
+      {secondaryCtaLabel && secondaryCtaHref && (
+        <Button href={secondaryCtaHref} variant="secondary" size="lg">
+          {secondaryCtaLabel}
+        </Button>
+      )}
+    </div>
+  </div>
+</section>

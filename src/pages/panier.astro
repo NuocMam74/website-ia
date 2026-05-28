@@ -1,0 +1,37 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import Cart from '~/components/islands/Cart.tsx';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+---
+
+<BaseLayout
+  lang={lang}
+  path="/panier"
+  title={t(lang, 'cart.title')}
+  description={lang === 'fr'
+    ? 'Votre panier de templates conformes (ASPICE, ISO 26262…).'
+    : 'Your cart of compliant templates (ASPICE, ISO 26262…).'}
+  noindex
+>
+  <Hero
+    variant="page"
+    family="templates"
+    title={t(lang, 'cart.title')}
+  />
+
+  <Section>
+    <Cart
+      client:load
+      lang={lang}
+      emptyMessage={t(lang, 'cart.empty')}
+      totalLabel={t(lang, 'cart.total')}
+      checkoutLabel={t(lang, 'cart.checkout')}
+      removeLabel={t(lang, 'cart.remove')}
+      checkoutEndpoint="/api/checkout"
+    />
+  </Section>
+</BaseLayout>

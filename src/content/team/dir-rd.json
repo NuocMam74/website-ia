@@ -1,0 +1,9 @@
+{
+  "name": "[À renseigner — Directeur/trice R&D]",
+  "role": "Direction R&D",
+  "bio": "Pilote la roadmap produits et la maturité technique des solutions. 15+ ans d'expérience en ingénierie système automobile et médicale.",
+  "expertise": ["ASPICE", "ISO 26262", "Polarion", "Architecture système"],
+  "icon": "wrench",
+  "accent": "teal",
+  "order": 1
+}

@@ -1,0 +1,93 @@
+---
+/**
+ * Section avec rythme vertical standard (80px desktop / 48px mobile)
+ * et conteneur interne max 1200px.
+ *
+ * Variantes de surface :
+ *   - default  : fond de page
+ *   - muted    : un peu plus sombre
+ *   - elevated : carte surélevée
+ *   - mesh     : gradient mesh signature (utilisé en hero/secondary)
+ */
+interface Props {
+  title?: string;
+  subtitle?: string;
+  /** Couleur d'accent de la famille (souligne le titre). */
+  family?: 'solutions' | 'ia' | 'templates';
+  surface?: 'default' | 'muted' | 'elevated' | 'mesh';
+  id?: string;
+  class?: string;
+  centered?: boolean;
+  /** Le titre/subtitle déclenchent un fade-up au scroll. */
+  reveal?: boolean;
+}
+
+const {
+  title,
+  subtitle,
+  family,
+  surface = 'default',
+  id,
+  class: className = '',
+  centered = false,
+  reveal = true,
+} = Astro.props;
+
+/* Fonds très légers (semi-transparents) pour laisser passer le
+   décor d'ambiance derrière, plutôt que des blocs opaques. */
+const surfaceClass =
+  surface === 'muted'
+    ? 'bg-ink-950/40 backdrop-blur-sm'
+    : surface === 'elevated'
+      ? 'bg-ink-900/60 backdrop-blur-sm'
+      : surface === 'mesh'
+        ? 'bg-mesh'
+        : '';
+
+const accentLineClass = family
+  ? family === 'solutions'
+    ? 'after:bg-teal-400'
+    : family === 'ia'
+      ? 'after:bg-coral-400'
+      : 'after:bg-amber-400'
+  : '';
+---
+
+<section
+  id={id}
+  class:list={[
+    'py-16 md:py-24 relative',
+    surfaceClass,
+    className,
+  ]}
+>
+  <div class="mx-auto max-w-[1200px] px-6">
+    {(title || subtitle) && (
+      <header
+        class:list={[
+          'mb-12 md:mb-16',
+          reveal && 'reveal',
+          centered && 'text-center mx-auto max-w-2xl',
+        ]}
+      >
+        {title && (
+          <h2
+            class:list={[
+              'text-h1 md:text-display font-semibold tracking-tight relative inline-block',
+              family &&
+                'after:content-[""] after:absolute after:-bottom-3 after:left-0 after:w-12 after:h-[2px] after:rounded-full',
+              centered && 'after:left-1/2 after:-translate-x-1/2',
+              accentLineClass,
+            ]}
+          >
+            {title}
+          </h2>
+        )}
+        {subtitle && (
+          <p class:list={['mt-6 text-base md:text-h4 text-ink-300 font-light leading-relaxed', !centered && 'max-w-2xl']}>{subtitle}</p>
+        )}
+      </header>
+    )}
+    <slot />
+  </div>
+</section>

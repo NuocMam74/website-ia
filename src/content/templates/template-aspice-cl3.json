@@ -1,0 +1,19 @@
+{
+  "name": "Template ASPICE CL3",
+  "norm": "aspice",
+  "icon": "file-text",
+  "summary": "Structure complète niveau 3, 17 process areas prêtes à l'emploi.",
+  "longDescription": "Un template prêt à importer couvrant l'ensemble des process areas pour viser le niveau de capacité 3. Inclut les HomePages, les rôles de liens et un guide d'usage détaillé pour démarrer en quelques heures.",
+  "contents": [
+    "17 process areas structurées",
+    "HomePages prêtes",
+    "Rôles de liens configurés",
+    "Guide d'usage"
+  ],
+  "fileFormat": ".docx + .xml (Polarion)",
+  "version": "1.0",
+  "priceEUR": 490,
+  "license": "Licence mono-entreprise, usage interne",
+  "order": 1,
+  "cta": "buy"
+}

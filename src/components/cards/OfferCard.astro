@@ -1,0 +1,48 @@
+---
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Chip from '~/components/ui/Chip.astro';
+import type { Family } from '~/content.config';
+
+interface Props {
+  variant: 'solution' | 'ai';
+  name: string;
+  tagline: string;
+  icon: string;
+  tags: string[];
+  href: string;
+}
+
+const { variant, name, tagline, icon, tags, href } = Astro.props;
+const accent: Family = variant === 'solution' ? 'solutions' : 'ia';
+
+/* Icône : carré rounded avec gradient + petit halo lumineux */
+const iconBg =
+  variant === 'solution'
+    ? 'bg-gradient-to-br from-teal-400/30 to-teal-600/20 text-teal-200 ring-1 ring-teal-400/30'
+    : 'bg-gradient-to-br from-coral-400/30 to-coral-600/20 text-coral-200 ring-1 ring-coral-400/30';
+
+const arrowColor = variant === 'solution' ? 'text-teal-300' : 'text-coral-300';
+---
+
+<Card accent={accent} href={href} interactive spotlight class="group">
+  <div class="p-6 h-full flex flex-col">
+    <div class="flex items-start justify-between mb-5">
+      <div class:list={['inline-flex items-center justify-center w-11 h-11 rounded-lg', iconBg]}>
+        <Icon name={icon} size={22} />
+      </div>
+      <span class:list={['opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0', arrowColor]}>
+        <Icon name="arrow-right" size={18} />
+      </span>
+    </div>
+
+    <h3 class="text-h3 font-semibold text-ink-50 mb-1.5 tracking-tight">{name}</h3>
+    <p class="text-small text-ink-300 leading-relaxed">{tagline}</p>
+
+    {tags.length > 0 && (
+      <div class="flex flex-wrap gap-1.5 mt-auto pt-5">
+        {tags.map((tag) => <Chip>{tag}</Chip>)}
+      </div>
+    )}
+  </div>
+</Card>

@@ -1,0 +1,6 @@
+{
+  "id": "ia-data",
+  "question": "Que deviennent les données utilisées par vos solutions IA ?",
+  "answer": "Les corpus clients sont traités de façon confidentielle. Selon l'offre, le traitement peut être réalisé en local (on-premise) ou dans un environnement isolé. Aucune donnée client n'est utilisée pour entraîner des modèles tiers.",
+  "family": "ia"
+}

@@ -1,0 +1,123 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import OfferCard from '~/components/cards/OfferCard.astro';
+import EmptyState from '~/components/ui/EmptyState.astro';
+import LayeredFilters from '~/components/islands/LayeredFilters.tsx';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+import { DOMAINS, SERVICES } from '~/content.config';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const solutions = (await getCollection('solutions')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+/* On ne propose dans le filtre que les domaines réellement présents
+ * dans le catalogue (pas de chip qui mène à un état vide). */
+const usedDomains = Array.from(
+  new Set(solutions.flatMap((s) => s.data.domains)),
+);
+const usedServices = Array.from(
+  new Set(solutions.flatMap((s) => s.data.services)),
+);
+
+const primaryOptions = [
+  { value: 'all', label: t(lang, 'domain.all') },
+  ...DOMAINS.filter((d) => usedDomains.includes(d)).map((d) => ({
+    value: d,
+    label: t(lang, `domain.${d}`),
+  })),
+];
+
+/* Pour chaque service, on calcule la liste des domaines où il apparaît,
+ * pour que le sous-filtre se restreigne dynamiquement. */
+const serviceDomainMap = new Map<string, Set<string>>();
+solutions.forEach((s) => {
+  s.data.services.forEach((svc) => {
+    const set = serviceDomainMap.get(svc) ?? new Set<string>();
+    s.data.domains.forEach((d) => set.add(d));
+    serviceDomainMap.set(svc, set);
+  });
+});
+
+const secondaryOptions = [
+  { value: 'all', label: t(lang, 'service.all') },
+  ...SERVICES.filter((s) => usedServices.includes(s)).map((s) => ({
+    value: s,
+    label: t(lang, `service.${s}`),
+    domains: Array.from(serviceDomainMap.get(s) ?? []),
+  })),
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/solutions"
+  title={`${t(lang, 'family.solutions')} — ${t(lang, 'solutions.hero.title')}`}
+  description={lang === 'fr'
+    ? 'Logiciels métier sur-mesure pour tous secteurs : RH, finance, production, commercial, DevOps, achats, qualité.'
+    : 'Custom business software for any sector: HR, finance, production, sales, DevOps, procurement, quality.'}
+>
+  <Hero
+    variant="page"
+    family="solutions"
+    kicker={t(lang, 'family.solutions')}
+    title={lang === 'fr'
+      ? 'Du logiciel métier qui se déploie en quelques semaines'
+      : 'Business software shipped in weeks'}
+    subtitle={lang === 'fr'
+      ? 'Des applications web et plateformes sur-mesure pour vos équipes RH, finance, production, commercial, IT… Conçues et livrées avec une exigence de fiabilité.'
+      : 'Custom web apps and platforms for your HR, finance, production, sales, IT teams… Designed and delivered with a focus on reliability.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+  />
+
+  <Section>
+    <div class="mb-10">
+      <LayeredFilters
+        client:idle
+        primaryLabel={t(lang, 'solutions.filter.label')}
+        primaryOptions={primaryOptions}
+        secondaryLabel={t(lang, 'service.label')}
+        secondaryOptions={secondaryOptions}
+        targetSelector="[data-filter-card='solution']"
+        emptySelector="#solutions-empty"
+        accent="teal"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {solutions.map((s) => (
+        <div
+          data-filter-card="solution"
+          data-primary-value={s.data.domains.join(',')}
+          data-secondary-value={s.data.services.join(',')}
+        >
+          <OfferCard
+            variant="solution"
+            name={s.data.name}
+            tagline={s.data.tagline}
+            icon={s.data.icon}
+            tags={[
+              ...s.data.domains.slice(0, 1).map((d) => t(lang, `domain.${d}`)),
+              ...s.data.services.slice(0, 2).map((sv) => t(lang, `service.${sv}`)),
+            ]}
+            href={localizeUrl(`/solutions/${s.id}`, lang)}
+          />
+        </div>
+      ))}
+    </div>
+
+    <div id="solutions-empty" style="display: none">
+      <EmptyState
+        title={t(lang, 'filter.empty.title')}
+        message={t(lang, 'filter.empty.message')}
+        ctaLabel={t(lang, 'cta.contact')}
+        ctaHref={localizeUrl('/contact', lang)}
+      />
+    </div>
+  </Section>
+</BaseLayout>

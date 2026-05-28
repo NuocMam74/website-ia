@@ -1,0 +1,81 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import PartnerLogo from '~/components/ui/PartnerLogo.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const partners = (await getCollection('partners')).sort((a, b) => a.data.order - b.data.order);
+
+const categories = [
+  { key: 'technology' as const, label: lang === 'fr' ? 'Technologies' : 'Technologies', desc: lang === 'fr' ? 'Les plateformes et outils sur lesquels nos solutions s’appuient.' : 'The platforms and tools our solutions rely on.' },
+  { key: 'integrator' as const, label: lang === 'fr' ? 'Intégrateurs' : 'Integrators', desc: lang === 'fr' ? 'Cabinets et intégrateurs qui déploient nos produits.' : 'Firms and integrators who deploy our products.' },
+  { key: 'certification' as const, label: lang === 'fr' ? 'Certifications' : 'Certifications', desc: lang === 'fr' ? 'Schémas et certifications que nous suivons.' : 'Schemes and certifications we follow.' },
+  { key: 'community' as const, label: lang === 'fr' ? 'Communauté' : 'Community', desc: lang === 'fr' ? 'Réseaux et associations dans lesquels nous contribuons.' : 'Networks and communities we contribute to.' },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/partenaires"
+  title={lang === 'fr' ? 'Partenaires & écosystème' : 'Partners & ecosystem'}
+  description={lang === 'fr'
+    ? 'Notre écosystème technique et nos partenaires d’intégration et de certification.'
+    : 'Our technical ecosystem and our integration and certification partners.'}
+>
+  <Hero
+    variant="page"
+    kicker={lang === 'fr' ? 'Écosystème' : 'Ecosystem'}
+    title={lang === 'fr' ? 'Un écosystème de confiance, pas un silo' : 'A trusted ecosystem, not a silo'}
+    subtitle={lang === 'fr'
+      ? 'Nos produits s’intègrent avec ce que vous utilisez déjà, et nos partenaires nous aident à déployer à votre échelle.'
+      : 'Our products integrate with what you already use, and our partners help us deploy at your scale.'}
+  />
+
+  {categories.map((cat) => {
+    const items = partners.filter((p) => p.data.category === cat.key);
+    if (items.length === 0) return null;
+    return (
+      <Section title={cat.label} subtitle={cat.desc}>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {items.map((p, i) => (
+            <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+              <Card interactive class="h-full">
+                <div class="p-6 h-full flex flex-col">
+                  <PartnerLogo name={p.data.name} category={p.data.category} size={64} class="mb-5" />
+                  <h3 class="text-h3 font-semibold text-ink-50 tracking-tight">{p.data.name}</h3>
+                  <p class="mt-2 text-small text-ink-300 leading-relaxed flex-1">{p.data.description}</p>
+                  {p.data.url && (
+                    <a
+                      href={p.data.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="mt-5 inline-flex items-center gap-1 text-xs text-ink-400 hover:text-ink-200"
+                    >
+                      {lang === 'fr' ? 'Site officiel' : 'Official site'}
+                      <Icon name="external-link" size={12} />
+                    </a>
+                  )}
+                </div>
+              </Card>
+            </div>
+          ))}
+        </div>
+      </Section>
+    );
+  })}
+
+  <CTASection
+    title={lang === 'fr' ? 'Vous êtes intégrateur ou éditeur ?' : 'You’re an integrator or vendor?'}
+    subtitle={lang === 'fr'
+      ? 'Discutons d’un partenariat technique ou d’une intégration de votre plateforme.'
+      : 'Let’s talk about a technical partnership or an integration of your platform.'}
+    ctaLabel={lang === 'fr' ? 'Devenir partenaire' : 'Become a partner'}
+    ctaHref={localizeUrl('/contact?type=projet', lang)}
+  />
+</BaseLayout>

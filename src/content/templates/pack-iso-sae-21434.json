@@ -1,0 +1,16 @@
+{
+  "name": "Pack ISO/SAE 21434",
+  "norm": "iso21434",
+  "icon": "lock-keyhole",
+  "summary": "Modèles cybersécurité automobile et analyse de risques TARA.",
+  "longDescription": "Modèles pour la gestion du risque cyber véhicule : analyse TARA, plan de cybersécurité et catalogue de menaces, prêts à adapter à votre projet.",
+  "contents": [
+    "Modèle TARA",
+    "Plan de cybersécurité",
+    "Catalogue de menaces"
+  ],
+  "fileFormat": ".docx + .xlsx",
+  "priceEUR": 390,
+  "order": 3,
+  "cta": "buy"
+}

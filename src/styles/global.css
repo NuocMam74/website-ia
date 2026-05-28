@@ -1,0 +1,397 @@
+@import 'tailwindcss';
+
+/* ================================================================
+   PALETTE DARK PREMIUM (v2)
+   Esprit Linear / Vercel : fonds anthracite profonds, accents
+   lumineux saturés, micro-effets de profondeur (lueurs, glass,
+   gradient mesh). Sérieux d'ingénierie + qualité perçue élevée.
+   ================================================================ */
+@theme {
+  /* === Neutres (échelle inversée → ink-50 = clair, ink-950 = fond) === */
+  --color-ink-50:  #FAFAFC; /* texte principal */
+  --color-ink-100: #E4E4EA; /* texte secondaire fort */
+  --color-ink-200: #C2C2CC; /* texte secondaire */
+  --color-ink-300: #9999A4;
+  --color-ink-400: #74747F; /* texte muted */
+  --color-ink-500: #5C5C66;
+  --color-ink-600: #44444D; /* dividers visibles */
+  --color-ink-700: #2E2E36; /* borders fortes */
+  --color-ink-800: #1F1F26; /* borders subtiles */
+  --color-ink-900: #14141A; /* surface cartes */
+  --color-ink-950: #09090D; /* fond de page */
+
+  /* === Solutions : cyan électrique === */
+  --color-teal-50:  #E6FCFF;
+  --color-teal-100: #B3F5FF;
+  --color-teal-200: #66E5FF;
+  --color-teal-300: #33DBFF;
+  --color-teal-400: #00D9FF;
+  --color-teal-500: #00B8DB;
+  --color-teal-600: #008FA8;
+  --color-teal-700: #006A7D;
+  --color-teal-800: #00485A;
+  --color-teal-900: #002830;
+
+  /* === IA & Agents : magenta vibrant === */
+  --color-coral-50:  #FFE8F1;
+  --color-coral-100: #FFB8D2;
+  --color-coral-200: #FF85B1;
+  --color-coral-300: #FF6699;
+  --color-coral-400: #FF3D7F;
+  --color-coral-500: #E51E68;
+  --color-coral-600: #B81654;
+  --color-coral-700: #8A0F3F;
+  --color-coral-800: #5C0A2A;
+  --color-coral-900: #2E0515;
+
+  /* === Templates : or chaud === */
+  --color-amber-50:  #FFF6E0;
+  --color-amber-100: #FFE099;
+  --color-amber-200: #FFCC4D;
+  --color-amber-300: #FFBC1F;
+  --color-amber-400: #FFB000;
+  --color-amber-500: #E89B00;
+  --color-amber-600: #B87B00;
+  --color-amber-700: #8A5C00;
+  --color-amber-800: #5C3D00;
+  --color-amber-900: #2E1F00;
+
+  /* === Typo === */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 3rem;       /* 48 — plus généreux qu'en V1 */
+  --text-display--line-height: 1.1;
+  --text-hero: 4rem;          /* 64 — hero accueil */
+  --text-hero--line-height: 1.05;
+  --text-h1: 2.25rem;         /* 36 */
+  --text-h1--line-height: 1.15;
+  --text-h2: 1.625rem;        /* 26 */
+  --text-h2--line-height: 1.25;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.35;
+  --text-h4: 1rem;
+  --text-h4--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.7;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.6;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.6;
+
+  /* === Rayons & layout === */
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --container-content: 1200px;
+}
+
+/* ================================================================
+   Tokens sémantiques (faciles à overrider pour un futur mode clair)
+   ================================================================ */
+:root {
+  color-scheme: dark;
+
+  --surface-page:   var(--color-ink-950);
+  --surface-card:   var(--color-ink-900);
+  --surface-muted:  #0F0F14;
+  --surface-elevated: #1A1A22;
+
+  --text-primary:   var(--color-ink-50);
+  --text-secondary: var(--color-ink-200);
+  --text-muted:     var(--color-ink-400);
+
+  --border-default: var(--color-ink-800);
+  --border-strong:  var(--color-ink-700);
+  --border-subtle:  rgba(255, 255, 255, 0.06);
+
+  --accent-solutions:        var(--color-teal-400);
+  --accent-solutions-glow:   rgba(0, 217, 255, 0.20);
+  --accent-ia:               var(--color-coral-400);
+  --accent-ia-glow:          rgba(255, 61, 127, 0.20);
+  --accent-templates:        var(--color-amber-400);
+  --accent-templates-glow:   rgba(255, 176, 0, 0.20);
+
+  --grain: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ================================================================
+   Base
+   ================================================================ */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    background-color: var(--surface-page);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-weight: 400;
+    line-height: 1.7;
+    background-image: var(--grain);
+    background-attachment: fixed;
+    background-size: 256px 256px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -0.015em;
+  }
+  h1, h2 { font-weight: 600; letter-spacing: -0.025em; }
+
+  h1 { font-size: var(--text-h1); line-height: var(--text-h1--line-height); }
+  h2 { font-size: var(--text-h2); line-height: var(--text-h2--line-height); }
+  h3 { font-size: var(--text-h3); line-height: var(--text-h3--line-height); }
+  h4 { font-size: var(--text-h4); line-height: var(--text-h4--line-height); }
+
+  a { color: inherit; text-decoration: none; }
+
+  ::selection {
+    background-color: var(--color-teal-400);
+    color: var(--color-ink-950);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-teal-400);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Skip-link */
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: 1rem;
+    background: var(--color-ink-50);
+    color: var(--color-ink-950);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    z-index: 100;
+    font-weight: 500;
+    transition: top 150ms ease;
+  }
+  .skip-link:focus { top: 1rem; }
+
+  /* Scrollbar discrète (Webkit) */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--surface-page); }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-ink-700);
+    border-radius: 5px;
+    border: 2px solid var(--surface-page);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-ink-600); }
+}
+
+/* ================================================================
+   Utilities sur mesure : motifs, animations, gradient mesh
+   ================================================================ */
+@layer utilities {
+  /* Grille blueprint en fond de hero */
+  .bg-blueprint {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+    background-position: -1px -1px;
+  }
+
+  /* Pointillés style schéma technique */
+  .bg-dots {
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Gradient mesh discret, signature visuelle du site */
+  .bg-mesh {
+    background-image:
+      radial-gradient(at 20% 20%, rgba(0, 217, 255, 0.10) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(255, 61, 127, 0.08) 0px, transparent 50%),
+      radial-gradient(at 70% 80%, rgba(255, 176, 0, 0.08) 0px, transparent 50%);
+  }
+
+  /* Glow par famille — utilisé sur les CTA primaires et boutons */
+  .glow-teal { box-shadow: 0 0 0 1px rgba(0,217,255,0.3), 0 8px 32px -8px rgba(0,217,255,0.4); }
+  .glow-coral { box-shadow: 0 0 0 1px rgba(255,61,127,0.3), 0 8px 32px -8px rgba(255,61,127,0.4); }
+  .glow-amber { box-shadow: 0 0 0 1px rgba(255,176,0,0.3), 0 8px 32px -8px rgba(255,176,0,0.4); }
+
+  /* Effet glass utilisé pour le header sticky et les modales */
+  .glass {
+    background-color: rgba(9, 9, 13, 0.72);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+  }
+
+  /* Gradient text — pour des accents typographiques sur le hero */
+  .text-gradient-cyan {
+    background: linear-gradient(135deg, #00D9FF 0%, #66E5FF 50%, #FFFFFF 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gradient-mix {
+    background: linear-gradient(135deg, #00D9FF 0%, #FF3D7F 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Card avec ombre et bordure dégradée par famille */
+  .card-shadow {
+    box-shadow:
+      0 1px 0 0 rgba(255,255,255,0.04) inset,
+      0 0 0 1px rgba(255,255,255,0.04),
+      0 24px 48px -16px rgba(0,0,0,0.6);
+  }
+
+  /* Hover-lift réutilisable */
+  .hover-lift {
+    transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 200ms ease,
+                border-color 150ms ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Scroll-reveal classes (activées par script dans BaseLayout) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Cursor-spotlight : ajoute un halo lumineux qui suit le curseur sur
+     les éléments marqués `data-spotlight`. Pris en charge par un script
+     dans BaseLayout qui injecte les vars CSS --mx / --my au mouvement. */
+  [data-spotlight] {
+    position: relative;
+  }
+  [data-spotlight]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      320px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.08),
+      transparent 40%
+    );
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+  [data-spotlight]:hover::before {
+    opacity: 1;
+  }
+  [data-spotlight] > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Variante par famille — la lueur prend la couleur de l'accent */
+  [data-spotlight='solutions']::before {
+    background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(0, 217, 255, 0.12), transparent 40%);
+  }
+  [data-spotlight='ia']::before {
+    background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 61, 127, 0.12), transparent 40%);
+  }
+  [data-spotlight='templates']::before {
+    background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 176, 0, 0.12), transparent 40%);
+  }
+
+  /* Underline animé sous les liens */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-underline:hover {
+    background-size: 100% 1px;
+  }
+
+  /* Marquee horizontal infini */
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 40s linear infinite;
+    padding-right: 3rem;
+    flex-shrink: 0;
+    will-change: transform;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-100%); }
+  }
+
+  /* Pulse pour le hero animé */
+  .animate-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+}
+
+/* ================================================================
+   Astro View Transitions — cross-fade subtil
+   ================================================================ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 240ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(root) {
+  animation-name: vt-fade-out;
+}
+::view-transition-new(root) {
+  animation-name: vt-fade-in;
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================================================
+   Reduced motion : tout désactivé sauf l'essentiel
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .marquee-track { animation: none; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}

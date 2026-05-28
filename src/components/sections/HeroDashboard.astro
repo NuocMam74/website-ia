@@ -1,0 +1,72 @@
+---
+/**
+ * Composit visuel du hero d'accueil : 3 mockups UI flottants en stack.
+ * Suggère immédiatement le registre tech / IA / digital :
+ *  - un code snippet Python (l'API)
+ *  - un orchestrateur multi-agents (l'IA en action)
+ *  - un dashboard live (le produit en prod)
+ */
+import DashboardCard from '~/components/mockups/DashboardCard.astro';
+import AgentCard from '~/components/mockups/AgentCard.astro';
+import CodeSnippet from '~/components/mockups/CodeSnippet.astro';
+---
+
+<div class="relative w-full aspect-[4/4.5] max-w-[560px] mx-auto pointer-events-none select-none">
+  {/* Halos de fond pour donner de la profondeur */}
+  <div
+    class="absolute top-1/4 left-1/4 w-3/4 h-3/4 rounded-full opacity-40 blur-3xl bg-gradient-radial from-teal-400/40 to-transparent"
+    aria-hidden="true"
+  ></div>
+  <div
+    class="absolute bottom-0 right-0 w-2/3 h-2/3 rounded-full opacity-30 blur-3xl bg-gradient-radial from-coral-400/30 to-transparent"
+    aria-hidden="true"
+  ></div>
+
+  {/* Carte 1 : dashboard (au fond, légèrement penché à gauche) */}
+  <div
+    class="absolute top-0 left-0 w-[78%] -rotate-3 transform-gpu animate-float-1"
+    style="z-index: 1"
+  >
+    <DashboardCard />
+  </div>
+
+  {/* Carte 2 : agent terminal (à droite, en avant) */}
+  <div
+    class="absolute top-[20%] right-0 w-[68%] rotate-2 transform-gpu animate-float-2"
+    style="z-index: 3"
+  >
+    <AgentCard />
+  </div>
+
+  {/* Carte 3 : code snippet (en bas, recouvre légèrement) */}
+  <div
+    class="absolute bottom-0 left-[8%] w-[74%] -rotate-1 transform-gpu animate-float-3"
+    style="z-index: 2"
+  >
+    <CodeSnippet />
+  </div>
+</div>
+
+<style>
+  /* Flottement très léger, décalé entre cartes — sensation de "vivant" */
+  @keyframes float-a {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50%      { transform: translateY(-8px) rotate(-3deg); }
+  }
+  @keyframes float-b {
+    0%, 100% { transform: translateY(0) rotate(2deg); }
+    50%      { transform: translateY(-6px) rotate(2deg); }
+  }
+  @keyframes float-c {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-10px) rotate(-1deg); }
+  }
+  .animate-float-1 { animation: float-a 8s ease-in-out infinite; }
+  .animate-float-2 { animation: float-b 9s ease-in-out infinite 0.5s; }
+  .animate-float-3 { animation: float-c 10s ease-in-out infinite 1s; }
+
+  /* Gradient radial helper — Tailwind n'a pas bg-gradient-radial natif */
+  .bg-gradient-radial {
+    background-image: radial-gradient(var(--tw-gradient-stops));
+  }
+</style>

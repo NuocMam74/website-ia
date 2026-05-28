@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Chip from '~/components/ui/Chip.astro';
+import AvatarPortrait from '~/components/ui/AvatarPortrait.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const members = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
+
+const accentClasses: Record<'teal' | 'coral' | 'amber', { bg: string; ring: string; text: string }> = {
+  teal: { bg: 'from-teal-400 to-teal-600', ring: 'ring-teal-400/30', text: 'text-teal-200' },
+  coral: { bg: 'from-coral-400 to-coral-600', ring: 'ring-coral-400/30', text: 'text-coral-200' },
+  amber: { bg: 'from-amber-400 to-amber-600', ring: 'ring-amber-400/30', text: 'text-amber-200' },
+};
+---
+
+<BaseLayout
+  lang={lang}
+  path="/equipe"
+  title={lang === 'fr' ? 'L’équipe' : 'The team'}
+  description={lang === 'fr'
+    ? 'Une équipe d’ingénieurs experts en conformité, sécurité fonctionnelle et IA industrielle.'
+    : 'A team of engineers specialised in compliance, functional safety and industrial AI.'}
+>
+  <Hero
+    variant="page"
+    kicker={lang === 'fr' ? 'L’équipe' : 'The team'}
+    title={lang === 'fr' ? 'Les personnes derrière les produits' : 'The people behind the products'}
+    subtitle={lang === 'fr'
+      ? 'Petite équipe d’ingénieurs et d’architectes — pas de couche commerciale entre vous et la technique.'
+      : 'A small team of engineers and architects — no commercial layer between you and the technical side.'}
+  />
+
+  <Section>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {members.map((m, i) => {
+        const a = accentClasses[m.data.accent];
+        return (
+          <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+            <Card interactive class="h-full">
+              <div class="p-7 h-full flex flex-col">
+                {/* Portrait placeholder premium (à remplacer par photo plus tard) */}
+                <AvatarPortrait
+                  name={m.data.name}
+                  accent={m.data.accent}
+                  size={96}
+                  class="mb-5"
+                />
+
+                <h3 class="text-h3 font-semibold text-ink-50 tracking-tight">{m.data.name}</h3>
+                <p class:list={['text-small font-medium mt-1', a.text]}>{m.data.role}</p>
+
+                <p class="mt-4 text-small text-ink-300 leading-relaxed flex-1">{m.data.bio}</p>
+
+                {m.data.expertise.length > 0 && (
+                  <div class="mt-5 flex flex-wrap gap-1.5">
+                    {m.data.expertise.map((e) => <Chip>{e}</Chip>)}
+                  </div>
+                )}
+
+                {m.data.linkedin && (
+                  <a
+                    href={m.data.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-5 inline-flex items-center gap-1 text-xs text-ink-400 hover:text-ink-200"
+                  >
+                    LinkedIn
+                    <Icon name="external-link" size={12} />
+                  </a>
+                )}
+              </div>
+            </Card>
+          </div>
+        );
+      })}
+    </div>
+
+    <p class="mt-12 text-center text-small text-ink-400 italic max-w-xl mx-auto">
+      {lang === 'fr'
+        ? 'Les portraits seront remplacés par les vraies photos une fois validées par chaque personne.'
+        : 'Portraits will be replaced by real photos once each person has approved them.'}
+    </p>
+  </Section>
+
+  <CTASection
+    title={lang === 'fr' ? 'Envie de rejoindre l’équipe ?' : 'Want to join the team?'}
+    subtitle={lang === 'fr'
+      ? 'Nous recrutons régulièrement des ingénieurs qualité, des architectes IA et des intégrateurs Polarion. Écrivez-nous.'
+      : 'We regularly hire quality engineers, AI architects and Polarion integrators. Get in touch.'}
+    ctaLabel={lang === 'fr' ? 'Postuler en candidature spontanée' : 'Submit a spontaneous application'}
+    ctaHref={localizeUrl('/contact', lang)}
+  />
+</BaseLayout>

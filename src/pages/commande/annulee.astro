@@ -1,0 +1,41 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import Button from '~/components/ui/Button.astro';
+import { localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+---
+
+<BaseLayout
+  lang={lang}
+  path="/commande/annulee"
+  title={lang === 'fr' ? 'Paiement annulé' : 'Payment cancelled'}
+  description={lang === 'fr'
+    ? 'Le paiement n’a pas été finalisé. Votre panier est conservé.'
+    : 'Payment was not completed. Your cart is preserved.'}
+  noindex
+>
+  <Hero
+    variant="page"
+    family="templates"
+    title={lang === 'fr' ? 'Paiement annulé' : 'Payment cancelled'}
+    subtitle={lang === 'fr'
+      ? 'Aucun montant ne vous a été facturé. Votre panier est conservé.'
+      : 'No amount was charged. Your cart is preserved.'}
+  />
+
+  <Section>
+    <div class="max-w-md mx-auto text-center">
+      <div class="flex flex-wrap justify-center gap-3">
+        <Button href={localizeUrl('/panier', lang)} variant="primary" family="templates">
+          {lang === 'fr' ? 'Retour au panier' : 'Back to cart'}
+        </Button>
+        <Button href={localizeUrl('/templates', lang)} variant="secondary">
+          {lang === 'fr' ? 'Voir les templates' : 'See templates'}
+        </Button>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

@@ -1,0 +1,62 @@
+---
+import Counter from '~/components/islands/Counter.tsx';
+
+interface Stat {
+  value: number;
+  prefix?: string;
+  suffix?: string;
+  /** Si non animable (ex. "FR/EN"), utiliser raw au lieu de value. */
+  raw?: string;
+  label: string;
+  /** Couleur d'accent pour le grand chiffre. */
+  accent?: 'teal' | 'coral' | 'amber' | 'neutral';
+}
+
+interface Props {
+  title?: string;
+  stats: Stat[];
+  norms?: string[];
+}
+
+const { title, stats, norms = [] } = Astro.props;
+
+const accentMap: Record<NonNullable<Stat['accent']>, string> = {
+  teal: 'text-teal-300',
+  coral: 'text-coral-300',
+  amber: 'text-amber-300',
+  neutral: 'text-ink-50',
+};
+---
+
+<div class="relative overflow-hidden rounded-xl border border-ink-800 bg-ink-900/60 backdrop-blur p-8 md:p-10">
+  <div class="absolute inset-0 bg-mesh opacity-50 pointer-events-none" aria-hidden="true"></div>
+
+  <div class="relative">
+    {title && (
+      <h2 class="reveal text-h3 font-semibold text-ink-50 text-center mb-10 tracking-tight">{title}</h2>
+    )}
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      {stats.map((s, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <div class:list={['text-display md:text-hero font-semibold tracking-tight', accentMap[s.accent ?? 'neutral']]}>
+            <Counter
+              client:visible
+              to={s.value ?? 0}
+              prefix={s.prefix}
+              suffix={s.suffix}
+              raw={s.raw}
+            />
+          </div>
+          <div class="text-xs uppercase tracking-wider text-ink-400 mt-2">{s.label}</div>
+        </div>
+      ))}
+    </div>
+
+    {norms.length > 0 && (
+      <div class="mt-10 pt-8 border-t border-ink-800 flex flex-wrap justify-center gap-x-8 gap-y-3 text-small text-ink-500">
+        {norms.map((n) => <span class="font-medium tracking-wide">{n}</span>)}
+      </div>
+    )}
+  </div>
+</div>

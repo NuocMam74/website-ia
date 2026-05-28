@@ -1,0 +1,19 @@
+---
+/**
+ * Petit tag neutre pour métadonnées (domaine, service, tag d'article).
+ * Pour les puces de filtre interactives, voir l'island FilterChips.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<span
+  class:list={[
+    'inline-flex items-center gap-1 px-2.5 py-1 text-xs text-ink-300 border border-ink-800 rounded-full',
+    className,
+  ]}
+>
+  <slot />
+</span>

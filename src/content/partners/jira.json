@@ -1,0 +1,8 @@
+{
+  "name": "Jira / Atlassian",
+  "category": "technology",
+  "description": "Connecteurs et passerelles vers Jira pour le suivi de tickets et la traçabilité croisée avec votre ALM.",
+  "url": "https://www.atlassian.com",
+  "icon": "git-branch",
+  "order": 2
+}

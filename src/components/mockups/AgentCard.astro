@@ -1,0 +1,74 @@
+---
+/**
+ * Mock orchestration multi-agents — 3 agents qui collaborent sur une
+ * tâche. Plus universel et "AI" qu'un agent unique de conformité.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+
+const agents = [
+  { name: 'researcher', status: 'thinking', color: 'teal', desc: 'analyse 38 sources' },
+  { name: 'writer', status: 'ready', color: 'coral', desc: 'attend la synthèse' },
+  { name: 'reviewer', status: 'idle', color: 'amber', desc: 'mode validation' },
+];
+
+const dotClass: Record<string, string> = {
+  teal: 'bg-teal-400',
+  coral: 'bg-coral-400',
+  amber: 'bg-amber-400',
+};
+const colorClass: Record<string, string> = {
+  teal: 'border-teal-400/40 bg-teal-500/10',
+  coral: 'border-coral-400/40 bg-coral-500/10',
+  amber: 'border-amber-400/40 bg-amber-500/10',
+};
+---
+
+<div class:list={['relative bg-ink-950 border border-ink-700 rounded-xl overflow-hidden card-shadow', className]}>
+  <div class="flex items-center justify-between px-4 py-2.5 border-b border-ink-800 bg-ink-900/60">
+    <div class="flex items-center gap-2">
+      <span class="text-[10px] text-ink-400 font-mono">orchestrator · workflow #4218</span>
+    </div>
+    <span class="inline-flex items-center gap-1 text-[10px] text-coral-300 font-medium">
+      <span class="w-1.5 h-1.5 rounded-full bg-coral-400 animate-pulse-soft"></span>
+      running
+    </span>
+  </div>
+
+  <div class="p-5">
+    <div class="mb-4">
+      <div class="text-[10px] uppercase tracking-wider text-ink-500 mb-1.5">task</div>
+      <div class="text-small text-ink-100 italic">« Génère un rapport de marché sur le secteur batteries EV »</div>
+    </div>
+
+    <div class="space-y-2.5">
+      {agents.map((agent) => {
+        const opacity = agent.status === 'idle' ? 'opacity-40' : '';
+        return (
+          <div class:list={['flex items-center gap-3 px-3 py-2.5 rounded-lg border', colorClass[agent.color], opacity]}>
+            <span
+              class:list={['w-2 h-2 rounded-full', dotClass[agent.color], agent.status === 'thinking' && 'animate-pulse-soft']}
+            ></span>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-mono text-ink-50">{agent.name}</div>
+              <div class="text-[10px] text-ink-400">{agent.desc}</div>
+            </div>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-ink-400">{agent.status}</span>
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="mt-5 pt-4 border-t border-ink-800">
+      <div class="flex items-center justify-between text-[10px] text-ink-500 mb-1.5">
+        <span>étape 2 / 5</span>
+        <span class="font-mono">38% · ETA 1m12s</span>
+      </div>
+      <div class="h-1 bg-ink-800 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-teal-400 to-coral-400 rounded-full" style="width: 38%"></div>
+      </div>
+    </div>
+  </div>
+</div>

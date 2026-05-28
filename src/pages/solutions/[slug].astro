@@ -1,0 +1,196 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import FeatureGrid from '~/components/sections/FeatureGrid.astro';
+import FAQAccordion from '~/components/sections/FAQAccordion.astro';
+import RelatedGrid from '~/components/sections/RelatedGrid.astro';
+import OfferCard from '~/components/cards/OfferCard.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import Chip from '~/components/ui/Chip.astro';
+import Icon from '~/components/ui/Icon.astro';
+import {
+  softwareApplicationLd,
+  breadcrumbLd,
+  faqLd,
+  canonicalUrl,
+} from '~/lib/seo';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+export async function getStaticPaths() {
+  const solutions = await getCollection('solutions');
+  return solutions.map((s) => ({
+    params: { slug: s.id },
+    props: { entry: s },
+  }));
+}
+
+const { entry } = Astro.props;
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+const { Content } = await render(entry);
+
+const all = await getCollection('solutions');
+const related = (entry.data.relatedSlugs ?? [])
+  .map((slug) => all.find((s) => s.id === slug))
+  .filter((x): x is NonNullable<typeof x> => Boolean(x));
+
+/* Si pas de related explicites, prendre 2 autres solutions du même domaine */
+const fallbackRelated =
+  related.length > 0
+    ? []
+    : all
+        .filter(
+          (s) =>
+            s.id !== entry.id &&
+            s.data.domains.some((d) => entry.data.domains.includes(d)),
+        )
+        .slice(0, 2);
+
+const relatedFinal = related.length > 0 ? related : fallbackRelated;
+
+const faqAll = await getCollection('faq', ({ data }) =>
+  entry.data.faqRefs ? entry.data.faqRefs.includes(data.id) : false,
+);
+
+const url = canonicalUrl(`/solutions/${entry.id}`, lang);
+
+const jsonLd: object[] = [
+  softwareApplicationLd({
+    name: entry.data.name,
+    description: entry.data.summary,
+    url,
+    category: 'BusinessApplication',
+  }),
+  breadcrumbLd([
+    { name: t(lang, 'brand'), url: canonicalUrl('/', lang) },
+    {
+      name: t(lang, 'family.solutions'),
+      url: canonicalUrl('/solutions', lang),
+    },
+    { name: entry.data.name, url },
+  ]),
+];
+
+if (faqAll.length > 0) {
+  jsonLd.push(
+    faqLd(faqAll.map((f) => ({ question: f.data.question, answer: f.data.answer }))),
+  );
+}
+---
+
+<BaseLayout
+  lang={lang}
+  path={`/solutions/${entry.id}`}
+  title={`${entry.data.name} — ${entry.data.tagline}`}
+  description={entry.data.summary}
+  jsonLd={jsonLd}
+>
+  <Hero
+    variant="page"
+    family="solutions"
+    kicker={t(lang, 'family.solutions')}
+    title={entry.data.name}
+    subtitle={entry.data.tagline}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl(`/contact?solution=${entry.id}`, lang)}
+    secondaryCtaLabel={t(lang, 'cta.demo')}
+    secondaryCtaHref={localizeUrl(`/contact?type=demo&solution=${entry.id}`, lang)}
+  />
+
+  <Section>
+    <div class="flex flex-wrap gap-2 mb-8">
+      {entry.data.domains.map((d) => <Chip>{t(lang, `domain.${d}`)}</Chip>)}
+      {entry.data.services.map((s) => <Chip>{s}</Chip>)}
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-10 lg:gap-16">
+      <div>
+        <h2 class="text-h2 font-medium text-ink-50 mb-3">{t(lang, 'detail.problem')}</h2>
+        <p class="text-base text-ink-200 leading-relaxed">{entry.data.problem}</p>
+      </div>
+      <div>
+        <h2 class="text-h2 font-medium text-ink-50 mb-3">{t(lang, 'detail.solution')}</h2>
+        <p class="text-base text-ink-200 leading-relaxed">{entry.data.solution}</p>
+      </div>
+    </div>
+  </Section>
+
+  <Section title={t(lang, 'detail.features')} surface="muted">
+    <FeatureGrid features={entry.data.features} columns={entry.data.features.length === 4 ? 4 : 3} />
+  </Section>
+
+  {entry.data.metrics && entry.data.metrics.length > 0 && (
+    <Section title={t(lang, 'detail.metrics')}>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {entry.data.metrics.map((m) => (
+          <div class="border-l-2 border-teal-400 pl-4">
+            <div class="text-display font-medium text-ink-50">{m.value}</div>
+            <div class="text-small text-ink-300">{m.label}</div>
+          </div>
+        ))}
+      </div>
+    </Section>
+  )}
+
+  {entry.data.aiInside && (
+    <Section title={t(lang, 'detail.aiInside')} surface="muted">
+      <div class="max-w-3xl">
+        <div class="inline-flex items-center gap-2 mb-4 text-small font-medium text-coral-300 bg-coral-500/10 px-3 py-1 rounded-full">
+          <Icon name="sparkles" size={14} />
+          Automatisation intelligente
+        </div>
+        <p class="text-h4 text-ink-100 leading-relaxed font-medium">{entry.data.aiInside}</p>
+      </div>
+    </Section>
+  )}
+
+  {entry.data.integrations && entry.data.integrations.length > 0 && (
+    <Section title={t(lang, 'detail.integrations')}>
+      <div class="flex flex-wrap gap-3">
+        {entry.data.integrations.map((i) => (
+          <span class="inline-flex items-center px-4 py-2 border border-ink-700 rounded-md text-small text-ink-100 bg-ink-900">
+            {i}
+          </span>
+        ))}
+      </div>
+    </Section>
+  )}
+
+  <Section>
+    <div class="prose prose-ink max-w-3xl text-base text-ink-200 leading-relaxed">
+      <Content />
+    </div>
+  </Section>
+
+  {faqAll.length > 0 && (
+    <Section title={t(lang, 'detail.faq')} surface="muted">
+      <FAQAccordion items={faqAll.map((f) => f.data)} />
+    </Section>
+  )}
+
+  {relatedFinal.length > 0 && (
+    <RelatedGrid title={t(lang, 'detail.related')}>
+      {relatedFinal.map((s) => (
+        <OfferCard
+          variant="solution"
+          name={s.data.name}
+          tagline={s.data.tagline}
+          icon={s.data.icon}
+          tags={s.data.domains.map((d) => t(lang, `domain.${d}`))}
+          href={localizeUrl(`/solutions/${s.id}`, lang)}
+        />
+      ))}
+    </RelatedGrid>
+  )}
+
+  <CTASection
+    title={lang === 'fr' ? 'Parlons de votre projet' : 'Let’s talk about your project'}
+    subtitle={lang === 'fr'
+      ? 'Une démo, un cadrage, un devis : nous revenons vers vous sous 48h ouvrées.'
+      : 'A demo, a scoping session, a quote: we get back to you within 48 business hours.'}
+    family="solutions"
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl(`/contact?solution=${entry.id}`, lang)}
+  />
+</BaseLayout>
