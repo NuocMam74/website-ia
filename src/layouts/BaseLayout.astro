@@ -4,7 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import SiteHeader from '~/components/layout/SiteHeader.astro';
 import SiteFooter from '~/components/layout/SiteFooter.astro';
 import CookieBanner from '~/components/islands/CookieBanner.tsx';
-import AmbientBackdrop from '~/components/sections/AmbientBackdrop.astro';
+import TechBackdrop from '~/components/sections/TechBackdrop.astro';
 import { type Lang, t, DEFAULT_LANG } from '~/lib/i18n';
 import { canonicalUrl, hreflangAlternates, absoluteUrl } from '~/lib/seo';
 
@@ -47,7 +47,7 @@ const ldArray = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#09090D" />
+    <meta name="theme-color" content="#0E1118" />
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
@@ -146,8 +146,8 @@ const ldArray = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       </script>
     */}
   </head>
-  <body class="min-h-screen flex flex-col relative">
-    <AmbientBackdrop />
+  <body class="min-h-screen flex flex-col">
+    <TechBackdrop />
     <a href="#main" class="skip-link">{t(lang, 'nav.skipToContent')}</a>
     <SiteHeader lang={lang} path={path} />
     <main id="main" class="flex-1 relative">

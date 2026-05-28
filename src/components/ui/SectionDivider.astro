@@ -1,0 +1,44 @@
+---
+/**
+ * Séparateur entre sections — trait dégradé doux + petit marqueur
+ * centré (optionnel). Sert à rythmer le scroll sans imposer une barre
+ * dure qui découperait le site en blocs.
+ *
+ * Variantes :
+ *   - default : trait fin + point central
+ *   - icon    : remplace le point par une petite icône (ex: sparkles)
+ *   - blank   : trait seul, sans marqueur
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  variant?: 'default' | 'icon' | 'blank';
+  icon?: string;
+  class?: string;
+}
+
+const { variant = 'default', icon = 'sparkles', class: className = '' } = Astro.props;
+---
+
+<div class:list={['relative mx-auto max-w-[1200px] px-6 py-10 md:py-12', className]} aria-hidden="true">
+  <div class="flex items-center gap-5">
+    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-ink-700 to-transparent"></div>
+
+    {variant === 'default' && (
+      <div class="relative">
+        <div class="w-1.5 h-1.5 rounded-full bg-ink-500"></div>
+        <div class="absolute inset-0 -m-1 rounded-full ring-1 ring-ink-700"></div>
+      </div>
+    )}
+
+    {variant === 'icon' && (
+      <div class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-ink-900 border border-ink-700 text-ink-400">
+        <Icon name={icon} size={12} />
+      </div>
+    )}
+
+    {variant === 'blank' && <div class="w-0"></div>}
+
+    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-ink-700 to-transparent"></div>
+  </div>
+</div>

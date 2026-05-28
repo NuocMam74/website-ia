@@ -3,6 +3,8 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
 import RelatedGrid from '~/components/sections/RelatedGrid.astro';
 import TemplateCard from '~/components/cards/TemplateCard.astro';
 import AddToCartButton from '~/components/islands/AddToCartButton.tsx';
@@ -76,98 +78,135 @@ const jsonLd: object[] = [
   />
 
   <Section>
-    <div class="grid lg:grid-cols-[2fr_1fr] gap-10">
-      <div>
-        <p class="text-base text-ink-200 leading-relaxed mb-8">{entry.data.longDescription}</p>
+    <div class="grid lg:grid-cols-[2fr_1fr] gap-8">
+      <div class="space-y-6">
+        {/* === Description longue dans une Card === */}
+        <div class="reveal">
+          <Card>
+            <div class="p-7 md:p-8">
+              <p class="text-base text-ink-200 leading-relaxed">{entry.data.longDescription}</p>
+            </div>
+          </Card>
+        </div>
 
-        <h2 class="text-h2 font-medium text-ink-50 mb-4">{t(lang, 'template.contents')}</h2>
-        <ul class="space-y-2 mb-10">
-          {entry.data.contents.map((c) => (
-            <li class="flex items-start gap-2">
-              <Icon name="check" size={18} class="text-amber-600 mt-0.5 shrink-0" />
-              <span class="text-base text-ink-100">{c}</span>
-            </li>
-          ))}
-        </ul>
+        {/* === Contenu du pack === */}
+        <div class="reveal" style="--reveal-delay: 100ms">
+          <Card>
+            <div class="p-7 md:p-8">
+              <h2 class="text-h2 font-semibold text-ink-50 mb-5 tracking-tight">{t(lang, 'template.contents')}</h2>
+              <ul class="space-y-3">
+                {entry.data.contents.map((c) => (
+                  <li class="flex items-start gap-3">
+                    <span class="mt-1 w-5 h-5 rounded-md bg-amber-500/10 ring-1 ring-amber-400/30 flex items-center justify-center shrink-0">
+                      <Icon name="check" size={12} class="text-amber-300" />
+                    </span>
+                    <span class="text-base text-ink-100">{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Card>
+        </div>
 
-        <dl class="grid sm:grid-cols-3 gap-4 text-small">
-          <div class="p-4 border border-ink-800 rounded-md bg-ink-900">
-            <dt class="text-xs text-ink-500 mb-1">{t(lang, 'template.format')}</dt>
-            <dd class="text-ink-50 font-medium">{entry.data.fileFormat}</dd>
-          </div>
-          <div class="p-4 border border-ink-800 rounded-md bg-ink-900">
-            <dt class="text-xs text-ink-500 mb-1">{t(lang, 'template.version')}</dt>
-            <dd class="text-ink-50 font-medium">{entry.data.version}</dd>
-          </div>
-          <div class="p-4 border border-ink-800 rounded-md bg-ink-900">
-            <dt class="text-xs text-ink-500 mb-1">{t(lang, 'norm.' + entry.data.norm)}</dt>
-            <dd class="text-ink-50 font-medium">{t(lang, `norm.${entry.data.norm}`)}</dd>
-          </div>
-        </dl>
+        {/* === Fiche technique : 3 mini-cards format/version/norme === */}
+        <div class="reveal" style="--reveal-delay: 200ms">
+          <dl class="grid sm:grid-cols-3 gap-3">
+            {[
+              { dt: t(lang, 'template.format'), dd: entry.data.fileFormat, icon: 'file-text' },
+              { dt: t(lang, 'template.version'), dd: entry.data.version, icon: 'history' },
+              { dt: lang === 'fr' ? 'Norme' : 'Standard', dd: t(lang, `norm.${entry.data.norm}`), icon: 'shield-check' },
+            ].map((item) => (
+              <Card>
+                <div class="p-4">
+                  <div class="flex items-center gap-2 mb-2">
+                    <Icon name={item.icon} size={14} class="text-amber-300" />
+                    <dt class="text-xs text-ink-400 uppercase tracking-wider">{item.dt}</dt>
+                  </div>
+                  <dd class="text-base text-ink-50 font-medium font-mono">{item.dd}</dd>
+                </div>
+              </Card>
+            ))}
+          </dl>
+        </div>
 
-        <p class="mt-6 text-small text-ink-300 italic">
-          <Icon name="lock-keyhole" size={14} class="inline -mt-0.5 mr-1" />
-          {entry.data.license}
-        </p>
+        {/* === Licence === */}
+        <div class="reveal" style="--reveal-delay: 280ms">
+          <Card>
+            <div class="p-5 flex items-start gap-3">
+              <Icon name="lock-keyhole" size={16} class="text-ink-400 mt-0.5 shrink-0" />
+              <p class="text-small text-ink-200 italic">{entry.data.license}</p>
+            </div>
+          </Card>
+        </div>
       </div>
 
-      <aside class="lg:sticky lg:top-6 self-start">
-        <div class="border border-ink-800 rounded-lg bg-ink-900 p-6">
-          <div class="pb-4 border-b border-ink-800">
-            <div class="text-xs text-ink-500 uppercase tracking-wider mb-1">
-              {t(lang, 'template.priceLabel')}
+      {/* === Sidebar prix + actions === */}
+      <aside class="lg:sticky lg:top-24 self-start reveal" style="--reveal-delay: 50ms">
+        <Card accent="templates">
+          <div class="p-7">
+            <div class="pb-5 border-b border-ink-800">
+              <div class="text-xs text-ink-500 uppercase tracking-wider mb-1">
+                {t(lang, 'template.priceLabel')}
+              </div>
+              <div class="text-display font-semibold text-gradient-cyan tracking-tight" style="background: linear-gradient(135deg, #FFB000, #FFCC4D); -webkit-background-clip: text; background-clip: text; color: transparent;">
+                {formatPrice(entry.data.priceEUR, lang)}
+              </div>
             </div>
-            <div class="text-display font-medium text-ink-50">
-              {formatPrice(entry.data.priceEUR, lang)}
+
+            <div class="mt-5 space-y-3">
+              <AddToCartButton
+                client:load
+                slug={entry.id}
+                name={entry.data.name}
+                priceEUR={entry.data.priceEUR}
+                labelAdd={t(lang, 'cta.addToCart')}
+                labelAdded={lang === 'fr' ? 'Ajouté' : 'Added'}
+              />
+              <a
+                href={localizeUrl('/panier', lang)}
+                class="block w-full text-center px-4 py-2.5 text-small font-medium text-ink-50 border border-ink-700 hover:bg-ink-800 hover:border-ink-600 rounded-md transition-colors"
+              >
+                {t(lang, 'cta.buyNow')}
+              </a>
             </div>
-          </div>
 
-          <div class="mt-4 space-y-3">
-            <AddToCartButton
-              client:load
-              slug={entry.id}
-              name={entry.data.name}
-              priceEUR={entry.data.priceEUR}
-              labelAdd={t(lang, 'cta.addToCart')}
-              labelAdded={lang === 'fr' ? 'Ajouté' : 'Added'}
-            />
-            <a
-              href={localizeUrl('/panier', lang)}
-              class="block w-full text-center px-4 py-2 text-small font-medium text-ink-50 border border-ink-700 hover:bg-ink-800 rounded-md transition-colors"
-            >
-              {t(lang, 'cta.buyNow')}
-            </a>
-          </div>
+            {entry.data.sampleUrl && (
+              <a
+                href={entry.data.sampleUrl}
+                target="_blank"
+                rel="noopener"
+                class="mt-5 flex items-center justify-center gap-1.5 text-small text-ink-300 hover:text-amber-300 transition-colors"
+              >
+                <Icon name="file-text" size={14} />
+                {lang === 'fr' ? 'Voir un extrait' : 'See a sample'}
+              </a>
+            )}
 
-          {entry.data.sampleUrl && (
-            <a
-              href={entry.data.sampleUrl}
-              target="_blank"
-              rel="noopener"
-              class="block mt-4 text-small text-ink-300 hover:text-ink-50 text-center"
-            >
-              <Icon name="file-text" size={14} class="inline -mt-0.5 mr-1" />
-              {lang === 'fr' ? 'Voir un extrait' : 'See a sample'}
-            </a>
-          )}
-        </div>
+            <p class="mt-5 pt-5 border-t border-ink-800 text-xs text-ink-500 text-center">
+              {lang === 'fr' ? 'Téléchargement immédiat après paiement' : 'Instant download after payment'}
+            </p>
+          </div>
+        </Card>
       </aside>
     </div>
   </Section>
 
   {relatedFinal.length > 0 && (
-    <RelatedGrid title={t(lang, 'detail.related')}>
-      {relatedFinal.map((t) => (
-        <TemplateCard
-          slug={t.id}
-          name={t.data.name}
-          summary={t.data.summary}
-          icon={t.data.icon}
-          priceEUR={t.data.priceEUR}
-          href={localizeUrl(`/templates/${t.id}`, lang)}
-          lang={lang}
-        />
-      ))}
-    </RelatedGrid>
+    <>
+      <SectionDivider />
+      <RelatedGrid title={t(lang, 'detail.related')}>
+        {relatedFinal.map((t) => (
+          <TemplateCard
+            slug={t.id}
+            name={t.data.name}
+            summary={t.data.summary}
+            icon={t.data.icon}
+            priceEUR={t.data.priceEUR}
+            href={localizeUrl(`/templates/${t.id}`, lang)}
+            lang={lang}
+          />
+        ))}
+      </RelatedGrid>
+    </>
   )}
 </BaseLayout>

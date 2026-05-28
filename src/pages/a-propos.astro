@@ -114,28 +114,34 @@ const sectors = [
     secondaryCtaHref={localizeUrl('/methodologie', lang)}
   />
 
-  {/* === Mission encadrée === */}
-  <Section>
-    <div class="reveal max-w-4xl mx-auto text-center">
-      <p class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-ink-700 bg-ink-900 text-xs uppercase tracking-[0.15em] text-ink-300">
-        <span class="inline-block w-1.5 h-1.5 rounded-full bg-teal-400"></span>
-        {lang === 'fr' ? 'Notre mission' : 'Our mission'}
-      </p>
-      <p class="text-h2 md:text-h1 font-light text-ink-100 leading-snug tracking-tight">
-        {lang === 'fr' ? (
-          <>
-            « Rendre la <span class="text-gradient-cyan font-medium">conformité</span> moins coûteuse,
-            la <span class="text-gradient-mix font-medium">traçabilité</span> plus solide,
-            et l'<span class="text-gradient-cyan font-medium">IA</span> réellement utile en production. »
-          </>
-        ) : (
-          <>
-            "Make <span class="text-gradient-cyan font-medium">compliance</span> less costly,
-            <span class="text-gradient-mix font-medium"> traceability</span> more solid,
-            and <span class="text-gradient-cyan font-medium">AI</span> genuinely useful in production."
-          </>
-        )}
-      </p>
+  {/* === Mission encadrée dans une Card === */}
+  <Section reveal={false}>
+    <div class="max-w-4xl mx-auto reveal">
+      <Card>
+        <div class="p-10 md:p-14 text-center">
+          <p class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-ink-700 bg-ink-950/60 text-xs uppercase tracking-[0.15em] text-ink-300">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+            {lang === 'fr' ? 'Notre mission' : 'Our mission'}
+          </p>
+          <p class="text-h2 md:text-h1 font-light text-ink-100 leading-snug tracking-tight">
+            {lang === 'fr' ? (
+              <>
+                Concevoir des produits <span class="text-gradient-cyan font-medium">software</span> et des
+                <span class="text-gradient-mix font-medium"> agents IA</span> qui
+                <span class="text-gradient-cyan font-medium"> tiennent en production</span>,
+                pour les équipes qui en ont besoin.
+              </>
+            ) : (
+              <>
+                Build <span class="text-gradient-cyan font-medium">software</span> products and
+                <span class="text-gradient-mix font-medium"> AI agents</span> that
+                <span class="text-gradient-cyan font-medium"> hold in production</span>,
+                for the teams that need them.
+              </>
+            )}
+          </p>
+        </div>
+      </Card>
     </div>
   </Section>
 

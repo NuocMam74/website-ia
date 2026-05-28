@@ -3,6 +3,8 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
 import CTASection from '~/components/sections/CTASection.astro';
 import Chip from '~/components/ui/Chip.astro';
 import Icon from '~/components/ui/Icon.astro';
@@ -50,22 +52,40 @@ const url = canonicalUrl(`/references/${entry.id}`, lang);
       )}
     </div>
 
-    <div class="grid lg:grid-cols-[2fr_1fr] gap-10">
-      <div class="space-y-8">
-        <div>
-          <h2 class="text-h2 font-medium text-ink-50 mb-3">
-            {lang === 'fr' ? 'Le défi' : 'The challenge'}
-          </h2>
-          <p class="text-base text-ink-200 leading-relaxed">{entry.data.challenge}</p>
+    <div class="grid lg:grid-cols-[2fr_1fr] gap-8">
+      <div class="space-y-6">
+        <div class="reveal">
+          <Card>
+            <div class="p-7 md:p-8">
+              <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-coral-500/10 ring-1 ring-coral-400/30 text-coral-300 mb-4">
+                <Icon name="bell" size={18} />
+              </div>
+              <h2 class="text-h2 font-semibold text-ink-50 mb-3 tracking-tight">
+                {lang === 'fr' ? 'Le défi' : 'The challenge'}
+              </h2>
+              <p class="text-base text-ink-200 leading-relaxed">{entry.data.challenge}</p>
+            </div>
+          </Card>
         </div>
-        <div>
-          <h2 class="text-h2 font-medium text-ink-50 mb-3">
-            {lang === 'fr' ? 'Notre approche' : 'Our approach'}
-          </h2>
-          <p class="text-base text-ink-200 leading-relaxed">{entry.data.approach}</p>
+        <div class="reveal" style="--reveal-delay: 100ms">
+          <Card accent={entry.data.relatedFamily}>
+            <div class="p-7 md:p-8">
+              <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-teal-500/10 ring-1 ring-teal-400/30 text-teal-300 mb-4">
+                <Icon name="wrench" size={18} />
+              </div>
+              <h2 class="text-h2 font-semibold text-ink-50 mb-3 tracking-tight">
+                {lang === 'fr' ? 'Notre approche' : 'Our approach'}
+              </h2>
+              <p class="text-base text-ink-200 leading-relaxed">{entry.data.approach}</p>
+            </div>
+          </Card>
         </div>
-        <div class="prose prose-ink max-w-none text-base text-ink-200 leading-relaxed">
-          <Content />
+        <div class="reveal" style="--reveal-delay: 200ms">
+          <Card>
+            <div class="p-7 md:p-8 prose prose-ink max-w-none text-base text-ink-200 leading-relaxed">
+              <Content />
+            </div>
+          </Card>
         </div>
       </div>
 
@@ -110,6 +130,8 @@ const url = canonicalUrl(`/references/${entry.id}`, lang);
     </div>
   </Section>
 
+  <SectionDivider />
+
   {/* === Aperçu du livrable === */}
   <Section
     title={lang === 'fr' ? 'Aperçu du livrable' : 'Deliverable preview'}
@@ -127,6 +149,8 @@ const url = canonicalUrl(`/references/${entry.id}`, lang);
       </p>
     </div>
   </Section>
+
+  <SectionDivider />
 
   {/* === Étapes du projet === */}
   <Section

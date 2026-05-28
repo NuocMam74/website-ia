@@ -2,6 +2,7 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import Card from '~/components/ui/Card.astro';
 import ContactForm from '~/components/islands/ContactForm.tsx';
 import Icon from '~/components/ui/Icon.astro';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
@@ -19,6 +20,28 @@ const initialType: 'projet' | 'demo' | 'template' | 'autre' =
   typeParam === 'demo' || typeParam === 'template' || typeParam === 'autre'
     ? typeParam
     : 'projet';
+
+const asideBlocks = [
+  {
+    icon: 'mail',
+    title: 'Email',
+    body: 'contact@example.com',
+  },
+  {
+    icon: 'lock-keyhole',
+    title: lang === 'fr' ? 'Réponses & confidentialité' : 'Response & privacy',
+    body: lang === 'fr'
+      ? 'Vos données sont utilisées uniquement pour traiter votre demande. Vous pouvez demander leur suppression à tout moment.'
+      : 'Your data is used only to handle your request. You can request its deletion at any time.',
+  },
+];
+
+const quickLinks = [
+  { label: 'FAQ', href: localizeUrl('/faq', lang) },
+  { label: t(lang, 'family.templates'), href: localizeUrl('/templates', lang) },
+  { label: t(lang, 'nav.references'), href: localizeUrl('/references', lang) },
+  { label: t(lang, 'nav.method'), href: localizeUrl('/methodologie', lang) },
+];
 ---
 
 <BaseLayout
@@ -31,6 +54,7 @@ const initialType: 'projet' | 'demo' | 'template' | 'autre' =
 >
   <Hero
     variant="page"
+    kicker={t(lang, 'nav.contact')}
     title={lang === 'fr' ? 'Parlons de votre projet' : 'Let’s talk about your project'}
     subtitle={lang === 'fr'
       ? 'Décrivez votre besoin. Nous revenons vers vous avec une première lecture sous 48 heures ouvrées.'
@@ -38,44 +62,58 @@ const initialType: 'projet' | 'demo' | 'template' | 'autre' =
   />
 
   <Section>
-    <div class="grid lg:grid-cols-[2fr_1fr] gap-12">
-      <ContactForm
-        client:load
-        lang={lang}
-        endpoint={localizeUrl('/api/contact', lang)}
-        initialType={initialType}
-        reference={refParam}
-      />
+    <div class="grid lg:grid-cols-[2fr_1fr] gap-8">
+      {/* === Formulaire dans une Card === */}
+      <div class="reveal">
+        <Card>
+          <div class="p-8 md:p-10">
+            <ContactForm
+              client:load
+              lang={lang}
+              endpoint={localizeUrl('/api/contact', lang)}
+              initialType={initialType}
+              reference={refParam}
+            />
+          </div>
+        </Card>
+      </div>
 
-      <aside class="space-y-6 text-small text-ink-200">
-        <div>
-          <h2 class="text-h4 font-medium text-ink-50 mb-2 flex items-center gap-2">
-            <Icon name="mail" size={18} class="text-ink-300" />
-            Email
-          </h2>
-          <p>contact@example.com</p>
-        </div>
+      {/* === Aside : 3 cards distinctes empilées === */}
+      <aside class="space-y-6">
+        {asideBlocks.map((block, i) => (
+          <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+            <Card>
+              <div class="p-6">
+                <div class="flex items-center gap-2.5 mb-3">
+                  <div class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-ink-800 text-teal-300">
+                    <Icon name={block.icon} size={16} />
+                  </div>
+                  <h2 class="text-h4 font-semibold text-ink-50 tracking-tight">{block.title}</h2>
+                </div>
+                <p class="text-small text-ink-200 leading-relaxed">{block.body}</p>
+              </div>
+            </Card>
+          </div>
+        ))}
 
-        <div>
-          <h2 class="text-h4 font-medium text-ink-50 mb-2">
-            {lang === 'fr' ? 'Réponses & confidentialité' : 'Response & privacy'}
-          </h2>
-          <p class="leading-relaxed">
-            {lang === 'fr'
-              ? 'Vos données sont utilisées uniquement pour traiter votre demande. Vous pouvez demander leur suppression à tout moment.'
-              : 'Your data is used only to handle your request. You can request its deletion at any time.'}
-          </p>
-        </div>
-
-        <div>
-          <h2 class="text-h4 font-medium text-ink-50 mb-2">
-            {lang === 'fr' ? 'Vous cherchez plutôt :' : 'You may also need:'}
-          </h2>
-          <ul class="space-y-1.5">
-            <li><a href={localizeUrl('/faq', lang)} class="text-ink-100 hover:underline">FAQ</a></li>
-            <li><a href={localizeUrl('/templates', lang)} class="text-ink-100 hover:underline">{t(lang, 'family.templates')}</a></li>
-            <li><a href={localizeUrl('/references', lang)} class="text-ink-100 hover:underline">{t(lang, 'nav.references')}</a></li>
-          </ul>
+        <div class="reveal" style="--reveal-delay: 240ms">
+          <Card interactive spotlight>
+            <div class="p-6">
+              <h2 class="text-h4 font-semibold text-ink-50 mb-3 tracking-tight">
+                {lang === 'fr' ? 'Liens rapides' : 'Quick links'}
+              </h2>
+              <ul class="space-y-2">
+                {quickLinks.map((l) => (
+                  <li>
+                    <a href={l.href} class="group flex items-center justify-between gap-2 px-3 py-2 -mx-3 rounded-md text-small text-ink-200 hover:bg-ink-800 hover:text-ink-50 transition-colors">
+                      {l.label}
+                      <Icon name="arrow-right" size={14} class="opacity-0 group-hover:opacity-100 transition-opacity text-ink-400" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Card>
         </div>
       </aside>
     </div>

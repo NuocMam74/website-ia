@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
 import Card from '~/components/ui/Card.astro';
 import Icon from '~/components/ui/Icon.astro';
 import Button from '~/components/ui/Button.astro';
@@ -96,7 +97,6 @@ const homeFaq = homeFaqAll
 >
   {/* === HERO flagship === */}
   <section class="relative overflow-hidden">
-    <div class="absolute inset-0 bg-blueprint opacity-40 [mask-image:radial-gradient(ellipse_at_center,#000_30%,transparent_70%)]" aria-hidden="true"></div>
 
     <div class="relative mx-auto max-w-[1200px] px-6 py-24 md:py-32 grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center">
       <div>
@@ -177,6 +177,8 @@ const homeFaq = homeFaqAll
   {/* === ProductSurface — "à quoi ça ressemble" === */}
   <ProductSurface lang={lang} />
 
+  <SectionDivider variant="icon" icon="sparkles" />
+
   {/* === Capacités IA — vitrine des briques fondamentales === */}
   <Section
     title={lang === 'fr' ? 'Les briques IA que nous mettons en œuvre' : 'The AI building blocks we deploy'}
@@ -229,6 +231,8 @@ const homeFaq = homeFaqAll
       ))}
     </div>
   </Section>
+
+  <SectionDivider />
 
   {/* === Stats band === */}
   <Section>
@@ -335,6 +339,8 @@ const homeFaq = homeFaqAll
       </Button>
     </div>
   </Section>
+
+  <SectionDivider />
 
   {/* === Témoignages === */}
   <Section

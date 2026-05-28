@@ -3,6 +3,8 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
 import FeatureGrid from '~/components/sections/FeatureGrid.astro';
 import FAQAccordion from '~/components/sections/FAQAccordion.astro';
 import RelatedGrid from '~/components/sections/RelatedGrid.astro';
@@ -35,7 +37,6 @@ const related = (entry.data.relatedSlugs ?? [])
   .map((slug) => all.find((s) => s.id === slug))
   .filter((x): x is NonNullable<typeof x> => Boolean(x));
 
-/* Si pas de related explicites, prendre 2 autres solutions du même domaine */
 const fallbackRelated =
   related.length > 0
     ? []
@@ -98,90 +99,165 @@ if (faqAll.length > 0) {
     secondaryCtaHref={localizeUrl(`/contact?type=demo&solution=${entry.id}`, lang)}
   />
 
-  <Section>
-    <div class="flex flex-wrap gap-2 mb-8">
+  <Section reveal={false}>
+    <div class="flex flex-wrap gap-2 mb-10 reveal">
       {entry.data.domains.map((d) => <Chip>{t(lang, `domain.${d}`)}</Chip>)}
-      {entry.data.services.map((s) => <Chip>{s}</Chip>)}
+      {entry.data.services.map((s) => <Chip>{t(lang, `service.${s}`)}</Chip>)}
     </div>
 
-    <div class="grid md:grid-cols-2 gap-10 lg:gap-16">
-      <div>
-        <h2 class="text-h2 font-medium text-ink-50 mb-3">{t(lang, 'detail.problem')}</h2>
-        <p class="text-base text-ink-200 leading-relaxed">{entry.data.problem}</p>
+    {/* === Problème / Solution dans 2 cards distinctes === */}
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="reveal">
+        <Card>
+          <div class="p-7 md:p-8 h-full">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-coral-500/10 ring-1 ring-coral-400/30 text-coral-300 mb-4">
+              <Icon name="bell" size={18} />
+            </div>
+            <h2 class="text-h2 font-semibold text-ink-50 mb-3 tracking-tight">{t(lang, 'detail.problem')}</h2>
+            <p class="text-base text-ink-200 leading-relaxed">{entry.data.problem}</p>
+          </div>
+        </Card>
       </div>
-      <div>
-        <h2 class="text-h2 font-medium text-ink-50 mb-3">{t(lang, 'detail.solution')}</h2>
-        <p class="text-base text-ink-200 leading-relaxed">{entry.data.solution}</p>
+      <div class="reveal" style="--reveal-delay: 100ms">
+        <Card accent="solutions">
+          <div class="p-7 md:p-8 h-full">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-teal-500/10 ring-1 ring-teal-400/30 text-teal-300 mb-4">
+              <Icon name="check" size={18} />
+            </div>
+            <h2 class="text-h2 font-semibold text-ink-50 mb-3 tracking-tight">{t(lang, 'detail.solution')}</h2>
+            <p class="text-base text-ink-200 leading-relaxed">{entry.data.solution}</p>
+          </div>
+        </Card>
       </div>
     </div>
   </Section>
 
-  <Section title={t(lang, 'detail.features')} surface="muted">
-    <FeatureGrid features={entry.data.features} columns={entry.data.features.length === 4 ? 4 : 3} />
+  <SectionDivider />
+
+  {/* === Fonctionnalités : chaque feature dans sa propre Card === */}
+  <Section title={t(lang, 'detail.features')}>
+    <div class:list={['grid grid-cols-1 md:grid-cols-2 gap-5', entry.data.features.length > 3 ? 'lg:grid-cols-2' : 'lg:grid-cols-3']}>
+      {entry.data.features.map((f, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card interactive spotlight class="h-full">
+            <div class="p-6 h-full">
+              {f.icon && (
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-ink-800 text-teal-300 mb-4">
+                  <Icon name={f.icon} size={20} />
+                </div>
+              )}
+              <h3 class="text-h4 font-semibold text-ink-50 mb-2 tracking-tight">{f.title}</h3>
+              <p class="text-small text-ink-200 leading-relaxed">{f.desc}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
   </Section>
 
   {entry.data.metrics && entry.data.metrics.length > 0 && (
-    <Section title={t(lang, 'detail.metrics')}>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {entry.data.metrics.map((m) => (
-          <div class="border-l-2 border-teal-400 pl-4">
-            <div class="text-display font-medium text-ink-50">{m.value}</div>
-            <div class="text-small text-ink-300">{m.label}</div>
-          </div>
-        ))}
-      </div>
-    </Section>
+    <>
+      <SectionDivider />
+      <Section title={t(lang, 'detail.metrics')}>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {entry.data.metrics.map((m, i) => (
+            <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+              <Card class="h-full">
+                <div class="p-6 text-center">
+                  <div class="text-display font-semibold text-gradient-cyan tracking-tight">{m.value}</div>
+                  <div class="text-xs text-ink-300 mt-2 uppercase tracking-wider">{m.label}</div>
+                </div>
+              </Card>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </>
   )}
 
   {entry.data.aiInside && (
-    <Section title={t(lang, 'detail.aiInside')} surface="muted">
-      <div class="max-w-3xl">
-        <div class="inline-flex items-center gap-2 mb-4 text-small font-medium text-coral-300 bg-coral-500/10 px-3 py-1 rounded-full">
-          <Icon name="sparkles" size={14} />
-          Automatisation intelligente
+    <>
+      <SectionDivider variant="icon" icon="sparkles" />
+      <Section>
+        <div class="max-w-4xl mx-auto reveal">
+          <Card accent="ia">
+            <div class="p-8 md:p-10">
+              <div class="inline-flex items-center gap-2 mb-5 text-xs font-medium uppercase tracking-[0.15em] text-coral-300 bg-coral-500/10 px-3 py-1.5 rounded-full border border-coral-400/20">
+                <Icon name="sparkles" size={12} />
+                {lang === 'fr' ? 'Automatisation intelligente' : 'Smart automation'}
+              </div>
+              <h2 class="text-h2 font-semibold text-ink-50 mb-4 tracking-tight">{t(lang, 'detail.aiInside')}</h2>
+              <p class="text-h4 text-ink-100 leading-relaxed font-light">{entry.data.aiInside}</p>
+            </div>
+          </Card>
         </div>
-        <p class="text-h4 text-ink-100 leading-relaxed font-medium">{entry.data.aiInside}</p>
-      </div>
-    </Section>
+      </Section>
+    </>
   )}
 
   {entry.data.integrations && entry.data.integrations.length > 0 && (
-    <Section title={t(lang, 'detail.integrations')}>
-      <div class="flex flex-wrap gap-3">
-        {entry.data.integrations.map((i) => (
-          <span class="inline-flex items-center px-4 py-2 border border-ink-700 rounded-md text-small text-ink-100 bg-ink-900">
-            {i}
-          </span>
-        ))}
-      </div>
-    </Section>
+    <>
+      <SectionDivider />
+      <Section title={t(lang, 'detail.integrations')}>
+        <div class="reveal">
+          <Card>
+            <div class="p-6 md:p-8">
+              <div class="flex flex-wrap gap-3">
+                {entry.data.integrations.map((i) => (
+                  <span class="inline-flex items-center gap-1.5 px-4 py-2 border border-ink-700 rounded-md text-small text-ink-100 bg-ink-950/60 font-mono">
+                    <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                    {i}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+      </Section>
+    </>
   )}
 
   <Section>
-    <div class="prose prose-ink max-w-3xl text-base text-ink-200 leading-relaxed">
-      <Content />
+    <div class="max-w-3xl reveal">
+      <Card>
+        <div class="p-8 md:p-10 prose prose-ink text-base text-ink-200 leading-relaxed">
+          <Content />
+        </div>
+      </Card>
     </div>
   </Section>
 
   {faqAll.length > 0 && (
-    <Section title={t(lang, 'detail.faq')} surface="muted">
-      <FAQAccordion items={faqAll.map((f) => f.data)} />
-    </Section>
+    <>
+      <SectionDivider />
+      <Section title={t(lang, 'detail.faq')}>
+        <div class="max-w-3xl reveal">
+          <Card>
+            <div class="p-6 md:p-8">
+              <FAQAccordion items={faqAll.map((f) => f.data)} />
+            </div>
+          </Card>
+        </div>
+      </Section>
+    </>
   )}
 
   {relatedFinal.length > 0 && (
-    <RelatedGrid title={t(lang, 'detail.related')}>
-      {relatedFinal.map((s) => (
-        <OfferCard
-          variant="solution"
-          name={s.data.name}
-          tagline={s.data.tagline}
-          icon={s.data.icon}
-          tags={s.data.domains.map((d) => t(lang, `domain.${d}`))}
-          href={localizeUrl(`/solutions/${s.id}`, lang)}
-        />
-      ))}
-    </RelatedGrid>
+    <>
+      <SectionDivider />
+      <RelatedGrid title={t(lang, 'detail.related')}>
+        {relatedFinal.map((s) => (
+          <OfferCard
+            variant="solution"
+            name={s.data.name}
+            tagline={s.data.tagline}
+            icon={s.data.icon}
+            tags={s.data.domains.map((d) => t(lang, `domain.${d}`))}
+            href={localizeUrl(`/solutions/${s.id}`, lang)}
+          />
+        ))}
+      </RelatedGrid>
+    </>
   )}
 
   <CTASection

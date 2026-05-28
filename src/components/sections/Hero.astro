@@ -47,26 +47,22 @@ const kickerTextClass: Record<Family, string> = {
   templates: 'text-amber-200',
 };
 
+/* Halos très discrets : un seul accent coloré en haut, opacité ≈ 8%.
+   Donne la couleur d'identité famille sans saturer la page. */
 const meshClass: Record<Family, string> = {
-  solutions:
-    'bg-[radial-gradient(at_20%_30%,rgba(0,217,255,0.18),transparent_45%),radial-gradient(at_85%_10%,rgba(0,217,255,0.10),transparent_45%)]',
-  ia:
-    'bg-[radial-gradient(at_25%_20%,rgba(255,61,127,0.18),transparent_45%),radial-gradient(at_80%_50%,rgba(255,61,127,0.10),transparent_45%)]',
-  templates:
-    'bg-[radial-gradient(at_20%_30%,rgba(255,176,0,0.16),transparent_45%),radial-gradient(at_80%_10%,rgba(255,176,0,0.10),transparent_45%)]',
+  solutions: 'bg-[radial-gradient(at_30%_0%,rgba(0,217,255,0.08),transparent_55%)]',
+  ia:        'bg-[radial-gradient(at_30%_0%,rgba(255,61,127,0.08),transparent_55%)]',
+  templates: 'bg-[radial-gradient(at_30%_0%,rgba(255,176,0,0.07),transparent_55%)]',
 };
-const defaultMesh =
-  'bg-[radial-gradient(at_20%_20%,rgba(0,217,255,0.14),transparent_45%),radial-gradient(at_80%_30%,rgba(255,61,127,0.10),transparent_45%),radial-gradient(at_60%_80%,rgba(255,176,0,0.08),transparent_45%)]';
+const defaultMesh = '';
 ---
 
 <section class="relative overflow-hidden">
   {/* Couche 1 : gradient mesh diffus */}
   <div class:list={['absolute inset-0 pointer-events-none', family ? meshClass[family] : defaultMesh]} aria-hidden="true"></div>
 
-  {/* Couche 2 : grille blueprint subtile */}
-  {pattern && (
-    <div class="absolute inset-0 bg-blueprint opacity-60 [mask-image:linear-gradient(to_bottom,#000_0%,#000_60%,transparent_100%)]" aria-hidden="true"></div>
-  )}
+  {/* Couche 2 : la trame engineering paper du fond global suffit
+       maintenant — pas de double grille dans le hero. */}
 
   {/* Contenu */}
   <div class="relative mx-auto max-w-[1200px] px-6 py-20 md:py-28">

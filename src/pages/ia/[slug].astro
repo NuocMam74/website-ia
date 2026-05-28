@@ -3,10 +3,13 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
 import RelatedGrid from '~/components/sections/RelatedGrid.astro';
 import OfferCard from '~/components/cards/OfferCard.astro';
 import CTASection from '~/components/sections/CTASection.astro';
 import Chip from '~/components/ui/Chip.astro';
+import Icon from '~/components/ui/Icon.astro';
 import {
   softwareApplicationLd,
   breadcrumbLd,
@@ -74,69 +77,107 @@ const jsonLd: object[] = [
     secondaryCtaHref={localizeUrl(`/contact?product=${entry.id}`, lang)}
   />
 
-  <Section>
-    <div class="flex flex-wrap gap-2 mb-8">
+  {/* === Tags + résumé encadré === */}
+  <Section reveal={false}>
+    <div class="flex flex-wrap gap-2 mb-8 reveal">
       <Chip>{t(lang, `capability.${entry.data.capability}`)}</Chip>
     </div>
-    <p class="text-h4 text-ink-200 leading-relaxed max-w-3xl">{entry.data.summary}</p>
+    <div class="max-w-4xl reveal">
+      <Card accent="ia">
+        <div class="p-7 md:p-8">
+          <p class="text-h4 text-ink-100 leading-relaxed font-light">{entry.data.summary}</p>
+        </div>
+      </Card>
+    </div>
   </Section>
 
-  <Section title={t(lang, 'detail.howItWorks')} family="ia" surface="muted">
+  <SectionDivider />
+
+  {/* === Comment ça marche : étapes en cards numérotées === */}
+  <Section title={t(lang, 'detail.howItWorks')} family="ia">
     <ol class="grid md:grid-cols-3 gap-6 list-none p-0">
-      {entry.data.howItWorks.map((step) => (
-        <li class="relative bg-ink-900 border border-ink-800 rounded-lg p-6">
-          <div class="absolute -top-3 left-6 w-7 h-7 rounded-full bg-coral-400 text-white flex items-center justify-center text-small font-medium">
-            {step.step}
-          </div>
-          <h3 class="mt-2 text-h4 font-medium text-ink-50 mb-2">{step.title}</h3>
-          <p class="text-small text-ink-300 leading-relaxed">{step.desc}</p>
+      {entry.data.howItWorks.map((step, i) => (
+        <li class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+          <Card interactive spotlight class="h-full relative">
+            <div class="absolute -top-3 left-6 w-8 h-8 rounded-full bg-coral-400 text-ink-950 flex items-center justify-center text-small font-bold ring-4 ring-ink-950">
+              {step.step}
+            </div>
+            <div class="p-7 pt-9 h-full">
+              <h3 class="text-h4 font-semibold text-ink-50 mb-2 tracking-tight">{step.title}</h3>
+              <p class="text-small text-ink-200 leading-relaxed">{step.desc}</p>
+            </div>
+          </Card>
         </li>
       ))}
     </ol>
   </Section>
 
+  <SectionDivider />
+
+  {/* === Cas d'usage : grille de cards === */}
   <Section title={t(lang, 'detail.useCases')}>
-    <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {entry.data.useCases.map((uc) => (
-        <li class="flex items-start gap-3 p-4 border border-ink-800 rounded-md bg-ink-900">
-          <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-coral-400 shrink-0"></span>
-          <span class="text-base text-ink-100">{uc}</span>
+    <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0">
+      {entry.data.useCases.map((uc, i) => (
+        <li class="reveal" style={`--reveal-delay: ${i * 60}ms`}>
+          <Card interactive class="h-full">
+            <div class="p-5 flex items-start gap-3">
+              <span class="mt-1.5 w-2 h-2 rounded-full bg-coral-400 shrink-0 shadow-[0_0_8px_rgba(255,61,127,0.6)]"></span>
+              <span class="text-base text-ink-100">{uc}</span>
+            </div>
+          </Card>
         </li>
       ))}
     </ul>
   </Section>
 
   {entry.data.integrations && entry.data.integrations.length > 0 && (
-    <Section title={t(lang, 'detail.integrations')} surface="muted">
-      <div class="flex flex-wrap gap-3">
-        {entry.data.integrations.map((i) => (
-          <span class="inline-flex items-center px-4 py-2 border border-ink-700 rounded-md text-small text-ink-100 bg-ink-900">
-            {i}
-          </span>
-        ))}
-      </div>
-    </Section>
+    <>
+      <SectionDivider />
+      <Section title={t(lang, 'detail.integrations')}>
+        <div class="reveal">
+          <Card>
+            <div class="p-6 md:p-8">
+              <div class="flex flex-wrap gap-3">
+                {entry.data.integrations.map((i) => (
+                  <span class="inline-flex items-center gap-1.5 px-4 py-2 border border-ink-700 rounded-md text-small text-ink-100 bg-ink-950/60 font-mono">
+                    <span class="w-1.5 h-1.5 rounded-full bg-coral-400"></span>
+                    {i}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+      </Section>
+    </>
   )}
 
   <Section>
-    <div class="prose prose-ink max-w-3xl text-base text-ink-200 leading-relaxed">
-      <Content />
+    <div class="max-w-3xl reveal">
+      <Card>
+        <div class="p-8 md:p-10 prose prose-ink text-base text-ink-200 leading-relaxed">
+          <Content />
+        </div>
+      </Card>
     </div>
   </Section>
 
   {relatedFinal.length > 0 && (
-    <RelatedGrid title={t(lang, 'detail.related')}>
-      {relatedFinal.map((p) => (
-        <OfferCard
-          variant="ai"
-          name={p.data.name}
-          tagline={p.data.tagline}
-          icon={p.data.icon}
-          tags={[t(lang, `capability.${p.data.capability}`)]}
-          href={localizeUrl(`/ia/${p.id}`, lang)}
-        />
-      ))}
-    </RelatedGrid>
+    <>
+      <SectionDivider />
+      <RelatedGrid title={t(lang, 'detail.related')}>
+        {relatedFinal.map((p) => (
+          <OfferCard
+            variant="ai"
+            name={p.data.name}
+            tagline={p.data.tagline}
+            icon={p.data.icon}
+            tags={[t(lang, `capability.${p.data.capability}`)]}
+            href={localizeUrl(`/ia/${p.id}`, lang)}
+          />
+        ))}
+      </RelatedGrid>
+    </>
   )}
 
   <CTASection

@@ -15,10 +15,10 @@
   --color-ink-400: #74747F; /* texte muted */
   --color-ink-500: #5C5C66;
   --color-ink-600: #44444D; /* dividers visibles */
-  --color-ink-700: #2E2E36; /* borders fortes */
-  --color-ink-800: #1F1F26; /* borders subtiles */
-  --color-ink-900: #14141A; /* surface cartes */
-  --color-ink-950: #09090D; /* fond de page */
+  --color-ink-700: #2E2F3A; /* borders fortes */
+  --color-ink-800: #1F2029; /* borders subtiles */
+  --color-ink-900: #161821; /* surface cartes */
+  --color-ink-950: #0E1118; /* fond de page (slate-bleu, moins dur que le noir) */
 
   /* === Solutions : cyan électrique === */
   --color-teal-50:  #E6FCFF;
@@ -112,7 +112,7 @@
   --accent-templates:        var(--color-amber-400);
   --accent-templates-glow:   rgba(255, 176, 0, 0.20);
 
-  --grain: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --grain: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.015 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
 /* ================================================================
@@ -130,9 +130,6 @@
   body {
     font-weight: 400;
     line-height: 1.7;
-    background-image: var(--grain);
-    background-attachment: fixed;
-    background-size: 256px 256px;
   }
 
   h1, h2, h3, h4, h5, h6 {
