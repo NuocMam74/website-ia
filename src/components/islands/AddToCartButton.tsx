@@ -22,6 +22,7 @@ export default function AddToCartButton({
   const handleClick = () => {
     addToCart({ slug, name, priceEUR });
     setAdded(true);
+    (window as any).showToast?.(`${labelAdded} — ${name}`, { variant: 'success', duration: 2400 });
     window.setTimeout(() => setAdded(false), 1800);
   };
 

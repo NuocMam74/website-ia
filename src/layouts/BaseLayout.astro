@@ -4,7 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import SiteHeader from '~/components/layout/SiteHeader.astro';
 import SiteFooter from '~/components/layout/SiteFooter.astro';
 import CookieBanner from '~/components/islands/CookieBanner.tsx';
-import TechBackdrop from '~/components/sections/TechBackdrop.astro';
+import ToastProvider from '~/components/islands/Toast.tsx';
 import { type Lang, t, DEFAULT_LANG } from '~/lib/i18n';
 import { canonicalUrl, hreflangAlternates, absoluteUrl } from '~/lib/seo';
 
@@ -46,8 +46,38 @@ const ldArray = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0E1118" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F7F8FB" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B0D12" media="(prefers-color-scheme: dark)" />
+
+    {/* Anti-flash : applique le thème AVANT le rendu pour éviter un FOUC.
+        Lit la préférence localStorage > préférence système > clair par défaut.
+        Astro ClientRouter swap le <html> à chaque navigation et écrase
+        notre data-theme — on patche le document entrant via
+        astro:before-swap (idéal) + safety net sur astro:after-swap. */}
+    <script is:inline>
+      (function () {
+        function resolveTheme() {
+          try {
+            var stored = localStorage.getItem('theme.preference');
+            if (stored === 'light' || stored === 'dark') return stored;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          } catch (e) {
+            return 'light';
+          }
+        }
+        function applyTheme() {
+          document.documentElement.setAttribute('data-theme', resolveTheme());
+        }
+        applyTheme();
+        // Patche le document entrant AVANT le swap (zéro flash)
+        document.addEventListener('astro:before-swap', function (e) {
+          e.newDocument.documentElement.setAttribute('data-theme', resolveTheme());
+        });
+        // Safety net : re-applique après le swap au cas où
+        document.addEventListener('astro:after-swap', applyTheme);
+      })();
+    </script>
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
@@ -60,6 +90,7 @@ const ldArray = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <link rel="alternate" hreflang="x-default" href={alternates.find((a) => a.lang === DEFAULT_LANG)!.href} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={`${brand} — Blog`} href="/rss.xml" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -147,13 +178,13 @@ const ldArray = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     */}
   </head>
   <body class="min-h-screen flex flex-col">
-    <TechBackdrop />
     <a href="#main" class="skip-link">{t(lang, 'nav.skipToContent')}</a>
     <SiteHeader lang={lang} path={path} />
     <main id="main" class="flex-1 relative">
       <slot />
     </main>
     <SiteFooter lang={lang} />
+    <ToastProvider client:idle />
     <CookieBanner client:idle lang={lang} />
   </body>
 </html>

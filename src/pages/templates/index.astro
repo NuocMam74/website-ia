@@ -3,8 +3,14 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import Modal from '~/components/ui/Modal.astro';
 import TemplateCard from '~/components/cards/TemplateCard.astro';
 import EmptyState from '~/components/ui/EmptyState.astro';
+import CTASection from '~/components/sections/CTASection.astro';
 import FilterChips from '~/components/islands/FilterChips.tsx';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
 import { NORMS } from '~/content.config';
@@ -21,6 +27,100 @@ const filterOptions = [
     value: n,
     label: t(lang, `norm.${n}`),
   })),
+];
+
+/* Comment ça marche — 3 étapes simples */
+const howItWorks = [
+  {
+    n: '01',
+    icon: 'shopping-cart',
+    title: lang === 'fr' ? 'Choisir' : 'Choose',
+    desc: lang === 'fr'
+      ? 'Sélectionnez un pack conforme à votre norme cible.'
+      : 'Pick a pack matching your target norm.',
+  },
+  {
+    n: '02',
+    icon: 'send',
+    title: lang === 'fr' ? 'Payer' : 'Pay',
+    desc: lang === 'fr'
+      ? 'Paiement sécurisé Stripe, facture immédiate.'
+      : 'Stripe secure payment, instant invoice.',
+  },
+  {
+    n: '03',
+    icon: 'folder-open',
+    title: lang === 'fr' ? 'Télécharger' : 'Download',
+    desc: lang === 'fr'
+      ? 'Archive ZIP livrée sous 5 minutes par e-mail.'
+      : 'ZIP archive delivered by email within 5 minutes.',
+  },
+];
+
+/* Garanties — 4 cards rassurantes */
+const guarantees = [
+  {
+    icon: 'shield-check',
+    title: lang === 'fr' ? 'Conformité auditée' : 'Audited compliance',
+    desc: lang === 'fr'
+      ? 'Chaque pack est revu par un auditeur tiers avant publication.'
+      : 'Every pack is reviewed by a third-party auditor before publication.',
+  },
+  {
+    icon: 'history',
+    title: lang === 'fr' ? 'Mises à jour 12 mois' : '12-month updates',
+    desc: lang === 'fr'
+      ? 'Vous recevez automatiquement les nouvelles versions pendant un an.'
+      : 'You automatically receive new versions for a year.',
+  },
+  {
+    icon: 'file-text',
+    title: lang === 'fr' ? 'Procédures incluses' : 'Procedures included',
+    desc: lang === 'fr'
+      ? 'Templates + procédures de mise en œuvre + exemples remplis.'
+      : 'Templates + implementation procedures + filled examples.',
+  },
+  {
+    icon: 'lock-keyhole',
+    title: lang === 'fr' ? 'Licence permissive' : 'Permissive license',
+    desc: lang === 'fr'
+      ? 'Utilisation interne illimitée, multi-projets, sans royalties.'
+      : 'Unlimited internal use, multi-project, no royalties.',
+  },
+];
+
+/* Packs phares — modales avec contenu détaillé */
+const packs = [
+  {
+    id: 'pack-aspice',
+    icon: 'route',
+    title: 'Pack ASPICE',
+    tagline: lang === 'fr' ? 'Automotive SPICE — référentiel d’évaluation des processus.' : 'Automotive SPICE — process assessment framework.',
+    detail: lang === 'fr'
+      ? 'Pack complet ASPICE incluant les templates pour chacun des 17 process areas, les check-lists d’évaluation, les exemples d’évidences et un guide d’implémentation. Pensé pour un équipementier visant le niveau 2.'
+      : 'Complete ASPICE pack including templates for each of the 17 process areas, assessment checklists, evidence examples, and an implementation guide. Designed for a tier supplier targeting level 2.',
+    bullets: ['17 process areas', lang === 'fr' ? '60+ templates' : '60+ templates', lang === 'fr' ? 'Check-lists d’évaluation' : 'Assessment checklists', lang === 'fr' ? 'Exemples remplis' : 'Filled examples'],
+  },
+  {
+    id: 'pack-iso26262',
+    icon: 'shield-check',
+    title: 'Pack ISO 26262',
+    tagline: lang === 'fr' ? 'Sécurité fonctionnelle automobile, de l’ASIL au safety case.' : 'Functional safety for automotive, from ASIL to safety case.',
+    detail: lang === 'fr'
+      ? 'Pack ISO 26262 couvrant l’analyse de risques (HARA), les exigences de sécurité (SR), l’architecture de sécurité, le safety case et les vérifications. Compatible ASIL A à D.'
+      : 'ISO 26262 pack covering risk analysis (HARA), safety requirements (SR), safety architecture, safety case and verifications. Compatible with ASIL A to D.',
+    bullets: ['HARA', 'SR', 'Safety case', 'ASIL A→D'],
+  },
+  {
+    id: 'pack-iso21434',
+    icon: 'lock-keyhole',
+    title: 'Pack ISO/SAE 21434',
+    tagline: lang === 'fr' ? 'Cybersécurité automobile : TARA, exigences, validation.' : 'Automotive cybersecurity: TARA, requirements, validation.',
+    detail: lang === 'fr'
+      ? 'Pack cybersécurité automobile complet : TARA, identification d’assets, cybersecurity requirements, validation et opération sécurisée des véhicules connectés.'
+      : 'Full automotive cybersecurity pack: TARA, asset identification, cybersecurity requirements, validation and secure operation of connected vehicles.',
+    bullets: ['TARA', 'CS requirements', 'Validation', lang === 'fr' ? 'Opération sécurisée' : 'Secure operation'],
+  },
 ];
 ---
 
@@ -40,7 +140,132 @@ const filterOptions = [
     ctaHref={localizeUrl('/panier', lang)}
   />
 
-  <Section>
+  <SectionDivider />
+
+  {/* === Comment ça marche === */}
+  <Section
+    title={lang === 'fr' ? 'Comment ça marche ?' : 'How it works'}
+    subtitle={lang === 'fr'
+      ? 'Achat direct, sans engagement. Vous démarrez votre projet en 5 minutes.'
+      : 'Direct purchase, no commitment. You start your project in 5 minutes.'}
+    family="templates"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {howItWorks.map((step, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+          <Card class="h-full" interactive spotlight accent="templates">
+            <div class="p-7 h-full flex flex-col">
+              <div class="flex items-start justify-between mb-4">
+                <div class="text-h2 font-light text-ink-600 tracking-tight">{step.n}</div>
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400/25 to-amber-600/10 ring-1 ring-amber-400/30 text-amber-200">
+                  <Icon name={step.icon} size={18} />
+                </div>
+              </div>
+              <h3 class="text-h3 font-semibold text-ink-50 mb-2 tracking-tight">{step.title}</h3>
+              <p class="text-small text-ink-300 leading-relaxed">{step.desc}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider variant="icon" icon="shield-check" />
+
+  {/* === Garanties === */}
+  <Section
+    title={lang === 'fr' ? 'Nos garanties' : 'Our guarantees'}
+    subtitle={lang === 'fr'
+      ? 'Quatre engagements pour vous assurer que ce que vous achetez tient en production.'
+      : 'Four commitments to make sure what you buy holds up in production.'}
+    surface="muted"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      {guarantees.map((g, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 70}ms`}>
+          <Card class="h-full">
+            <div class="p-6">
+              <div class="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-amber-500/10 ring-1 ring-amber-400/30 text-amber-300 mb-4">
+                <Icon name={g.icon} size={20} />
+              </div>
+              <h3 class="text-h4 font-semibold text-ink-50 mb-2 tracking-tight">{g.title}</h3>
+              <p class="text-small text-ink-300 leading-relaxed">{g.desc}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider />
+
+  {/* === Packs phares — cards cliquables avec modales === */}
+  <Section
+    title={lang === 'fr' ? 'Nos packs phares' : 'Our flagship packs'}
+    subtitle={lang === 'fr'
+      ? 'Aperçu rapide de trois packs très demandés. Cliquez pour voir ce qu’il y a dedans.'
+      : 'Quick look at three popular packs. Click to see what’s inside.'}
+  >
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {packs.map((p, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+          <button
+            type="button"
+            data-modal-target={p.id}
+            class="group block w-full text-left h-full"
+          >
+            <Card class="h-full" interactive spotlight accent="templates">
+              <div class="p-7 h-full flex flex-col">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-amber-400/25 to-amber-600/10 ring-1 ring-amber-400/30 text-amber-200 mb-5">
+                  <Icon name={p.icon} size={22} />
+                </div>
+                <h3 class="text-h3 font-semibold text-ink-50 mb-2 tracking-tight">{p.title}</h3>
+                <p class="text-small text-ink-300 leading-relaxed flex-1">{p.tagline}</p>
+                <span class="mt-6 inline-flex items-center gap-1.5 text-small font-medium text-amber-300 group-hover:underline">
+                  {lang === 'fr' ? 'Voir le contenu' : 'See the contents'}
+                  <Icon name="arrow-right" size={14} />
+                </span>
+              </div>
+            </Card>
+          </button>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {packs.map((p) => (
+    <Modal id={p.id} family="templates" title={p.title} subtitle={p.tagline} size="lg">
+      <p class="text-base text-ink-200 leading-relaxed">{p.detail}</p>
+
+      <div class="mt-6 flex flex-wrap gap-2">
+        {p.bullets.map((b) => (
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-400/10 ring-1 ring-amber-400/30 text-small text-amber-200">
+            <Icon name="check" size={12} />
+            {b}
+          </span>
+        ))}
+      </div>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <Button href={localizeUrl('/templates', lang)} variant="primary" family="templates" icon="arrow-right">
+          {lang === 'fr' ? 'Voir le catalogue' : 'See the catalog'}
+        </Button>
+        <Button href={localizeUrl('/contact', lang)} variant="ghost">
+          {t(lang, 'cta.contact')}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  <SectionDivider variant="icon" icon="file-text" />
+
+  {/* === Catalogue filtré === */}
+  <Section
+    title={lang === 'fr' ? 'Tous les templates' : 'All templates'}
+    subtitle={lang === 'fr'
+      ? 'Filtrez par norme cible pour trouver le pack adapté à votre projet.'
+      : 'Filter by target norm to find the right pack for your project.'}
+  >
     <div class="mb-8">
       <FilterChips
         client:idle
@@ -77,4 +302,17 @@ const filterOptions = [
       />
     </div>
   </Section>
+
+  <SectionDivider />
+
+  <CTASection
+    title={lang === 'fr' ? 'Besoin d’un pack sur-mesure ?' : 'Need a custom pack?'}
+    subtitle={lang === 'fr'
+      ? 'Si votre référentiel n’est pas couvert, parlons-en. Pack ad-hoc possible sous 2-4 semaines.'
+      : 'If your reference isn’t covered, let’s talk. Custom pack possible in 2-4 weeks.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+    secondaryCtaLabel={lang === 'fr' ? 'Voir le panier' : 'View cart'}
+    secondaryCtaHref={localizeUrl('/panier', lang)}
+  />
 </BaseLayout>

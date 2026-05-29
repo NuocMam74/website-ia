@@ -14,6 +14,7 @@ const families = [
   { label: t(lang, 'nav.solutions'), href: localizeUrl('/solutions', lang) },
   { label: t(lang, 'nav.ia'), href: localizeUrl('/ia', lang) },
   { label: t(lang, 'nav.templates'), href: localizeUrl('/templates', lang) },
+  { label: lang === 'fr' ? 'Tarifs' : 'Pricing', href: localizeUrl('/tarifs', lang) },
 ];
 
 const resources = [
@@ -22,6 +23,9 @@ const resources = [
   { label: t(lang, 'nav.glossary'), href: localizeUrl('/lexique', lang) },
   { label: t(lang, 'nav.compare'), href: localizeUrl('/comparateur-templates', lang) },
   { label: 'FAQ', href: localizeUrl('/faq', lang) },
+  { label: 'Changelog', href: localizeUrl('/changelog', lang) },
+  { label: 'Status', href: localizeUrl('/status', lang) },
+  { label: lang === 'fr' ? 'RSS du blog' : 'Blog RSS', href: '/rss.xml' },
 ];
 
 const company = [
@@ -29,6 +33,7 @@ const company = [
   { label: t(lang, 'nav.team'), href: localizeUrl('/equipe', lang) },
   { label: t(lang, 'nav.method'), href: localizeUrl('/methodologie', lang) },
   { label: t(lang, 'nav.partners'), href: localizeUrl('/partenaires', lang) },
+  { label: lang === 'fr' ? 'Carrières' : 'Careers', href: localizeUrl('/carrieres', lang) },
   { label: t(lang, 'nav.contact'), href: localizeUrl('/contact', lang) },
 ];
 

@@ -1,0 +1,299 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import Modal from '~/components/ui/Modal.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+import { jobPostingLd, canonicalUrl } from '~/lib/seo';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const benefits = [
+  {
+    icon: 'sparkles',
+    accent: 'teal',
+    title: lang === 'fr' ? 'Projets à impact réel' : 'Real-impact projects',
+    desc: lang === 'fr'
+      ? 'Pas de POC qui finit dans un tiroir. Tout ce que tu construis tourne en production chez un industriel.'
+      : 'No POC that ends up in a drawer. Everything you build runs in production at an industrial.',
+  },
+  {
+    icon: 'shield-check',
+    accent: 'coral',
+    title: lang === 'fr' ? 'Liberté technique' : 'Tech freedom',
+    desc: lang === 'fr'
+      ? 'Stack moderne (Python, TS, Rust quand c’est utile). Tu choisis l’outil qui résout le problème, pas l’inverse.'
+      : 'Modern stack (Python, TS, Rust when useful). You pick the tool that solves the problem, not the other way.',
+  },
+  {
+    icon: 'history',
+    accent: 'amber',
+    title: lang === 'fr' ? 'Équipe humaine' : 'Human team',
+    desc: lang === 'fr'
+      ? 'Pas de management toxique, pas de bullshit. Code reviews bienveillantes, pair-programming, post-mortems blameless.'
+      : 'No toxic management, no bullshit. Kind code reviews, pair programming, blameless post-mortems.',
+  },
+  {
+    icon: 'wrench',
+    accent: 'teal',
+    title: lang === 'fr' ? 'Bureaux & remote' : 'Office & remote',
+    desc: lang === 'fr'
+      ? 'Bureaux à Paris et Lyon, ou full remote depuis n’importe quel fuseau ±3h. Visios courtes et asynchrone privilégié.'
+      : 'Offices in Paris and Lyon, or full remote from any timezone ±3h. Short videos, async-first.',
+  },
+];
+
+const accentBg: Record<string, string> = {
+  teal: 'bg-teal-500/10 ring-teal-400/30 text-teal-300',
+  coral: 'bg-coral-500/10 ring-coral-400/30 text-coral-300',
+  amber: 'bg-amber-500/10 ring-amber-400/30 text-amber-300',
+};
+
+const jobs = [
+  {
+    id: 'job-senior-fullstack',
+    title: lang === 'fr' ? 'Ingénieur·e Senior Full-Stack' : 'Senior Full-Stack Engineer',
+    type: 'CDI',
+    location: lang === 'fr' ? 'Paris / Lyon / Remote' : 'Paris / Lyon / Remote',
+    family: 'solutions' as const,
+    icon: 'wrench',
+    summary: lang === 'fr'
+      ? 'Tu construis des plateformes métier qui durent : TS / Python / Postgres, avec des intégrations sérieuses sur SI industriels.'
+      : 'You build business platforms that last: TS / Python / Postgres, with serious integrations on industrial stacks.',
+    bullets: lang === 'fr'
+      ? ['5+ ans d’expérience produit en production', 'TS / React / Astro / Node ou Python', 'Confort avec Postgres avancé (CTE, jsonb)', 'Notion d’observabilité (OpenTelemetry)']
+      : ['5+ years of production product experience', 'TS / React / Astro / Node or Python', 'Comfort with advanced Postgres (CTE, jsonb)', 'Observability basics (OpenTelemetry)'],
+  },
+  {
+    id: 'job-ml',
+    title: lang === 'fr' ? 'Ingénieur·e ML / LLM' : 'ML / LLM Engineer',
+    type: 'CDI',
+    location: lang === 'fr' ? 'Paris / Remote' : 'Paris / Remote',
+    family: 'ia' as const,
+    icon: 'bot',
+    summary: lang === 'fr'
+      ? 'Tu déploies des agents et des RAG en production. Tu mesures, tu fiabilises, tu observes.'
+      : 'You deploy agents and RAG in production. You measure, harden, observe.',
+    bullets: lang === 'fr'
+      ? ['Expérience prod RAG ou agents', 'Python, LangGraph ou équivalent', 'pgvector / Qdrant / Weaviate', 'Eval continue, garde-fous, guardrails']
+      : ['Production experience with RAG or agents', 'Python, LangGraph or equivalent', 'pgvector / Qdrant / Weaviate', 'Continuous eval, guardrails'],
+  },
+  {
+    id: 'job-quality',
+    title: lang === 'fr' ? 'Consultant·e Qualité ASPICE / ISO 26262' : 'Quality Consultant ASPICE / ISO 26262',
+    type: 'CDI',
+    location: lang === 'fr' ? 'Lyon / Stuttgart' : 'Lyon / Stuttgart',
+    family: 'solutions' as const,
+    icon: 'shield-check',
+    summary: lang === 'fr'
+      ? 'Tu accompagnes les évaluations ASPICE chez les équipementiers. Tu participes au développement de nos templates.'
+      : 'You support ASPICE assessments at suppliers. You contribute to our template development.',
+    bullets: lang === 'fr'
+      ? ['3+ ans en environnement ASPICE', 'Maîtrise des 17 process areas', 'Anglais professionnel', 'Mobilité ponctuelle']
+      : ['3+ years in ASPICE environment', 'Mastery of the 17 process areas', 'Business English', 'Occasional mobility'],
+  },
+  {
+    id: 'job-designer',
+    title: lang === 'fr' ? 'Product Designer (Senior)' : 'Senior Product Designer',
+    type: 'CDI',
+    location: lang === 'fr' ? 'Remote EU' : 'EU Remote',
+    family: 'templates' as const,
+    icon: 'sparkles',
+    summary: lang === 'fr'
+      ? 'Tu dessines les interfaces de nos produits métier et de notre site. Sensibilité forte à la lisibilité dense.'
+      : 'You design our business product interfaces and our website. Strong sensitivity for dense readability.',
+    bullets: lang === 'fr'
+      ? ['Portfolio prod B2B dense', 'Figma + composants systèmes', 'Empathie utilisateurs métier', 'Notion de code (HTML/CSS lecture)']
+      : ['Dense B2B product portfolio', 'Figma + design systems', 'Empathy for business users', 'Code literacy (read HTML/CSS)'],
+  },
+];
+
+const process = [
+  { n: '01', title: lang === 'fr' ? 'CV + intro courte' : 'CV + short intro', desc: lang === 'fr' ? 'Quelques lignes sur ce qui t’intéresse.' : 'A few lines on what interests you.', icon: 'mail' },
+  { n: '02', title: lang === 'fr' ? 'Visio 30 min' : '30-min video call', desc: lang === 'fr' ? 'Découverte mutuelle, attentes, contexte.' : 'Mutual discovery, expectations, context.', icon: 'message-square-text' },
+  { n: '03', title: lang === 'fr' ? 'Cas pratique payé' : 'Paid case study', desc: lang === 'fr' ? '½ journée payée, sur un cas réaliste anonymisé.' : 'Half-day paid, on an anonymised realistic case.', icon: 'wrench' },
+  { n: '04', title: lang === 'fr' ? 'Rencontre équipe' : 'Meet the team', desc: lang === 'fr' ? 'Café avec 2-3 personnes, discussion ouverte.' : 'Coffee with 2-3 people, open discussion.', icon: 'check' },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/carrieres"
+  title={lang === 'fr' ? 'Carrières' : 'Careers'}
+  description={lang === 'fr'
+    ? 'Rejoignez une équipe d’ingénieurs qui construit des produits industriels qui durent.'
+    : 'Join a team of engineers building industrial products that last.'}
+  jsonLd={jobs.map((job) =>
+    jobPostingLd({
+      title: job.title,
+      description: `${job.summary} ${job.bullets.join(' · ')}`,
+      url: `${canonicalUrl('/carrieres', lang)}#${job.id}`,
+      employmentType: 'FULL_TIME',
+      location: job.location.split(/[\/·]/)[0]?.trim(),
+      remote: /remote/i.test(job.location),
+      hiringOrganization: t(lang, 'brand'),
+    }),
+  )}
+>
+  <Hero
+    variant="page"
+    kicker={lang === 'fr' ? 'Carrières' : 'Careers'}
+    title={lang === 'fr' ? 'Construis avec nous ce qui tient en production' : 'Build with us what holds in production'}
+    subtitle={lang === 'fr'
+      ? 'Nous recrutons des ingénieur·e·s qui aiment résoudre des vrais problèmes industriels — pas pousser des POC qui finissent dans un tiroir.'
+      : 'We hire engineers who love solving real industrial problems — not pushing POCs that end up in a drawer.'}
+    ctaLabel={lang === 'fr' ? 'Voir les postes ouverts' : 'See open positions'}
+    ctaHref="#jobs"
+  />
+
+  <SectionDivider />
+
+  {/* === Pourquoi nous rejoindre === */}
+  <Section
+    title={lang === 'fr' ? 'Pourquoi nous rejoindre ?' : 'Why join us?'}
+    subtitle={lang === 'fr'
+      ? 'Quatre raisons qui reviennent souvent dans nos enquêtes internes.'
+      : 'Four reasons that come up often in our internal surveys.'}
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      {benefits.map((b, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card class="h-full" interactive>
+            <div class="p-6">
+              <div class:list={['inline-flex items-center justify-center w-11 h-11 rounded-lg ring-1 mb-4', accentBg[b.accent]]}>
+                <Icon name={b.icon} size={20} />
+              </div>
+              <h3 class="text-h4 font-semibold text-ink-50 mb-2 tracking-tight">{b.title}</h3>
+              <p class="text-small text-ink-300 leading-relaxed">{b.desc}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider variant="icon" icon="folder-open" />
+
+  {/* === Postes ouverts === */}
+  <Section
+    id="jobs"
+    title={lang === 'fr' ? 'Postes ouverts' : 'Open positions'}
+    subtitle={lang === 'fr' ? 'Cliquez sur un poste pour voir le détail.' : 'Click a position to see details.'}
+    surface="muted"
+  >
+    <div class="space-y-4">
+      {jobs.map((job, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 60}ms`}>
+          <Card class="h-full" interactive accent={job.family}>
+            <div class="p-6 md:p-7 flex flex-col md:flex-row md:items-center gap-5">
+              <div
+                class:list={[
+                  'inline-flex items-center justify-center w-11 h-11 rounded-lg ring-1 shrink-0',
+                  job.family === 'solutions' && 'bg-teal-500/10 ring-teal-400/30 text-teal-300',
+                  job.family === 'ia' && 'bg-coral-500/10 ring-coral-400/30 text-coral-300',
+                  job.family === 'templates' && 'bg-amber-500/10 ring-amber-400/30 text-amber-300',
+                ]}
+              >
+                <Icon name={job.icon} size={20} />
+              </div>
+
+              <div class="flex-1">
+                <h3 class="text-h3 font-semibold text-ink-50 tracking-tight">{job.title}</h3>
+                <div class="mt-1 flex flex-wrap items-center gap-3 text-xs text-ink-400">
+                  <span class="inline-flex items-center gap-1.5"><Icon name="check" size={12} class="text-teal-400" />{job.type}</span>
+                  <span class="inline-flex items-center gap-1.5"><Icon name="building-2" size={12} />{job.location}</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  data-modal-target={job.id}
+                  class="inline-flex items-center gap-1.5 text-small text-ink-200 hover:text-ink-50 transition-colors px-3 py-2 rounded-md hover:bg-ink-800"
+                >
+                  {lang === 'fr' ? 'Voir le détail' : 'See details'}
+                  <Icon name="arrow-right" size={14} />
+                </button>
+                <Button href={`${localizeUrl('/contact', lang)}?subject=${encodeURIComponent(job.title)}`} variant="primary" family={job.family}>
+                  {lang === 'fr' ? 'Postuler' : 'Apply'}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {jobs.map((job) => (
+    <Modal id={job.id} family={job.family} title={job.title} subtitle={`${job.type} · ${job.location}`} size="lg">
+      <p class="text-base text-ink-200 leading-relaxed">{job.summary}</p>
+      <h3 class="mt-7 text-small font-semibold text-ink-50 uppercase tracking-wider">{lang === 'fr' ? 'Ce qu’on cherche' : 'What we look for'}</h3>
+      <ul class="mt-3 space-y-2.5">
+        {job.bullets.map((b) => (
+          <li class="flex items-start gap-2.5 text-small text-ink-100">
+            <Icon name="check" size={14} class:list={[
+              'mt-1 shrink-0',
+              job.family === 'solutions' && 'text-teal-400',
+              job.family === 'ia' && 'text-coral-400',
+              job.family === 'templates' && 'text-amber-400',
+            ]} />
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <Button href={`${localizeUrl('/contact', lang)}?subject=${encodeURIComponent(job.title)}`} variant="primary" family={job.family} icon="arrow-right">
+          {lang === 'fr' ? 'Postuler à ce poste' : 'Apply to this role'}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  <SectionDivider variant="icon" icon="milestone" />
+
+  {/* === Process recrutement === */}
+  <Section
+    title={lang === 'fr' ? 'Notre process de recrutement' : 'Our hiring process'}
+    subtitle={lang === 'fr'
+      ? 'Court, transparent, payé pour le cas pratique. 3 à 4 semaines en moyenne entre le premier contact et l’offre.'
+      : 'Short, transparent, paid for the case study. 3 to 4 weeks on average between first contact and offer.'}
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      {process.map((step, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card class="h-full" interactive spotlight>
+            <div class="p-6 h-full flex flex-col">
+              <div class="flex items-start justify-between mb-4">
+                <div class="text-h2 font-light text-ink-600 tracking-tight">{step.n}</div>
+                <div class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-ink-800 text-teal-300">
+                  <Icon name={step.icon} size={16} />
+                </div>
+              </div>
+              <h3 class="text-h4 font-semibold text-ink-50 mb-2">{step.title}</h3>
+              <p class="text-small text-ink-300 leading-relaxed">{step.desc}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider />
+
+  <CTASection
+    title={lang === 'fr' ? 'Une candidature spontanée ?' : 'A spontaneous application?'}
+    subtitle={lang === 'fr'
+      ? 'Nous lisons toutes les candidatures, même hors postes ouverts.'
+      : 'We read every application, even outside open positions.'}
+    ctaLabel={lang === 'fr' ? 'Envoyer ma candidature' : 'Send my application'}
+    ctaHref={`${localizeUrl('/contact', lang)}?subject=${encodeURIComponent(lang === 'fr' ? 'Candidature spontanée' : 'Spontaneous application')}`}
+    secondaryCtaLabel={t(lang, 'nav.team')}
+    secondaryCtaHref={localizeUrl('/equipe', lang)}
+  />
+</BaseLayout>

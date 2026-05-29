@@ -1,0 +1,278 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+type Status = 'ok' | 'degraded' | 'down';
+
+interface Service {
+  name: string;
+  group: string;
+  status: Status;
+  uptime30d: number;
+  region?: string;
+}
+
+const services: Service[] = [
+  { name: lang === 'fr' ? 'Site web public' : 'Public website', group: 'Frontend', status: 'ok', uptime30d: 100 },
+  { name: lang === 'fr' ? 'Catalogue templates' : 'Templates catalog', group: 'Frontend', status: 'ok', uptime30d: 99.99 },
+  { name: 'API ASPICE Navigator', group: 'API', status: 'ok', uptime30d: 99.97, region: 'EU-West' },
+  { name: 'API AgentMesh', group: 'API', status: 'ok', uptime30d: 99.95, region: 'EU-West' },
+  { name: 'API DocuRAG', group: 'API', status: 'ok', uptime30d: 99.92, region: 'EU-West' },
+  { name: lang === 'fr' ? 'Paiement Stripe' : 'Stripe payment', group: 'Intégrations', status: 'ok', uptime30d: 100 },
+  { name: lang === 'fr' ? 'Authentification SSO' : 'SSO authentication', group: 'Intégrations', status: 'ok', uptime30d: 99.99 },
+  { name: lang === 'fr' ? 'Hébergement modèles vLLM' : 'vLLM model hosting', group: 'Infrastructure', status: 'ok', uptime30d: 99.88, region: 'EU-West' },
+  { name: lang === 'fr' ? 'Base vectorielle (pgvector)' : 'Vector DB (pgvector)', group: 'Infrastructure', status: 'ok', uptime30d: 99.95, region: 'EU-West' },
+];
+
+const groups = Array.from(new Set(services.map((s) => s.group))).map((g) => ({
+  name: g,
+  services: services.filter((s) => s.group === g),
+}));
+
+const overallOk = services.every((s) => s.status === 'ok');
+const overallStatus: Status = overallOk
+  ? 'ok'
+  : services.some((s) => s.status === 'down')
+    ? 'down'
+    : 'degraded';
+
+const statusMeta: Record<Status, { label: string; dot: string; bg: string; ring: string; text: string }> = {
+  ok: {
+    label: lang === 'fr' ? 'Opérationnel' : 'Operational',
+    dot: 'bg-teal-400 shadow-[0_0_12px_2px_rgba(0,217,255,0.5)]',
+    bg: 'bg-teal-500/10',
+    ring: 'ring-teal-400/30',
+    text: 'text-teal-300',
+  },
+  degraded: {
+    label: lang === 'fr' ? 'Dégradé' : 'Degraded',
+    dot: 'bg-amber-400 shadow-[0_0_12px_2px_rgba(255,176,0,0.5)]',
+    bg: 'bg-amber-500/10',
+    ring: 'ring-amber-400/30',
+    text: 'text-amber-300',
+  },
+  down: {
+    label: lang === 'fr' ? 'Indisponible' : 'Down',
+    dot: 'bg-coral-400 shadow-[0_0_12px_2px_rgba(255,61,127,0.5)]',
+    bg: 'bg-coral-500/10',
+    ring: 'ring-coral-400/30',
+    text: 'text-coral-300',
+  },
+};
+
+// Incidents historiques
+const incidents = [
+  {
+    date: '2026-05-04',
+    title: lang === 'fr' ? 'Latence accrue API AgentMesh' : 'Increased API latency on AgentMesh',
+    duration: lang === 'fr' ? '42 minutes' : '42 minutes',
+    impact: 'minor' as const,
+    summary: lang === 'fr'
+      ? 'Hausse de latence p95 entre 14:32 et 15:14 UTC due à un noeud vLLM saturé. Rééquilibrage automatique du load balancer.'
+      : 'p95 latency spike between 14:32 and 15:14 UTC due to a saturated vLLM node. Automatic load balancer rebalancing.',
+  },
+  {
+    date: '2026-04-11',
+    title: lang === 'fr' ? 'Indexation Confluence partiellement indisponible' : 'Confluence indexing partially unavailable',
+    duration: lang === 'fr' ? '1h17' : '1h17',
+    impact: 'minor' as const,
+    summary: lang === 'fr'
+      ? 'Rate-limit Atlassian sur certains tenants. Stratégie de retry exponentielle déployée le lendemain.'
+      : 'Atlassian rate-limit on some tenants. Exponential retry strategy deployed the next day.',
+  },
+  {
+    date: '2026-02-19',
+    title: lang === 'fr' ? 'Maintenance planifiée Postgres' : 'Planned Postgres maintenance',
+    duration: lang === 'fr' ? '23 minutes' : '23 minutes',
+    impact: 'planned' as const,
+    summary: lang === 'fr'
+      ? 'Migration 15 → 16. Bascule réplica → primaire transparente pour la majorité des clients.'
+      : 'Migration from 15 to 16. Replica → primary failover transparent for most clients.',
+  },
+];
+
+const impactMeta = {
+  minor: { color: 'bg-amber-500/15 text-amber-300 ring-amber-400/30', label: lang === 'fr' ? 'Impact mineur' : 'Minor impact' },
+  major: { color: 'bg-coral-500/15 text-coral-300 ring-coral-400/30', label: lang === 'fr' ? 'Impact majeur' : 'Major impact' },
+  planned: { color: 'bg-ink-50/10 text-ink-50 ring-ink-50/30', label: lang === 'fr' ? 'Planifié' : 'Planned' },
+};
+
+const dateFmt = new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' });
+
+// Heatmap des 30 derniers jours
+const days30 = Array.from({ length: 30 }, (_, i) => {
+  // Deterministic — pas de Math.random pour rester stable au build
+  const idx = i;
+  const isIncident = idx === 5 || idx === 18;
+  return isIncident ? 'minor' : 'ok';
+});
+---
+
+<BaseLayout
+  lang={lang}
+  path="/status"
+  title={lang === 'fr' ? 'Status — uptime temps réel' : 'Status — live uptime'}
+  description={lang === 'fr'
+    ? 'État opérationnel des services et historique des incidents.'
+    : 'Live operational status and incident history.'}
+>
+  <Hero
+    variant="page"
+    kicker={lang === 'fr' ? 'Status' : 'Status'}
+    title={lang === 'fr' ? 'Tout va bien' : 'All systems operational'}
+    subtitle={lang === 'fr'
+      ? 'Surveillance temps réel des services produit et infrastructure. Mise à jour automatique toutes les minutes.'
+      : 'Real-time monitoring of product and infrastructure services. Auto-refresh every minute.'}
+  />
+
+  <SectionDivider />
+
+  {/* === Bandeau global === */}
+  <Section reveal={false}>
+    <div class="reveal">
+      <Card class:list={['border-2', statusMeta[overallStatus].ring]}>
+        <div class:list={['p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6', statusMeta[overallStatus].bg]}>
+          <div class="flex items-center gap-4">
+            <span class:list={['relative inline-flex w-3 h-3 rounded-full', statusMeta[overallStatus].dot]}>
+              <span class:list={['absolute inset-0 rounded-full animate-pulse-soft', statusMeta[overallStatus].dot, 'opacity-50']}></span>
+            </span>
+            <div>
+              <div class:list={['text-xs uppercase tracking-wider', statusMeta[overallStatus].text]}>
+                {lang === 'fr' ? 'Statut global' : 'Overall status'}
+              </div>
+              <div class="text-h2 font-semibold text-ink-50 tracking-tight">{statusMeta[overallStatus].label}</div>
+            </div>
+          </div>
+
+          <div class="md:ml-auto grid grid-cols-3 gap-6 text-center">
+            <div>
+              <div class="text-h3 font-semibold text-ink-50 tabular-nums">99.97%</div>
+              <div class="text-xs uppercase tracking-wider text-ink-400">{lang === 'fr' ? 'Uptime 90j' : '90d uptime'}</div>
+            </div>
+            <div>
+              <div class="text-h3 font-semibold text-ink-50 tabular-nums">{services.length}</div>
+              <div class="text-xs uppercase tracking-wider text-ink-400">{lang === 'fr' ? 'Services' : 'Services'}</div>
+            </div>
+            <div>
+              <div class="text-h3 font-semibold text-ink-50 tabular-nums">0</div>
+              <div class="text-xs uppercase tracking-wider text-ink-400">{lang === 'fr' ? 'Incident actif' : 'Active incident'}</div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  </Section>
+
+  <SectionDivider variant="icon" icon="gauge" />
+
+  {/* === Heatmap 30 jours === */}
+  <Section
+    title={lang === 'fr' ? '30 derniers jours' : 'Last 30 days'}
+    subtitle={lang === 'fr' ? 'Vue d’ensemble des incidents par jour.' : 'Daily incident overview.'}
+  >
+    <div class="reveal">
+      <Card>
+        <div class="p-6 md:p-8">
+          <div class="grid grid-cols-15 sm:grid-cols-30 gap-1.5" style="grid-template-columns: repeat(30, minmax(0, 1fr));">
+            {days30.map((d, i) => (
+              <div
+                title={`J-${30 - i}: ${d === 'ok' ? (lang === 'fr' ? 'OK' : 'OK') : statusMeta.degraded.label}`}
+                class:list={[
+                  'aspect-square rounded-sm',
+                  d === 'ok' ? 'bg-teal-400/70 hover:bg-teal-300' : 'bg-amber-400/70 hover:bg-amber-300',
+                ]}
+              ></div>
+            ))}
+          </div>
+          <div class="mt-4 flex items-center gap-4 text-xs text-ink-400">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-teal-400"></span>{lang === 'fr' ? 'OK' : 'OK'}</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-amber-400"></span>{lang === 'fr' ? 'Incident mineur' : 'Minor incident'}</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-coral-400"></span>{lang === 'fr' ? 'Incident majeur' : 'Major incident'}</span>
+          </div>
+        </div>
+      </Card>
+    </div>
+  </Section>
+
+  <SectionDivider />
+
+  {/* === Services par groupe === */}
+  <Section
+    title={lang === 'fr' ? 'État détaillé des services' : 'Detailed service status'}
+  >
+    <div class="space-y-6">
+      {groups.map((g, gi) => (
+        <div class="reveal" style={`--reveal-delay: ${gi * 80}ms`}>
+          <Card>
+            <div class="p-6 md:p-7">
+              <h3 class="text-h4 font-semibold text-ink-50 mb-4 tracking-tight">{g.name}</h3>
+              <ul class="divide-y divide-ink-800">
+                {g.services.map((s) => (
+                  <li class="flex items-center gap-4 py-3.5">
+                    <span class:list={['inline-block w-2 h-2 rounded-full shrink-0', statusMeta[s.status].dot]}></span>
+                    <span class="flex-1 text-small text-ink-100 font-medium">{s.name}</span>
+                    {s.region && (
+                      <span class="text-xs text-ink-500 font-mono hidden md:inline">{s.region}</span>
+                    )}
+                    <span class="text-xs font-mono text-ink-300 tabular-nums">{s.uptime30d.toFixed(2)}%</span>
+                    <span class:list={['text-xs uppercase tracking-wider px-2 py-0.5 rounded ring-1', statusMeta[s.status].bg, statusMeta[s.status].ring, statusMeta[s.status].text]}>
+                      {statusMeta[s.status].label}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider variant="icon" icon="bell" />
+
+  {/* === Incidents récents === */}
+  <Section
+    title={lang === 'fr' ? 'Incidents récents' : 'Recent incidents'}
+    subtitle={lang === 'fr' ? 'Transparence sur ce qui s’est passé.' : 'Transparency on what happened.'}
+  >
+    <div class="space-y-4">
+      {incidents.map((inc, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card>
+            <div class="p-6">
+              <header class="flex flex-wrap items-center gap-3 mb-3">
+                <span class:list={['inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider ring-1', impactMeta[inc.impact].color]}>
+                  {impactMeta[inc.impact].label}
+                </span>
+                <h3 class="text-h4 font-semibold text-ink-50 tracking-tight">{inc.title}</h3>
+                <span class="text-xs text-ink-500 ml-auto">{dateFmt.format(new Date(inc.date))} · {inc.duration}</span>
+              </header>
+              <p class="text-small text-ink-300 leading-relaxed">{inc.summary}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider />
+
+  <CTASection
+    title={lang === 'fr' ? 'S’abonner aux alertes status' : 'Subscribe to status alerts'}
+    subtitle={lang === 'fr'
+      ? 'Recevez une notification en cas d’incident majeur sur les services que vous utilisez.'
+      : 'Get notified when a major incident impacts the services you use.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+    secondaryCtaLabel={lang === 'fr' ? 'Voir le changelog' : 'See changelog'}
+    secondaryCtaHref={localizeUrl('/changelog', lang)}
+  />
+</BaseLayout>

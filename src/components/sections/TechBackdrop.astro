@@ -20,7 +20,7 @@
 >
   {/* === 1. Réseau de nœuds — top-right === */}
   <svg
-    class="absolute -top-10 -right-10 w-[420px] h-[420px] opacity-[0.13] text-teal-200"
+    class="absolute -top-10 -right-10 w-[420px] h-[420px] tech-backdrop-graph"
     viewBox="0 0 400 400"
     fill="none"
     stroke="currentColor"
@@ -56,7 +56,7 @@
 
   {/* === 2. Snippet de code — middle-left === */}
   <div
-    class="absolute top-[35vh] left-[2vw] font-mono text-[11px] leading-relaxed opacity-[0.10] text-ink-50 max-w-[260px] whitespace-pre tracking-tight"
+    class="absolute top-[35vh] left-[2vw] font-mono text-[11px] leading-relaxed tech-backdrop-code max-w-[260px] whitespace-pre tracking-tight"
   >
 {`import { Agent } from 'brand-ai'
 
@@ -72,7 +72,7 @@ await agent.run(task)
 
   {/* === 3. Schéma puce / processeur — bottom-right === */}
   <svg
-    class="absolute bottom-[6vh] right-[3vw] w-[220px] h-[220px] opacity-[0.11] text-ink-200"
+    class="absolute bottom-[6vh] right-[3vw] w-[220px] h-[220px] tech-backdrop-chip"
     viewBox="0 0 200 200"
     fill="none"
     stroke="currentColor"
@@ -116,7 +116,7 @@ await agent.run(task)
 
   {/* === 4. Annotation cote technique — bottom-left === */}
   <div
-    class="absolute bottom-[8vh] left-[3vw] font-mono text-[10px] opacity-[0.11] text-ink-50 leading-tight"
+    class="absolute bottom-[8vh] left-[3vw] font-mono text-[10px] tech-backdrop-annot leading-tight"
   >
     <div class="tracking-wide">REV. 2.4 · 2025</div>
     <div class="tracking-wide">NODES: 1240</div>
@@ -125,7 +125,24 @@ await agent.run(task)
 
   {/* === 5. Subtile aura cyan en haut, pour le rappel "tech glow" sobre === */}
   <div
-    class="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.06] rounded-full blur-3xl"
+    class="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[400px] tech-backdrop-aura rounded-full blur-3xl"
     style="background: radial-gradient(circle, #00D9FF 0%, transparent 70%);"
   ></div>
 </div>
+
+<style>
+  /* Dark : valeurs originales */
+  .tech-backdrop-graph { color: var(--color-teal-200, #66E5FF); opacity: 0.13; }
+  .tech-backdrop-code { color: var(--color-ink-50); opacity: 0.10; }
+  .tech-backdrop-chip { color: var(--color-ink-200); opacity: 0.11; }
+  .tech-backdrop-annot { color: var(--color-ink-50); opacity: 0.11; }
+  .tech-backdrop-aura { opacity: 0.06; }
+
+  /* Light : palette tech sur fond clair, opacités tunées pour rester
+     visibles sans étouffer le contenu. */
+  :root[data-theme='light'] .tech-backdrop-graph { color: #006A7D; opacity: 0.22; }
+  :root[data-theme='light'] .tech-backdrop-code { color: #1E293B; opacity: 0.16; }
+  :root[data-theme='light'] .tech-backdrop-chip { color: #334155; opacity: 0.18; }
+  :root[data-theme='light'] .tech-backdrop-annot { color: #1E293B; opacity: 0.20; }
+  :root[data-theme='light'] .tech-backdrop-aura { opacity: 0.15; }
+</style>

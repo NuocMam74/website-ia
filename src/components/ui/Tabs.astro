@@ -1,0 +1,125 @@
+---
+/**
+ * Tabs accessibles, sans JS lourd. Pattern radio-input pour rester en
+ * pure CSS (état persistant via :checked). Une seule instance par page
+ * partage le même `name` par défaut, donc on génère un name unique.
+ *
+ * Usage :
+ *   <Tabs items={[
+ *     { id: 'overview', label: 'Aperçu', content: '…' },
+ *     { id: 'features', label: 'Fonctionnalités', content: '…' },
+ *   ]} />
+ *
+ * Pour du contenu riche, on peut nommer des slots correspondant à
+ * `slot-${id}` et omettre `content`.
+ */
+interface Tab {
+  id: string;
+  label: string;
+  content?: string;
+  icon?: string;
+}
+
+interface Props {
+  items: Tab[];
+  /** ID actif au chargement (sinon le premier). */
+  defaultId?: string;
+  family?: 'solutions' | 'ia' | 'templates';
+  class?: string;
+}
+
+import Icon from './Icon.astro';
+
+const { items, defaultId, family, class: className = '' } = Astro.props;
+const groupId = `tabs-${Math.random().toString(36).slice(2, 8)}`;
+const active = defaultId ?? items[0]?.id;
+
+const accentBorder: Record<string, string> = {
+  solutions: 'peer-checked:border-teal-400 peer-checked:text-teal-200',
+  ia: 'peer-checked:border-coral-400 peer-checked:text-coral-200',
+  templates: 'peer-checked:border-amber-400 peer-checked:text-amber-200',
+};
+const defaultAccent = 'peer-checked:border-ink-50 peer-checked:text-ink-50';
+const accentClass = family ? accentBorder[family] : defaultAccent;
+---
+
+<div class:list={['tabs-root', className]} data-tabs-group={groupId}>
+  <div role="tablist" class="flex flex-wrap items-end gap-1 border-b border-ink-800 mb-6">
+    {items.map((tab, i) => (
+      <>
+        <input
+          type="radio"
+          name={groupId}
+          id={`${groupId}-${tab.id}`}
+          class="peer sr-only"
+          data-tab-input={tab.id}
+          checked={tab.id === active}
+        />
+        <label
+          for={`${groupId}-${tab.id}`}
+          role="tab"
+          tabindex="0"
+          class:list={[
+            'inline-flex items-center gap-2 px-4 py-2.5 text-small font-medium text-ink-400',
+            'border-b-2 border-transparent -mb-px cursor-pointer hover:text-ink-100 transition-colors',
+            accentClass,
+          ]}
+        >
+          {tab.icon && <Icon name={tab.icon} size={14} />}
+          {tab.label}
+        </label>
+      </>
+    ))}
+  </div>
+
+  <div class="tabs-panels">
+    {items.map((tab) => (
+      <div
+        role="tabpanel"
+        data-tab-panel={tab.id}
+        class:list={['tab-panel', tab.id !== active && 'hidden']}
+      >
+        {tab.content && <div set:html={tab.content} />}
+        <slot name={`slot-${tab.id}`} />
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  function setupTabs() {
+    document.querySelectorAll<HTMLElement>('[data-tabs-group]').forEach((root) => {
+      if (root.dataset.tabsBound) return;
+      root.dataset.tabsBound = '1';
+
+      const inputs = root.querySelectorAll<HTMLInputElement>('[data-tab-input]');
+      const panels = root.querySelectorAll<HTMLElement>('[data-tab-panel]');
+
+      const sync = () => {
+        const active = root.querySelector<HTMLInputElement>('[data-tab-input]:checked')?.dataset.tabInput;
+        panels.forEach((p) => {
+          p.classList.toggle('hidden', p.dataset.tabPanel !== active);
+        });
+      };
+
+      inputs.forEach((inp) => inp.addEventListener('change', sync));
+      // Clavier : flèches gauche/droite déplacent l'activation
+      root.querySelectorAll<HTMLLabelElement>('[role="tab"]').forEach((label, idx, list) => {
+        label.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            const dir = e.key === 'ArrowRight' ? 1 : -1;
+            const next = list[(idx + dir + list.length) % list.length];
+            (next as HTMLLabelElement).click();
+            (next as HTMLLabelElement).focus();
+          }
+        });
+      });
+
+      sync();
+    });
+  }
+
+  setupTabs();
+  document.addEventListener('astro:page-load', setupTabs);
+</script>

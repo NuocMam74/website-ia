@@ -6,13 +6,13 @@ import SectionDivider from '~/components/ui/SectionDivider.astro';
 import Card from '~/components/ui/Card.astro';
 import Icon from '~/components/ui/Icon.astro';
 import Button from '~/components/ui/Button.astro';
+import Modal from '~/components/ui/Modal.astro';
 import OfferCard from '~/components/cards/OfferCard.astro';
 import PostCard from '~/components/cards/PostCard.astro';
 import StatsBand from '~/components/sections/StatsBand.astro';
 import Marquee from '~/components/sections/Marquee.astro';
 import HeroDashboard from '~/components/sections/HeroDashboard.astro';
 import ProductSurface from '~/components/sections/ProductSurface.astro';
-import AICapabilities from '~/components/sections/AICapabilities.astro';
 import FAQAccordion from '~/components/sections/FAQAccordion.astro';
 import Testimonials from '~/components/sections/Testimonials.astro';
 import CTASection from '~/components/sections/CTASection.astro';
@@ -44,6 +44,7 @@ const recentPosts = posts
   )
   .slice(0, 3);
 
+/* Familles — chaque carte ouvre une modale détaillée */
 const families = [
   {
     key: 'solutions' as const,
@@ -54,6 +55,26 @@ const families = [
     icon: 'wrench',
     href: localizeUrl('/solutions', lang),
     cta: t(lang, 'cta.contact'),
+    modalId: 'family-solutions',
+    modalTitle: lang === 'fr' ? 'Solutions logicielles sur-mesure' : 'Custom software solutions',
+    modalSubtitle: lang === 'fr'
+      ? 'Du POC à la production, avec une exigence de fiabilité.'
+      : 'From POC to production, with a focus on reliability.',
+    bullets: lang === 'fr'
+      ? [
+          'Apps web métier (RH, finance, production, qualité)',
+          'Intégrations sur SI existant (SAP, Polarion, Jira)',
+          'Tableaux de bord et pilotage temps réel',
+          'Automatisations de process internes',
+          'API et back-office sur mesure',
+        ]
+      : [
+          'Business web apps (HR, finance, production, quality)',
+          'Integrations with existing stack (SAP, Polarion, Jira)',
+          'Real-time dashboards and KPIs',
+          'Internal process automations',
+          'Custom APIs and back-office',
+        ],
   },
   {
     key: 'ia' as const,
@@ -64,6 +85,26 @@ const families = [
     icon: 'bot',
     href: localizeUrl('/ia', lang),
     cta: t(lang, 'cta.demo'),
+    modalId: 'family-ia',
+    modalTitle: lang === 'fr' ? 'IA & Agents en production' : 'AI & Agents in production',
+    modalSubtitle: lang === 'fr'
+      ? 'Pas de gadget. De l’IA qui répond, source ses réponses, et s’intègre à votre SI.'
+      : 'No gadget. AI that answers, grounds its answers, and integrates with your stack.',
+    bullets: lang === 'fr'
+      ? [
+          'Agents métier multi-rôles avec mémoire',
+          'RAG documentaire sourcé et traçable',
+          'Orchestration multi-agents (LangGraph)',
+          'Modèles privés on-premise ou cloud souverain',
+          'Observabilité, garde-fous, retry/rollback',
+        ]
+      : [
+          'Multi-role business agents with memory',
+          'Grounded, traceable document RAG',
+          'Multi-agent orchestration (LangGraph)',
+          'Private on-premise or sovereign cloud models',
+          'Observability, guardrails, retry/rollback',
+        ],
   },
   {
     key: 'templates' as const,
@@ -74,10 +115,126 @@ const families = [
     icon: 'file-text',
     href: localizeUrl('/templates', lang),
     cta: t(lang, 'cta.buy'),
+    modalId: 'family-templates',
+    modalTitle: lang === 'fr' ? 'Templates conformes' : 'Compliant templates',
+    modalSubtitle: lang === 'fr'
+      ? 'Démarrer un projet sérieux avec une base saine.'
+      : 'Start a serious project from a sound baseline.',
+    bullets: lang === 'fr'
+      ? [
+          'Packs ASPICE / ISO 26262 / ISO/SAE 21434 / ISO 13485',
+          'Templates Polarion, Jira, Excel, Word',
+          'Documentation et procédures incluses',
+          'Achat direct, livraison immédiate',
+          'Mises à jour incluses pendant 12 mois',
+        ]
+      : [
+          'ASPICE / ISO 26262 / ISO/SAE 21434 / ISO 13485 packs',
+          'Polarion, Jira, Excel, Word templates',
+          'Included documentation and procedures',
+          'Direct purchase, immediate delivery',
+          'Free updates for 12 months',
+        ],
   },
 ];
 
-const norms = ['ASPICE', 'ISO 26262', 'ISO/SAE 21434', 'ISO 13485', 'ISO 9001', 'CSRD', 'IATF 16949', 'Polarion ALM'];
+/* Méthodologie — chaque étape ouvre une modale avec détails */
+const steps = [
+  {
+    n: '01',
+    key: 'scoping',
+    title: lang === 'fr' ? 'Cadrage' : 'Scoping',
+    desc: lang === 'fr' ? 'On qualifie le problème, le périmètre, les risques.' : 'We qualify the problem, scope, risks.',
+    icon: 'clipboard-list',
+    detail: lang === 'fr'
+      ? 'Un atelier court (1 à 3 jours) pour cartographier le problème métier, les contraintes (SI, sécurité, conformité), les risques et les critères de succès mesurables. Livrable : note de cadrage chiffrée.'
+      : 'A short workshop (1 to 3 days) to map the business problem, constraints (IT, security, compliance), risks and measurable success criteria. Deliverable: a costed scoping note.',
+    bullets: lang === 'fr'
+      ? ['Atelier 1 à 3 jours', 'Cartographie SI & risques', 'Critères de succès chiffrés', 'Note de cadrage livrable']
+      : ['1 to 3 day workshop', 'Stack & risk mapping', 'Quantified success criteria', 'Scoping note delivered'],
+  },
+  {
+    n: '02',
+    key: 'poc',
+    title: 'POC',
+    desc: lang === 'fr' ? 'Une preuve de valeur frugale, mesurable, sur 2-6 semaines.' : 'A frugal, measurable proof of value over 2-6 weeks.',
+    icon: 'gauge',
+    detail: lang === 'fr'
+      ? 'Un POC court qui prouve la valeur sur un périmètre étroit. Métriques objectives, démonstration aux utilisateurs cibles, décision go/no-go documentée.'
+      : 'A short POC proving value on a narrow scope. Objective metrics, demo to target users, documented go/no-go decision.',
+    bullets: lang === 'fr'
+      ? ['Périmètre étroit volontairement', 'Métriques objectives', 'Démo aux utilisateurs cibles', 'Décision go/no-go tracée']
+      : ['Intentionally narrow scope', 'Objective metrics', 'Demo to target users', 'Tracked go/no-go decision'],
+  },
+  {
+    n: '03',
+    key: 'industrialisation',
+    title: lang === 'fr' ? 'Industrialisation' : 'Industrialisation',
+    desc: lang === 'fr' ? 'Mise en production, intégration, formation des équipes.' : 'Production rollout, integration, team training.',
+    icon: 'git-branch',
+    detail: lang === 'fr'
+      ? 'Build de la solution complète, intégrations SI, sécurisation, mise en production progressive, formation des équipes utilisatrices et administrateurs.'
+      : 'Full solution build, IT integrations, hardening, progressive production rollout, training for users and administrators.',
+    bullets: lang === 'fr'
+      ? ['Intégrations SI complètes', 'Sécurité, audits, RGPD', 'Mise en prod progressive', 'Formation équipes & admins']
+      : ['Full IT integrations', 'Security, audits, GDPR', 'Progressive production rollout', 'User & admin training'],
+  },
+  {
+    n: '04',
+    key: 'support',
+    title: 'Support',
+    desc: lang === 'fr' ? 'Suivi, mises à jour, accompagnement à la montée en maturité.' : 'Follow-up, updates, maturity coaching.',
+    icon: 'history',
+    detail: lang === 'fr'
+      ? 'Revues trimestrielles, mises à jour, montée en maturité côté processus. SLA personnalisé, observabilité, monitoring proactif.'
+      : 'Quarterly reviews, updates, process-side maturity coaching. Custom SLA, observability, proactive monitoring.',
+    bullets: lang === 'fr'
+      ? ['Revues trimestrielles', 'SLA personnalisé', 'Observabilité & monitoring', 'Mises à jour incluses']
+      : ['Quarterly reviews', 'Custom SLA', 'Observability & monitoring', 'Updates included'],
+  },
+];
+
+/* Secteurs adressés — pour une section "Pour qui ?" attractive */
+const sectors = [
+  { icon: 'wrench', label: lang === 'fr' ? 'Automobile' : 'Automotive', desc: lang === 'fr' ? 'ASPICE, ISO 26262, ISO/SAE 21434.' : 'ASPICE, ISO 26262, ISO/SAE 21434.' },
+  { icon: 'heart-pulse', label: lang === 'fr' ? 'Médical' : 'Medical', desc: lang === 'fr' ? 'ISO 13485, IEC 62304, FDA.' : 'ISO 13485, IEC 62304, FDA.' },
+  { icon: 'building-2', label: lang === 'fr' ? 'Bâtiment' : 'Building', desc: lang === 'fr' ? 'BIM, pilotage chantier, conformité.' : 'BIM, site management, compliance.' },
+  { icon: 'sparkles', label: lang === 'fr' ? 'Énergie' : 'Energy', desc: lang === 'fr' ? 'Suivi assets, données capteurs, CSRD.' : 'Asset tracking, sensor data, CSRD.' },
+];
+
+/* "Pourquoi nous ?" — cards avec preuves */
+const proofs = [
+  {
+    icon: 'shield-check',
+    accent: 'teal',
+    title: lang === 'fr' ? 'Confidentialité par défaut' : 'Privacy by default',
+    desc: lang === 'fr'
+      ? 'Vos données ne sortent pas de votre périmètre. Pas d’entraînement sur vos documents.'
+      : 'Your data stays within your perimeter. No training on your documents.',
+  },
+  {
+    icon: 'gauge',
+    accent: 'coral',
+    title: lang === 'fr' ? 'Mesurable, pas magique' : 'Measurable, not magic',
+    desc: lang === 'fr'
+      ? 'Métriques objectives à chaque étape. Si ça ne marche pas, on le dit.'
+      : 'Objective metrics at every step. If it doesn’t work, we say so.',
+  },
+  {
+    icon: 'history',
+    accent: 'amber',
+    title: lang === 'fr' ? 'En production, en durée' : 'In production, over time',
+    desc: lang === 'fr'
+      ? 'On reste en relation après la livraison. Revues, mises à jour, montée en maturité.'
+      : 'We stay involved after delivery. Reviews, updates, maturity coaching.',
+  },
+];
+
+const accentBg: Record<string, string> = {
+  teal: 'bg-teal-500/10 ring-teal-400/30 text-teal-300',
+  coral: 'bg-coral-500/10 ring-coral-400/30 text-coral-300',
+  amber: 'bg-amber-500/10 ring-amber-400/30 text-amber-300',
+};
 
 const homeFaqIds = ['ia-data', 'tpl-payment', 'sol-demo', 'gen-languages'];
 const homeFaqAll = await Promise.all(
@@ -86,6 +243,58 @@ const homeFaqAll = await Promise.all(
 const homeFaq = homeFaqAll
   .filter((f): f is NonNullable<typeof f> => Boolean(f))
   .map((f) => ({ question: f.data.question, answer: f.data.answer }));
+
+/* Briques IA + détails pour modales */
+const aiBricks = [
+  {
+    id: 'brick-agents',
+    icon: 'bot',
+    title: lang === 'fr' ? 'Agents métier' : 'Business agents',
+    desc: lang === 'fr'
+      ? 'Des agents IA spécialisés par rôle (ingénieur, comptable, support), avec leurs outils et leur mémoire.'
+      : 'AI agents specialised by role (engineer, accountant, support), with their tools and memory.',
+    features: lang === 'fr' ? ['Skills personnalisés', 'Mémoire long-terme', 'Outils MCP/API'] : ['Custom skills', 'Long-term memory', 'MCP/API tools'],
+    detail: lang === 'fr'
+      ? 'Un agent métier dispose d’un rôle clair, d’outils qu’il sait utiliser (recherche, calcul, écriture de fichiers, appels API), et d’une mémoire long-terme pour personnaliser ses réponses au fil des conversations. Chaque action est tracée et auditable.'
+      : 'A business agent has a clear role, tools it knows how to use (search, computation, file writing, API calls), and a long-term memory to personalise answers across conversations. Every action is traced and auditable.',
+  },
+  {
+    id: 'brick-rag',
+    icon: 'file-search',
+    title: lang === 'fr' ? 'RAG documentaire' : 'Document RAG',
+    desc: lang === 'fr'
+      ? 'Recherche sémantique sur vos corpus volumineux, avec réponses sourcées et traçabilité complète.'
+      : 'Semantic search on large corpora, with grounded answers and full traceability.',
+    features: ['pgvector / Qdrant', lang === 'fr' ? 'Citations exactes' : 'Exact citations', 'On-premise OK'],
+    detail: lang === 'fr'
+      ? 'Indexation de vos documents (PDF, Word, Confluence, SharePoint), recherche hybride (vectorielle + lexicale), réponses LLM grounded sur les passages retrouvés, citations cliquables. Tout reste dans votre périmètre.'
+      : 'Index your documents (PDF, Word, Confluence, SharePoint), hybrid search (vector + lexical), LLM answers grounded on retrieved passages, clickable citations. Everything stays in your perimeter.',
+  },
+  {
+    id: 'brick-orchestration',
+    icon: 'network',
+    title: lang === 'fr' ? 'Orchestration multi-agents' : 'Multi-agent orchestration',
+    desc: lang === 'fr'
+      ? 'Plusieurs agents qui collaborent : researcher, writer, reviewer. Workflows complexes décomposés et fiabilisés.'
+      : 'Multiple agents collaborating: researcher, writer, reviewer. Complex workflows decomposed and reliable.',
+    features: ['LangGraph', 'Temporal', lang === 'fr' ? 'Retry & rollback' : 'Retry & rollback'],
+    detail: lang === 'fr'
+      ? 'Un workflow complexe (analyse, rédaction, revue, validation) est décomposé en agents spécialisés qui collaborent via un orchestrateur. Reprise sur erreur, contrôles intermédiaires, validation humaine quand c’est nécessaire.'
+      : 'A complex workflow (analysis, drafting, review, validation) is decomposed into specialised agents collaborating through an orchestrator. Error recovery, intermediate checks, human validation where needed.',
+  },
+  {
+    id: 'brick-private',
+    icon: 'sparkles',
+    title: lang === 'fr' ? 'Modèles privés' : 'Private models',
+    desc: lang === 'fr'
+      ? 'Modèles open-source self-hosted (Llama, Mistral), ou clouds privés. Vos données ne sortent pas.'
+      : 'Self-hosted open-source models (Llama, Mistral) or private clouds. Your data stays in.',
+    features: ['Llama 3', 'Mistral', 'vLLM / Ollama'],
+    detail: lang === 'fr'
+      ? 'Déploiement on-premise ou cloud souverain (OVH, Scaleway, Outscale). Modèles open-source servis avec vLLM ou Ollama, monitoring, scaling automatique. Coût maîtrisé, conformité simplifiée.'
+      : 'On-premise or sovereign cloud (OVH, Scaleway, Outscale) deployment. Open-source models served with vLLM or Ollama, monitoring, automatic scaling. Controlled costs, simplified compliance.',
+  },
+];
 ---
 
 <BaseLayout
@@ -174,33 +383,95 @@ const homeFaq = homeFaqAll
     />
   </section>
 
+  <SectionDivider />
+
   {/* === ProductSurface — "à quoi ça ressemble" === */}
   <ProductSurface lang={lang} />
 
   <SectionDivider variant="icon" icon="sparkles" />
 
-  {/* === Capacités IA — vitrine des briques fondamentales === */}
+  {/* === Capacités IA — briques cliquables (modales) === */}
   <Section
     title={lang === 'fr' ? 'Les briques IA que nous mettons en œuvre' : 'The AI building blocks we deploy'}
     subtitle={lang === 'fr'
-      ? 'Pas de boîte noire. Des composants éprouvés, assemblés pour votre cas d’usage, en gardant la maîtrise sur vos données.'
-      : 'No black box. Battle-tested components, assembled for your use case, keeping control over your data.'}
+      ? 'Pas de boîte noire. Cliquez sur une brique pour voir comment nous l’assemblons en production.'
+      : 'No black box. Click a building block to see how we assemble it in production.'}
     family="ia"
   >
-    <AICapabilities lang={lang} />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {aiBricks.map((item, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+          <button
+            type="button"
+            data-modal-target={item.id}
+            class="group h-full w-full text-left p-7 bg-ink-900 border border-ink-800 rounded-xl hover-lift hover:border-coral-400/40 transition-all cursor-pointer"
+          >
+            <div class="flex items-start gap-5">
+              <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-coral-400/20 to-coral-600/10 ring-1 ring-coral-400/30 text-coral-200 shrink-0 group-hover:scale-105 transition-transform">
+                <Icon name={item.icon} size={22} />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-start justify-between gap-3">
+                  <h3 class="text-h3 font-semibold text-ink-50 tracking-tight">{item.title}</h3>
+                  <span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-coral-300/80 mt-1.5 shrink-0">
+                    {lang === 'fr' ? 'Détails' : 'Details'}
+                    <Icon name="arrow-right" size={12} />
+                  </span>
+                </div>
+                <p class="mt-2 text-small text-ink-300 leading-relaxed">{item.desc}</p>
+                <div class="mt-4 flex flex-wrap gap-1.5">
+                  {item.features.map((f) => (
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-ink-800 text-coral-200 border border-coral-400/20">
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </button>
+        </div>
+      ))}
+    </div>
   </Section>
 
-  {/* === 3 familles === */}
+  {/* Modales — briques IA */}
+  {aiBricks.map((item) => (
+    <Modal id={item.id} family="ia" title={item.title} subtitle={item.desc} size="lg">
+      <p class="text-base text-ink-200 leading-relaxed">{item.detail}</p>
+
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {item.features.map((f) => (
+          <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-ink-950/60 border border-ink-800">
+            <Icon name="check" size={14} class="text-coral-300 shrink-0" />
+            <span class="text-small text-ink-100 font-mono">{f}</span>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <Button href={localizeUrl('/ia', lang)} variant="primary" family="ia" icon="arrow-right">
+          {lang === 'fr' ? 'Voir nos produits IA' : 'See our AI products'}
+        </Button>
+        <Button href={localizeUrl('/contact?type=demo', lang)} variant="ghost">
+          {t(lang, 'cta.demo')}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  <SectionDivider />
+
+  {/* === 3 familles — cards cliquables avec modales === */}
   <Section
     title={lang === 'fr' ? 'Trois façons de travailler avec nous' : 'Three ways to work with us'}
     subtitle={lang === 'fr'
-      ? 'Logiciels métier sur-mesure, agents IA et templates structurants. Choisissez par où démarrer — ou combinez-les.'
-      : 'Custom business software, AI agents, and structuring templates. Pick where to start — or combine them.'}
+      ? 'Logiciels métier sur-mesure, agents IA et templates structurants. Cliquez sur une famille pour en savoir plus.'
+      : 'Custom business software, AI agents, and structuring templates. Click a family to learn more.'}
   >
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       {families.map((f, i) => (
         <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
-          <Card accent={f.key} href={f.href} interactive spotlight class="h-full">
+          <Card accent={f.key} interactive spotlight class="h-full">
             <div class="p-7 h-full flex flex-col">
               <div
                 class:list={[
@@ -214,17 +485,88 @@ const homeFaq = homeFaqAll
               </div>
               <h3 class="text-h3 font-semibold text-ink-50 mb-2 tracking-tight">{f.label}</h3>
               <p class="text-small text-ink-300 leading-relaxed flex-1">{f.desc}</p>
-              <div
-                class:list={[
-                  'mt-7 inline-flex items-center gap-1.5 text-small font-medium',
-                  f.key === 'solutions' && 'text-teal-300',
-                  f.key === 'ia' && 'text-coral-300',
-                  f.key === 'templates' && 'text-amber-300',
-                ]}
-              >
-                {f.cta}
-                <Icon name="arrow-right" size={14} />
+
+              <div class="mt-6 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  data-modal-target={f.modalId}
+                  class:list={[
+                    'inline-flex items-center gap-1.5 text-small font-medium hover:underline cursor-pointer',
+                    f.key === 'solutions' && 'text-teal-300',
+                    f.key === 'ia' && 'text-coral-300',
+                    f.key === 'templates' && 'text-amber-300',
+                  ]}
+                >
+                  {lang === 'fr' ? 'En savoir plus' : 'Learn more'}
+                  <Icon name="arrow-right" size={14} />
+                </button>
+                <a
+                  href={f.href}
+                  class="inline-flex items-center gap-1.5 text-small text-ink-400 hover:text-ink-100 transition-colors"
+                >
+                  {f.cta}
+                  <Icon name="external-link" size={12} />
+                </a>
               </div>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {/* Modales — familles */}
+  {families.map((f) => (
+    <Modal id={f.modalId} family={f.key} title={f.modalTitle} subtitle={f.modalSubtitle} size="lg">
+      <ul class="space-y-3">
+        {f.bullets.map((b) => (
+          <li class="flex items-start gap-3 text-base text-ink-100 leading-relaxed">
+            <span
+              class:list={[
+                'inline-flex items-center justify-center w-6 h-6 rounded-full ring-1 shrink-0 mt-0.5',
+                f.key === 'solutions' && 'bg-teal-400/10 ring-teal-400/30 text-teal-300',
+                f.key === 'ia' && 'bg-coral-400/10 ring-coral-400/30 text-coral-300',
+                f.key === 'templates' && 'bg-amber-400/10 ring-amber-400/30 text-amber-300',
+              ]}
+            >
+              <Icon name="check" size={14} />
+            </span>
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <Button href={f.href} variant="primary" family={f.key} icon="arrow-right">
+          {lang === 'fr' ? `Explorer ${f.label}` : `Explore ${f.label}`}
+        </Button>
+        <Button href={localizeUrl('/contact', lang)} variant="ghost">
+          {t(lang, 'cta.contact')}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  <SectionDivider />
+
+  {/* === Pourquoi nous ? — 3 preuves === */}
+  <Section
+    title={lang === 'fr' ? 'Pourquoi travailler avec nous ?' : 'Why work with us?'}
+    subtitle={lang === 'fr'
+      ? 'Trois engagements qui structurent chaque projet, du POC à la production.'
+      : 'Three commitments that shape every project, from POC to production.'}
+    surface="muted"
+  >
+    <div class="grid md:grid-cols-3 gap-6">
+      {proofs.map((p, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card class="h-full">
+            <div class="p-7">
+              <div class:list={['inline-flex items-center justify-center w-12 h-12 rounded-xl ring-1 mb-5', accentBg[p.accent]]}>
+                <Icon name={p.icon} size={22} />
+              </div>
+              <h3 class="text-h3 font-semibold text-ink-50 mb-2 tracking-tight">{p.title}</h3>
+              <p class="text-small text-ink-300 leading-relaxed">{p.desc}</p>
             </div>
           </Card>
         </div>
@@ -248,6 +590,34 @@ const homeFaq = homeFaqAll
       />
     </div>
   </Section>
+
+  <SectionDivider />
+
+  {/* === Secteurs adressés === */}
+  <Section
+    title={lang === 'fr' ? 'Pour qui ?' : 'Who is it for?'}
+    subtitle={lang === 'fr'
+      ? 'Quatre secteurs où nos méthodes et nos outils sont éprouvés.'
+      : 'Four sectors where our methods and tools are battle-tested.'}
+  >
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {sectors.map((s, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card class="h-full" interactive>
+            <div class="p-6 flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-full bg-gradient-to-br from-ink-800 to-ink-900 ring-1 ring-ink-700 flex items-center justify-center text-teal-300 mb-4">
+                <Icon name={s.icon} size={26} />
+              </div>
+              <span class="text-base font-medium text-ink-100">{s.label}</span>
+              <span class="mt-1.5 text-xs text-ink-400 leading-relaxed">{s.desc}</span>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider variant="icon" icon="wrench" />
 
   {/* === Featured solutions === */}
   {featuredSolutions.length > 0 && (
@@ -277,6 +647,8 @@ const homeFaq = homeFaqAll
       </div>
     </Section>
   )}
+
+  <SectionDivider variant="icon" icon="bot" />
 
   {/* === Featured AI === */}
   {featuredAi.length > 0 && (
@@ -308,28 +680,40 @@ const homeFaq = homeFaqAll
     </Section>
   )}
 
-  {/* === Méthodologie teaser === */}
+  <SectionDivider />
+
+  {/* === Méthodologie — cards cliquables avec modales === */}
   <Section
     title={lang === 'fr' ? 'Notre méthode, en 4 étapes' : 'Our method, in 4 steps'}
     subtitle={lang === 'fr'
-      ? 'Pas de promesse fumeuse. Un cadrage net, un POC frugal, puis une industrialisation maîtrisée.'
-      : 'No vague promises. A clear scoping, a frugal POC, then controlled industrialisation.'}
+      ? 'Pas de promesse fumeuse. Cadrage net, POC frugal, industrialisation maîtrisée. Cliquez sur une étape pour les détails.'
+      : 'No vague promises. Clear scoping, frugal POC, controlled industrialisation. Click a step for details.'}
   >
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-      {[
-        { n: '01', title: lang === 'fr' ? 'Cadrage' : 'Scoping', desc: lang === 'fr' ? 'On qualifie le problème, le périmètre, les risques.' : 'We qualify the problem, scope, risks.' },
-        { n: '02', title: 'POC', desc: lang === 'fr' ? 'Une preuve de valeur frugale, mesurable, sur 2-6 semaines.' : 'A frugal, measurable proof of value over 2-6 weeks.' },
-        { n: '03', title: lang === 'fr' ? 'Industrialisation' : 'Industrialisation', desc: lang === 'fr' ? 'Mise en production, intégration, formation des équipes.' : 'Production rollout, integration, team training.' },
-        { n: '04', title: 'Support', desc: lang === 'fr' ? 'Suivi, mises à jour, accompagnement à la montée en maturité.' : 'Follow-up, updates, maturity coaching.' },
-      ].map((step, i) => (
+      {steps.map((step, i) => (
         <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
-          <Card class="h-full">
-            <div class="p-6 h-full">
-              <div class="text-h2 font-light text-ink-600 tracking-tight mb-3">{step.n}</div>
-              <h3 class="text-h4 font-semibold text-ink-50 mb-2">{step.title}</h3>
-              <p class="text-small text-ink-300 leading-relaxed">{step.desc}</p>
-            </div>
-          </Card>
+          <button
+            type="button"
+            data-modal-target={`step-${step.key}`}
+            class="group block w-full text-left h-full"
+          >
+            <Card class="h-full" interactive spotlight>
+              <div class="p-6 h-full flex flex-col">
+                <div class="flex items-start justify-between gap-3 mb-3">
+                  <div class="text-h2 font-light text-ink-600 tracking-tight">{step.n}</div>
+                  <div class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-ink-800 text-teal-300 group-hover:bg-teal-400/10 transition-colors">
+                    <Icon name={step.icon} size={16} />
+                  </div>
+                </div>
+                <h3 class="text-h4 font-semibold text-ink-50 mb-2">{step.title}</h3>
+                <p class="text-small text-ink-300 leading-relaxed flex-1">{step.desc}</p>
+                <span class="mt-4 inline-flex items-center gap-1.5 text-xs text-ink-400 group-hover:text-teal-300 transition-colors">
+                  {lang === 'fr' ? 'Voir les détails' : 'See details'}
+                  <Icon name="arrow-right" size={12} />
+                </span>
+              </div>
+            </Card>
+          </button>
         </div>
       ))}
     </div>
@@ -339,6 +723,28 @@ const homeFaq = homeFaqAll
       </Button>
     </div>
   </Section>
+
+  {/* Modales — étapes méthodo */}
+  {steps.map((step) => (
+    <Modal id={`step-${step.key}`} title={`${step.n} · ${step.title}`} subtitle={step.desc} size="md">
+      <p class="text-base text-ink-200 leading-relaxed">{step.detail}</p>
+
+      <ul class="mt-6 space-y-2.5">
+        {step.bullets.map((b) => (
+          <li class="flex items-start gap-2.5 text-small text-ink-100">
+            <Icon name="check" size={14} class="text-teal-400 mt-1 shrink-0" />
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div class="mt-8">
+        <Button href={localizeUrl('/methodologie', lang)} variant="secondary" icon="arrow-right">
+          {lang === 'fr' ? 'Voir la méthodologie complète' : 'See the full methodology'}
+        </Button>
+      </div>
+    </Modal>
+  ))}
 
   <SectionDivider />
 
@@ -353,45 +759,53 @@ const homeFaq = homeFaqAll
 
   {/* === Derniers articles === */}
   {recentPosts.length > 0 && (
-    <Section
-      title={t(lang, 'home.posts.title')}
-      subtitle={lang === 'fr' ? 'Retours d’expérience et bonnes pratiques.' : 'Feedback and best practices.'}
-    >
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {recentPosts.map((p, i) => (
-          <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
-            <PostCard
-              title={p.data.title}
-              excerpt={p.data.excerpt}
-              href={localizeUrl(`/blog/${p.id}`, lang)}
-              publishedAt={p.data.publishedAt}
-              tags={p.data.tags}
-              lang={lang}
-            />
-          </div>
-        ))}
-      </div>
-    </Section>
+    <>
+      <SectionDivider />
+      <Section
+        title={t(lang, 'home.posts.title')}
+        subtitle={lang === 'fr' ? 'Retours d’expérience et bonnes pratiques.' : 'Feedback and best practices.'}
+      >
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {recentPosts.map((p, i) => (
+            <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+              <PostCard
+                title={p.data.title}
+                excerpt={p.data.excerpt}
+                href={localizeUrl(`/blog/${p.id}`, lang)}
+                publishedAt={p.data.publishedAt}
+                tags={p.data.tags}
+                lang={lang}
+              />
+            </div>
+          ))}
+        </div>
+      </Section>
+    </>
   )}
 
   {/* === FAQ teaser === */}
   {homeFaq.length > 0 && (
-    <Section
-      title={lang === 'fr' ? 'Les questions qu’on nous pose souvent' : 'Questions we often get'}
-      subtitle={lang === 'fr'
-        ? 'Confidentialité, paiement, licence, démo — l’essentiel ici. Le reste sur la page FAQ.'
-        : 'Confidentiality, payment, licensing, demo — the essentials here. The rest on the FAQ page.'}
-    >
-      <div class="max-w-3xl reveal">
-        <FAQAccordion items={homeFaq} />
-        <div class="mt-8">
-          <Button href={localizeUrl('/faq', lang)} variant="ghost" icon="arrow-right">
-            {lang === 'fr' ? 'Voir toutes les questions' : 'See all questions'}
-          </Button>
+    <>
+      <SectionDivider variant="icon" icon="message-square-text" />
+      <Section
+        title={lang === 'fr' ? 'Les questions qu’on nous pose souvent' : 'Questions we often get'}
+        subtitle={lang === 'fr'
+          ? 'Confidentialité, paiement, licence, démo — l’essentiel ici. Le reste sur la page FAQ.'
+          : 'Confidentiality, payment, licensing, demo — the essentials here. The rest on the FAQ page.'}
+      >
+        <div class="max-w-3xl reveal">
+          <FAQAccordion items={homeFaq} />
+          <div class="mt-8">
+            <Button href={localizeUrl('/faq', lang)} variant="ghost" icon="arrow-right">
+              {lang === 'fr' ? 'Voir toutes les questions' : 'See all questions'}
+            </Button>
+          </div>
         </div>
-      </div>
-    </Section>
+      </Section>
+    </>
   )}
+
+  <SectionDivider />
 
   <CTASection
     title={lang === 'fr' ? 'Un projet, une démo, une question ?' : 'A project, a demo, a question?'}

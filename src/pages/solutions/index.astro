@@ -3,8 +3,14 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import Modal from '~/components/ui/Modal.astro';
 import OfferCard from '~/components/cards/OfferCard.astro';
 import EmptyState from '~/components/ui/EmptyState.astro';
+import CTASection from '~/components/sections/CTASection.astro';
 import LayeredFilters from '~/components/islands/LayeredFilters.tsx';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
 import { DOMAINS, SERVICES } from '~/content.config';
@@ -15,8 +21,6 @@ const solutions = (await getCollection('solutions')).sort(
   (a, b) => a.data.order - b.data.order,
 );
 
-/* On ne propose dans le filtre que les domaines réellement présents
- * dans le catalogue (pas de chip qui mène à un état vide). */
 const usedDomains = Array.from(
   new Set(solutions.flatMap((s) => s.data.domains)),
 );
@@ -32,8 +36,6 @@ const primaryOptions = [
   })),
 ];
 
-/* Pour chaque service, on calcule la liste des domaines où il apparaît,
- * pour que le sous-filtre se restreigne dynamiquement. */
 const serviceDomainMap = new Map<string, Set<string>>();
 solutions.forEach((s) => {
   s.data.services.forEach((svc) => {
@@ -50,6 +52,66 @@ const secondaryOptions = [
     label: t(lang, `service.${s}`),
     domains: Array.from(serviceDomainMap.get(s) ?? []),
   })),
+];
+
+/* === Types de logiciels — cards cliquables avec modales === */
+const softwareTypes = [
+  {
+    id: 'sol-type-platforms',
+    icon: 'layers',
+    title: lang === 'fr' ? 'Plateformes métier' : 'Business platforms',
+    desc: lang === 'fr'
+      ? 'Applications web complètes pour piloter un domaine métier de bout en bout.'
+      : 'Complete web applications to manage a business domain end-to-end.',
+    bullets: lang === 'fr'
+      ? ['Pilotage temps réel', 'Multi-utilisateurs avec rôles', 'Reporting et exports', 'Notifications & workflows']
+      : ['Real-time dashboards', 'Multi-user with roles', 'Reporting and exports', 'Notifications & workflows'],
+    detail: lang === 'fr'
+      ? 'Vos métiers ont besoin d’un outil unique pour piloter leur activité : suivi des indicateurs, gestion des workflows, exports vers la finance ou la direction. Nous construisons des plateformes qui durent — pas des dashboards jetables.'
+      : 'Your teams need a single tool to run their activity: KPI tracking, workflow management, exports to finance or management. We build platforms that last — not throwaway dashboards.',
+  },
+  {
+    id: 'sol-type-automation',
+    icon: 'cog',
+    title: lang === 'fr' ? 'Automatisations & intégrations' : 'Automations & integrations',
+    desc: lang === 'fr'
+      ? 'Connectez vos outils (SAP, Polarion, Jira) et automatisez les tâches répétitives.'
+      : 'Connect your tools (SAP, Polarion, Jira) and automate repetitive tasks.',
+    bullets: lang === 'fr'
+      ? ['Connecteurs SAP / Polarion / Jira', 'ETL et synchronisations', 'Robots de saisie', 'API maison sécurisées']
+      : ['SAP / Polarion / Jira connectors', 'ETL and sync jobs', 'Data-entry robots', 'Secure custom APIs'],
+    detail: lang === 'fr'
+      ? 'Les équipes perdent un temps fou à recopier des données d’un outil à l’autre. Nous automatisons ces ponts (lecture, transformation, écriture, contrôles) pour libérer du temps à valeur ajoutée. Toutes les automatisations sont observables et reprenables.'
+      : 'Teams waste a lot of time copying data between tools. We automate these bridges (read, transform, write, checks) to free up time for higher-value work. All automations are observable and replayable.',
+  },
+  {
+    id: 'sol-type-dashboards',
+    icon: 'gauge',
+    title: lang === 'fr' ? 'Tableaux de bord' : 'Dashboards',
+    desc: lang === 'fr'
+      ? 'Visualisations métier sur-mesure, connectées aux vraies sources de données.'
+      : 'Custom business dashboards, connected to real data sources.',
+    bullets: lang === 'fr'
+      ? ['KPIs métier sur-mesure', 'Drill-down et exports', 'Embed dans vos outils', 'Alertes paramétrables']
+      : ['Custom business KPIs', 'Drill-down and exports', 'Embed in your tools', 'Configurable alerts'],
+    detail: lang === 'fr'
+      ? 'Au-delà de Power BI : des tableaux de bord taillés exactement à vos besoins, intégrés dans vos outils, avec drill-down, exports propres et alertes par e-mail/webhook. Les données viennent de vos vraies sources (SAP, Polarion, bases internes), pas de fichiers Excel.'
+      : 'Beyond Power BI: dashboards tailored exactly to your needs, embedded in your tools, with drill-down, clean exports and email/webhook alerts. Data comes from your real sources (SAP, Polarion, internal DBs), not Excel files.',
+  },
+  {
+    id: 'sol-type-internal',
+    icon: 'wrench',
+    title: lang === 'fr' ? 'Outils internes sur-mesure' : 'Custom internal tools',
+    desc: lang === 'fr'
+      ? 'Petits outils ciblés pour une équipe, qui font gagner des heures par semaine.'
+      : 'Targeted tools for one team, saving hours per week.',
+    bullets: lang === 'fr'
+      ? ['Cadrage court', 'Livraison 2-6 semaines', 'Prix maîtrisé', 'Évolutif sans dette technique']
+      : ['Short scoping', '2-6 week delivery', 'Controlled cost', 'Evolvable without tech debt'],
+    detail: lang === 'fr'
+      ? 'Un formulaire complexe, une calculette métier, un workflow d’approbation, un outil de saisie qualité… Ces petits outils, bien faits, font gagner des heures par semaine à des équipes entières. Livraison rapide, sans surinvestissement.'
+      : 'A complex form, a business calculator, an approval workflow, a quality data-entry tool… Done well, these small tools save entire teams hours per week. Quick delivery, no overengineering.',
+  },
 ];
 ---
 
@@ -75,7 +137,76 @@ const secondaryOptions = [
     ctaHref={localizeUrl('/contact', lang)}
   />
 
-  <Section>
+  <SectionDivider />
+
+  {/* === Types de logiciels — cards + modales === */}
+  <Section
+    title={lang === 'fr' ? 'Quels logiciels construisons-nous ?' : 'What software do we build?'}
+    subtitle={lang === 'fr'
+      ? 'Quatre familles de logiciels métier, du petit outil ciblé à la plateforme complète. Cliquez pour les détails.'
+      : 'Four families of business software, from a targeted tool to a full platform. Click for details.'}
+    family="solutions"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      {softwareTypes.map((s, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <button
+            type="button"
+            data-modal-target={s.id}
+            class="group block w-full text-left h-full"
+          >
+            <Card class="h-full" interactive spotlight accent="solutions">
+              <div class="p-6 h-full flex flex-col">
+                <div class="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-gradient-to-br from-teal-400/25 to-teal-600/10 ring-1 ring-teal-400/30 text-teal-200 mb-4">
+                  <Icon name={s.icon} size={20} />
+                </div>
+                <h3 class="text-h4 font-semibold text-ink-50 mb-2 tracking-tight">{s.title}</h3>
+                <p class="text-small text-ink-300 leading-relaxed flex-1">{s.desc}</p>
+                <span class="mt-5 inline-flex items-center gap-1.5 text-xs text-teal-300 group-hover:underline">
+                  {lang === 'fr' ? 'En savoir plus' : 'Learn more'}
+                  <Icon name="arrow-right" size={12} />
+                </span>
+              </div>
+            </Card>
+          </button>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {softwareTypes.map((s) => (
+    <Modal id={s.id} family="solutions" title={s.title} subtitle={s.desc} size="lg">
+      <p class="text-base text-ink-200 leading-relaxed">{s.detail}</p>
+
+      <ul class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {s.bullets.map((b) => (
+          <li class="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-ink-950/60 border border-ink-800">
+            <Icon name="check" size={14} class="text-teal-300 mt-1 shrink-0" />
+            <span class="text-small text-ink-100">{b}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <Button href={localizeUrl('/contact', lang)} variant="primary" family="solutions" icon="arrow-right">
+          {t(lang, 'cta.contact')}
+        </Button>
+        <Button href={localizeUrl('/methodologie', lang)} variant="ghost">
+          {lang === 'fr' ? 'Notre méthode' : 'Our method'}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  <SectionDivider variant="icon" icon="wrench" />
+
+  {/* === Catalogue filtré === */}
+  <Section
+    title={lang === 'fr' ? 'Notre catalogue' : 'Our catalog'}
+    subtitle={lang === 'fr'
+      ? 'Filtrez par domaine et par service métier pour trouver une référence proche de votre besoin.'
+      : 'Filter by domain and business service to find a reference close to your need.'}
+  >
     <div class="mb-10">
       <LayeredFilters
         client:idle
@@ -120,4 +251,17 @@ const secondaryOptions = [
       />
     </div>
   </Section>
+
+  <SectionDivider />
+
+  <CTASection
+    title={lang === 'fr' ? 'Une solution sur-mesure pour votre équipe ?' : 'A custom solution for your team?'}
+    subtitle={lang === 'fr'
+      ? 'Décrivez votre besoin. Première lecture sous 48 heures ouvrées, sans engagement.'
+      : 'Tell us about your need. First read within 48 business hours, no commitment.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+    secondaryCtaLabel={lang === 'fr' ? 'Voir les références' : 'See references'}
+    secondaryCtaHref={localizeUrl('/references', lang)}
+  />
 </BaseLayout>

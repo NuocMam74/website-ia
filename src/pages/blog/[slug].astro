@@ -4,6 +4,7 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import Section from '~/components/ui/Section.astro';
 import Chip from '~/components/ui/Chip.astro';
 import Button from '~/components/ui/Button.astro';
+import ShareButtons from '~/components/ui/ShareButtons.astro';
 import { articleLd, breadcrumbLd, canonicalUrl } from '~/lib/seo';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
 
@@ -71,10 +72,11 @@ const formattedDate = new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'fr-FR',
         <Content />
       </div>
 
-      <div class="mx-auto max-w-3xl mt-16 pt-8 border-t border-ink-800">
+      <div class="mx-auto max-w-3xl mt-16 pt-8 border-t border-ink-800 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <Button href={localizeUrl('/blog', lang)} variant="secondary" icon="arrow-left" iconPosition="leading">
           {lang === 'fr' ? 'Retour au blog' : 'Back to blog'}
         </Button>
+        <ShareButtons url={url} title={entry.data.title} lang={lang} />
       </div>
     </Section>
   </article>

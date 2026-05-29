@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight, Search } from 'lucide-react';
 import type { Lang } from '~/lib/i18n';
 
 interface NavItem {
@@ -23,12 +23,14 @@ interface Props {
  * - Trap basique du focus (premier élément focusé à l'ouverture).
  */
 export default function MobileMenu({
+  lang,
   items,
   contactHref,
   contactLabel,
   openLabel,
   closeLabel,
 }: Props) {
+  const searchLabel = lang === 'fr' ? 'Rechercher' : 'Search';
   const [open, setOpen] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -69,7 +71,18 @@ export default function MobileMenu({
           aria-label={openLabel}
           className="fixed inset-0 z-50 bg-ink-900 flex flex-col"
         >
-          <div className="h-16 px-6 flex items-center justify-end border-b border-ink-800">
+          <div className="h-16 px-6 flex items-center justify-end gap-2 border-b border-ink-800">
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                window.setTimeout(() => window.dispatchEvent(new CustomEvent('cmdk:open')), 50);
+              }}
+              className="inline-flex items-center justify-center w-10 h-10 rounded-md text-ink-300 hover:text-ink-50 hover:bg-ink-800 transition-colors"
+              aria-label={searchLabel}
+            >
+              <Search size={18} strokeWidth={1.75} aria-hidden="true" />
+            </button>
             <button
               ref={closeBtnRef}
               type="button"

@@ -2,9 +2,11 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
 import Card from '~/components/ui/Card.astro';
 import Icon from '~/components/ui/Icon.astro';
 import CTASection from '~/components/sections/CTASection.astro';
+import Stepper from '~/components/islands/Stepper.tsx';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
 
 const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
@@ -111,7 +113,37 @@ const principles = [
       : 'Our method is deliberately classic: scoping → POC → industrialisation → support. What changes is the rigor at each step and the transparency on expected deliverables.'}
   />
 
-  <Section>
+  <SectionDivider />
+
+  {/* === Stepper interactif === */}
+  <Section
+    title={lang === 'fr' ? 'Parcourez les 4 étapes' : 'Walk through the 4 steps'}
+    subtitle={lang === 'fr'
+      ? 'Cliquez sur une étape pour voir le détail, les livrables et la durée typique.'
+      : 'Click a step to see details, deliverables and typical duration.'}
+  >
+    <div class="reveal">
+      <Stepper
+        client:visible
+        steps={steps.map((s) => ({
+          id: s.n,
+          label: s.title,
+          duration: s.duration,
+          description: s.desc,
+          bullets: s.deliverables,
+          icon: s.icon,
+        }))}
+      />
+    </div>
+  </Section>
+
+  <SectionDivider variant="icon" icon="folder-open" />
+
+  {/* === Cards détaillées (vue dépliée) === */}
+  <Section
+    title={lang === 'fr' ? 'Détail complet' : 'Full breakdown'}
+    subtitle={lang === 'fr' ? 'Une fiche par étape, avec les livrables attendus.' : 'One card per step, with expected deliverables.'}
+  >
     <div class="space-y-6">
       {steps.map((step, i) => (
         <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
@@ -145,6 +177,8 @@ const principles = [
       ))}
     </div>
   </Section>
+
+  <SectionDivider />
 
   <Section
     title={lang === 'fr' ? 'Nos principes de travail' : 'Our working principles'}

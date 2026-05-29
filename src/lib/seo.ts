@@ -138,3 +138,37 @@ export function breadcrumbLd(items: { name: string; url: string }[]) {
     })),
   };
 }
+
+/** JSON-LD JobPosting (page carrières). */
+export function jobPostingLd(opts: {
+  title: string;
+  description: string;
+  url: string;
+  employmentType?: 'FULL_TIME' | 'PART_TIME' | 'CONTRACTOR' | 'TEMPORARY' | 'INTERN';
+  location?: string;
+  remote?: boolean;
+  datePosted?: Date;
+  hiringOrganization: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    title: opts.title,
+    description: opts.description,
+    url: opts.url,
+    datePosted: (opts.datePosted ?? new Date()).toISOString().slice(0, 10),
+    employmentType: opts.employmentType ?? 'FULL_TIME',
+    hiringOrganization: {
+      '@type': 'Organization',
+      name: opts.hiringOrganization,
+      sameAs: absoluteUrl('/'),
+    },
+    ...(opts.location && {
+      jobLocation: {
+        '@type': 'Place',
+        address: { '@type': 'PostalAddress', addressLocality: opts.location, addressCountry: 'FR' },
+      },
+    }),
+    ...(opts.remote && { jobLocationType: 'TELECOMMUTE' }),
+  };
+}

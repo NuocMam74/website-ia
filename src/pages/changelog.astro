@@ -1,0 +1,213 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+type Kind = 'feature' | 'improvement' | 'fix' | 'security';
+
+interface Entry {
+  date: string;
+  version: string;
+  product: 'ASPICE Navigator' | 'AgentMesh' | 'DocuRAG' | 'Plateforme';
+  family: 'solutions' | 'ia' | 'templates';
+  highlights: { kind: Kind; text: string }[];
+}
+
+const entries: Entry[] = [
+  {
+    date: '2026-05-12',
+    version: 'v3.4.0',
+    product: 'ASPICE Navigator',
+    family: 'solutions',
+    highlights: [
+      { kind: 'feature', text: lang === 'fr' ? 'Export ZIP de l’évaluation avec évidences attachées' : 'Assessment ZIP export with attached evidence' },
+      { kind: 'feature', text: lang === 'fr' ? 'Connecteur Polarion bidirectionnel (sync work items)' : 'Bidirectional Polarion connector (work item sync)' },
+      { kind: 'improvement', text: lang === 'fr' ? 'Performance scoring +60% sur grands projets' : 'Scoring performance +60% on large projects' },
+      { kind: 'fix', text: lang === 'fr' ? 'Correctif rendu des sous-process MAN.3' : 'Fix for MAN.3 sub-process rendering' },
+    ],
+  },
+  {
+    date: '2026-04-20',
+    version: 'v1.8.0',
+    product: 'AgentMesh',
+    family: 'ia',
+    highlights: [
+      { kind: 'feature', text: lang === 'fr' ? 'Nouvel orchestrateur LangGraph 2.x avec checkpoints' : 'New LangGraph 2.x orchestrator with checkpoints' },
+      { kind: 'feature', text: lang === 'fr' ? 'Support modèles Llama 3.3 70B en local (vLLM)' : 'Llama 3.3 70B local support (vLLM)' },
+      { kind: 'security', text: lang === 'fr' ? 'Audit garde-fous renforcé sur sorties d’agents' : 'Hardened guardrail audit on agent outputs' },
+    ],
+  },
+  {
+    date: '2026-04-02',
+    version: 'v2.1.0',
+    product: 'DocuRAG',
+    family: 'ia',
+    highlights: [
+      { kind: 'feature', text: lang === 'fr' ? 'Indexation incrémentale sur Confluence et SharePoint' : 'Incremental indexing on Confluence and SharePoint' },
+      { kind: 'improvement', text: lang === 'fr' ? 'Recherche hybride : reranker BGE intégré' : 'Hybrid search: BGE reranker built-in' },
+      { kind: 'fix', text: lang === 'fr' ? 'Citations exactes : robustesse sur PDF complexes' : 'Exact citations: robustness on complex PDFs' },
+    ],
+  },
+  {
+    date: '2026-03-15',
+    version: 'v4.0.0',
+    product: 'Plateforme',
+    family: 'solutions',
+    highlights: [
+      { kind: 'feature', text: lang === 'fr' ? 'Nouvelle UI dark premium (refonte complète)' : 'New dark premium UI (full redesign)' },
+      { kind: 'feature', text: lang === 'fr' ? 'Catalogue templates : achat direct + Stripe' : 'Templates catalog: direct purchase + Stripe' },
+      { kind: 'improvement', text: lang === 'fr' ? 'Performance Lighthouse 100/100 sur pages publiques' : 'Lighthouse 100/100 on public pages' },
+    ],
+  },
+  {
+    date: '2026-02-08',
+    version: 'v1.5.0',
+    product: 'AgentMesh',
+    family: 'ia',
+    highlights: [
+      { kind: 'feature', text: lang === 'fr' ? 'Memory long-terme par utilisateur (Postgres + pgvector)' : 'Per-user long-term memory (Postgres + pgvector)' },
+      { kind: 'improvement', text: lang === 'fr' ? 'Observabilité OpenTelemetry étendue aux outils MCP' : 'OpenTelemetry observability extended to MCP tools' },
+    ],
+  },
+  {
+    date: '2026-01-22',
+    version: 'v3.3.0',
+    product: 'ASPICE Navigator',
+    family: 'solutions',
+    highlights: [
+      { kind: 'feature', text: lang === 'fr' ? 'Suggestions IA d’évidences à partir des artefacts projet' : 'AI-suggested evidence from project artifacts' },
+      { kind: 'security', text: lang === 'fr' ? 'Migration SSO SAML 2.0 + Microsoft Entra ID' : 'SSO migration to SAML 2.0 + Microsoft Entra ID' },
+    ],
+  },
+];
+
+const kindMeta: Record<Kind, { color: string; label: string; icon: string }> = {
+  feature: { color: 'bg-teal-500/15 text-teal-300 ring-teal-400/30', label: lang === 'fr' ? 'Nouveau' : 'New', icon: 'sparkles' },
+  improvement: { color: 'bg-coral-500/15 text-coral-300 ring-coral-400/30', label: lang === 'fr' ? 'Amélioré' : 'Improved', icon: 'gauge' },
+  fix: { color: 'bg-amber-500/15 text-amber-300 ring-amber-400/30', label: lang === 'fr' ? 'Correctif' : 'Fix', icon: 'wrench' },
+  security: { color: 'bg-ink-50/10 text-ink-50 ring-ink-50/30', label: lang === 'fr' ? 'Sécurité' : 'Security', icon: 'shield-check' },
+};
+
+const productMeta: Record<Entry['product'], string> = {
+  'ASPICE Navigator': 'bg-teal-400/10 text-teal-300 ring-teal-400/30',
+  'AgentMesh': 'bg-coral-400/10 text-coral-300 ring-coral-400/30',
+  'DocuRAG': 'bg-coral-400/10 text-coral-300 ring-coral-400/30',
+  'Plateforme': 'bg-ink-50/10 text-ink-50 ring-ink-50/30',
+};
+
+const dateFmt = new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' });
+
+const counts = {
+  feature: entries.reduce((n, e) => n + e.highlights.filter((h) => h.kind === 'feature').length, 0),
+  improvement: entries.reduce((n, e) => n + e.highlights.filter((h) => h.kind === 'improvement').length, 0),
+  fix: entries.reduce((n, e) => n + e.highlights.filter((h) => h.kind === 'fix').length, 0),
+  security: entries.reduce((n, e) => n + e.highlights.filter((h) => h.kind === 'security').length, 0),
+};
+---
+
+<BaseLayout
+  lang={lang}
+  path="/changelog"
+  title={lang === 'fr' ? 'Changelog produits' : 'Product changelog'}
+  description={lang === 'fr'
+    ? 'Suivi public des évolutions de nos produits ASPICE Navigator, AgentMesh et DocuRAG.'
+    : 'Public tracking of changes to our ASPICE Navigator, AgentMesh and DocuRAG products.'}
+>
+  <Hero
+    variant="page"
+    kicker={lang === 'fr' ? 'Changelog' : 'Changelog'}
+    title={lang === 'fr' ? 'Ce qui bouge dans nos produits' : 'What’s shipping in our products'}
+    subtitle={lang === 'fr'
+      ? 'Publication mensuelle des évolutions notables. Nouveautés, améliorations, correctifs, sécurité.'
+      : 'Monthly publication of notable changes. Features, improvements, fixes, security.'}
+  />
+
+  <SectionDivider />
+
+  {/* === Stats récap === */}
+  <Section reveal={false}>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+      {(Object.keys(counts) as Kind[]).map((k, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 70}ms`}>
+          <Card class="h-full">
+            <div class="p-6 text-center">
+              <div class:list={['inline-flex items-center justify-center w-11 h-11 rounded-lg ring-1 mb-3', kindMeta[k].color]}>
+                <Icon name={kindMeta[k].icon} size={18} />
+              </div>
+              <div class="text-h1 font-semibold text-ink-50 tracking-tight">{counts[k]}</div>
+              <div class="text-xs uppercase tracking-wider text-ink-400 mt-1">{kindMeta[k].label}</div>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider variant="icon" icon="history" />
+
+  {/* === Timeline === */}
+  <Section
+    title={lang === 'fr' ? 'Historique des versions' : 'Release history'}
+    subtitle={lang === 'fr' ? 'Du plus récent au plus ancien.' : 'From newest to oldest.'}
+  >
+    <div class="relative max-w-4xl mx-auto">
+      <div class="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-ink-700 to-transparent" aria-hidden="true"></div>
+
+      <ol class="space-y-8">
+        {entries.map((e, i) => (
+          <li class="reveal relative pl-12 md:pl-16" style={`--reveal-delay: ${i * 60}ms`}>
+            <div class:list={[
+              'absolute left-4 md:left-6 top-3 -translate-x-1/2 w-3 h-3 rounded-full ring-4 ring-ink-950',
+              e.family === 'solutions' && 'bg-teal-400',
+              e.family === 'ia' && 'bg-coral-400',
+              e.family === 'templates' && 'bg-amber-400',
+            ]} aria-hidden="true"></div>
+
+            <Card>
+              <div class="p-6 md:p-7">
+                <header class="flex flex-wrap items-center gap-3 mb-5">
+                  <span class:list={['inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono ring-1', productMeta[e.product]]}>
+                    {e.product}
+                  </span>
+                  <span class="text-xs font-mono text-ink-300">{e.version}</span>
+                  <span class="text-xs text-ink-500 ml-auto">{dateFmt.format(new Date(e.date))}</span>
+                </header>
+
+                <ul class="space-y-2.5">
+                  {e.highlights.map((h) => (
+                    <li class="flex items-start gap-3">
+                      <span class:list={['inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider ring-1 shrink-0 mt-0.5', kindMeta[h.kind].color]}>
+                        {kindMeta[h.kind].label}
+                      </span>
+                      <span class="text-small text-ink-100 leading-relaxed">{h.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Card>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </Section>
+
+  <SectionDivider />
+
+  <CTASection
+    title={lang === 'fr' ? 'Une demande d’évolution à proposer ?' : 'A feature request to submit?'}
+    subtitle={lang === 'fr'
+      ? 'Nous priorisons en fonction des retours utilisateurs. Décrivez votre besoin, nous l’étudions.'
+      : 'We prioritise based on user feedback. Describe your need, we’ll review it.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+    secondaryCtaLabel={lang === 'fr' ? 'Status temps réel' : 'Live status'}
+    secondaryCtaHref={localizeUrl('/status', lang)}
+  />
+</BaseLayout>

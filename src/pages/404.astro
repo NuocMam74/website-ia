@@ -1,10 +1,27 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import Section from '~/components/ui/Section.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
 import Button from '~/components/ui/Button.astro';
-import { t, localizeUrl, getLang } from '~/lib/i18n';
+import { t, localizeUrl, getLang, type Lang } from '~/lib/i18n';
 
-const lang = getLang(Astro.url.pathname);
+const lang: Lang = getLang(Astro.url.pathname);
+
+const suggestions = [
+  { label: t(lang, 'nav.solutions'), href: localizeUrl('/solutions', lang), icon: 'wrench', accent: 'teal' },
+  { label: t(lang, 'nav.ia'), href: localizeUrl('/ia', lang), icon: 'bot', accent: 'coral' },
+  { label: t(lang, 'nav.templates'), href: localizeUrl('/templates', lang), icon: 'file-text', accent: 'amber' },
+  { label: t(lang, 'nav.references'), href: localizeUrl('/references', lang), icon: 'building-2', accent: 'neutral' },
+  { label: t(lang, 'nav.blog'), href: localizeUrl('/blog', lang), icon: 'message-square-text', accent: 'neutral' },
+  { label: 'FAQ', href: localizeUrl('/faq', lang), icon: 'check', accent: 'neutral' },
+];
+
+const accentBg: Record<string, string> = {
+  teal: 'bg-teal-500/10 ring-teal-400/30 text-teal-300',
+  coral: 'bg-coral-500/10 ring-coral-400/30 text-coral-300',
+  amber: 'bg-amber-500/10 ring-amber-400/30 text-amber-300',
+  neutral: 'bg-ink-800 ring-ink-700 text-ink-200',
+};
 ---
 
 <BaseLayout
@@ -14,14 +31,108 @@ const lang = getLang(Astro.url.pathname);
   description={t(lang, '404.message')}
   noindex
 >
-  <Section>
-    <div class="max-w-md mx-auto text-center py-20">
-      <div class="text-display text-ink-200 mb-2">404</div>
-      <h1 class="text-h1 font-medium text-ink-50 mb-3">{t(lang, '404.title')}</h1>
-      <p class="text-base text-ink-300 mb-8">{t(lang, '404.message')}</p>
-      <Button href={localizeUrl('/', lang)} icon="arrow-right">
-        {t(lang, '404.back')}
-      </Button>
+  <section class="relative overflow-hidden">
+    {/* Décor de fond — circuit imprimé / grille */}
+    <div
+      class="absolute inset-0 pointer-events-none bg-blueprint opacity-50"
+      aria-hidden="true"
+    ></div>
+    <div
+      class="absolute inset-0 pointer-events-none"
+      style="background: radial-gradient(circle at 50% 35%, rgba(0,217,255,0.10), transparent 55%);"
+      aria-hidden="true"
+    ></div>
+
+    <div class="relative mx-auto max-w-[1100px] px-6 py-20 md:py-32">
+      <div class="grid lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
+        <div>
+          <p class="reveal inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-ink-700 bg-ink-900/60 backdrop-blur text-xs uppercase tracking-[0.15em] text-ink-300">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-coral-400 animate-pulse-soft"></span>
+            HTTP 404 · {lang === 'fr' ? 'Page introuvable' : 'Page not found'}
+          </p>
+
+          <h1
+            class="reveal text-display md:text-hero font-semibold tracking-tight leading-[1.02]"
+            style="--reveal-delay: 80ms"
+          >
+            <span class="block text-ink-200">404.</span>
+            <span class="block text-gradient-mix">
+              {lang === 'fr' ? 'Cette page n’est pas en production.' : 'This page is not in production.'}
+            </span>
+          </h1>
+
+          <p
+            class="reveal mt-6 text-base md:text-h3 text-ink-300 font-light leading-relaxed max-w-xl"
+            style="--reveal-delay: 160ms"
+          >
+            {lang === 'fr'
+              ? 'L’URL que vous avez suivie n’existe pas, ou plus. Aucun crash applicatif — juste un mauvais chemin.'
+              : 'The URL you followed doesn’t exist, or no longer does. No app crash — just a wrong path.'}
+          </p>
+
+          <div
+            class="reveal mt-8 flex flex-wrap gap-3"
+            style="--reveal-delay: 240ms"
+          >
+            <Button href={localizeUrl('/', lang)} variant="primary" icon="arrow-right" size="lg">
+              {t(lang, '404.back')}
+            </Button>
+            <button
+              type="button"
+              onclick="window.dispatchEvent(new CustomEvent('cmdk:open'))"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-ink-700 bg-ink-900/60 backdrop-blur text-small font-medium text-ink-100 hover:bg-ink-800 hover:border-ink-600 transition-colors cursor-pointer"
+            >
+              <Icon name="check" size={16} />
+              {lang === 'fr' ? 'Rechercher' : 'Search'}
+              <kbd class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-ink-400 border border-ink-700 bg-ink-950">⌘K</kbd>
+            </button>
+          </div>
+        </div>
+
+        {/* Visuel "stack trace" stylisé */}
+        <div class="reveal" style="--reveal-delay: 200ms">
+          <Card variant="glass">
+            <div class="p-6">
+              <div class="flex items-center gap-2 mb-4 pb-3 border-b border-ink-800">
+                <span class="w-2.5 h-2.5 rounded-full bg-coral-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-teal-400"></span>
+                <span class="ml-2 text-xs font-mono text-ink-400">terminal — 404</span>
+              </div>
+              <pre class="text-xs font-mono leading-relaxed text-ink-300 whitespace-pre-wrap break-words"><span class="text-teal-300">$</span> curl -I {Astro.url.pathname}
+<span class="text-ink-500">HTTP/2 404 NotFound</span>
+<span class="text-ink-500">content-type: text/html</span>
+<span class="text-ink-500">cache-control: no-store</span>
+
+<span class="text-coral-300">⚠</span>  Route not found in app/router.ts
+   <span class="text-ink-500">→ matched fallback handler /404</span>
+
+<span class="text-teal-300">✓</span>  System healthy. Resume navigation.</pre>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Suggestions */}
+      <div class="reveal mt-16" style="--reveal-delay: 320ms">
+        <h2 class="text-small uppercase tracking-wider text-ink-400 mb-5">
+          {lang === 'fr' ? 'Vous cherchiez peut-être' : 'You might be looking for'}
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {suggestions.map((s) => (
+            <a
+              href={s.href}
+              class="group flex items-center gap-3 px-3 py-3 rounded-lg border border-ink-800 bg-ink-900/40 backdrop-blur hover:bg-ink-900 hover:border-ink-600 transition-colors"
+            >
+              <span class:list={['inline-flex items-center justify-center w-9 h-9 rounded-md ring-1 shrink-0', accentBg[s.accent]]}>
+                <Icon name={s.icon} size={16} />
+              </span>
+              <span class="text-small font-medium text-ink-100 truncate">{s.label}</span>
+              <Icon name="arrow-right" size={12} class="ml-auto text-ink-500 group-hover:text-ink-100 transition-colors" />
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
-  </Section>
+  </section>
 </BaseLayout>

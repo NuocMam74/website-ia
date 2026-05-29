@@ -1,0 +1,54 @@
+---
+/**
+ * Tooltip CSS-only basé sur :hover/:focus-within. Pas de JS.
+ * S'utilise pour annoter du jargon (ASPICE, ASIL, RAG…).
+ *
+ * Usage :
+ *   <Tooltip text="Recherche augmentée par récupération">
+ *     <span class="underline decoration-dotted">RAG</span>
+ *   </Tooltip>
+ */
+interface Props {
+  text: string;
+  placement?: 'top' | 'bottom';
+  class?: string;
+}
+
+const { text, placement = 'top', class: className = '' } = Astro.props;
+
+const placementClass =
+  placement === 'top'
+    ? 'bottom-full mb-2 left-1/2 -translate-x-1/2'
+    : 'top-full mt-2 left-1/2 -translate-x-1/2';
+---
+
+<span
+  class:list={['tooltip-root relative inline-flex group', className]}
+  tabindex="0"
+>
+  <slot />
+  <span
+    role="tooltip"
+    class:list={[
+      'absolute z-30 whitespace-nowrap px-2.5 py-1.5 rounded-md text-xs leading-snug',
+      'bg-ink-50 text-ink-950 font-medium shadow-lg pointer-events-none',
+      'opacity-0 scale-95 transition-all duration-150 ease-out',
+      'group-hover:opacity-100 group-hover:scale-100',
+      'group-focus-within:opacity-100 group-focus-within:scale-100',
+      placementClass,
+    ]}
+  >
+    {text}
+    <span
+      class:list={[
+        'absolute left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-ink-50',
+        placement === 'top' ? '-bottom-1' : '-top-1',
+      ]}
+      aria-hidden="true"
+    ></span>
+  </span>
+</span>
+
+<style>
+  .tooltip-root:focus { outline: none; }
+</style>

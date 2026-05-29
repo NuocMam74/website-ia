@@ -3,7 +3,13 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import Modal from '~/components/ui/Modal.astro';
 import PostCard from '~/components/cards/PostCard.astro';
+import CTASection from '~/components/sections/CTASection.astro';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
 
 const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
@@ -14,6 +20,49 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
 );
 
 const allTags = Array.from(new Set(posts.flatMap((p) => p.data.tags)));
+
+const featured = posts[0];
+const others = posts.slice(1);
+
+/* Rubriques éditoriales */
+const topics = [
+  {
+    id: 'topic-ia',
+    icon: 'bot',
+    accent: 'coral',
+    title: lang === 'fr' ? 'IA & Agents' : 'AI & Agents',
+    desc: lang === 'fr' ? 'Architectures RAG, agents métier, observabilité.' : 'RAG architectures, business agents, observability.',
+    detail: lang === 'fr'
+      ? 'Articles de fond sur les architectures IA en production : RAG hybrides, mémoires longues, garde-fous, évaluation continue, multi-agents et observabilité. Tout est tiré de projets réels, pas de démos jouet.'
+      : 'In-depth articles on production AI architectures: hybrid RAG, long memories, guardrails, continuous evaluation, multi-agents and observability. Everything is from real projects, not toy demos.',
+  },
+  {
+    id: 'topic-quality',
+    icon: 'shield-check',
+    accent: 'teal',
+    title: lang === 'fr' ? 'Qualité & Conformité' : 'Quality & Compliance',
+    desc: lang === 'fr' ? 'ASPICE, ISO 26262, ISO 21434, ISO 13485.' : 'ASPICE, ISO 26262, ISO 21434, ISO 13485.',
+    detail: lang === 'fr'
+      ? 'Retours d’expérience sur les démarches qualité et conformité dans l’industrie : ASPICE, sécurité fonctionnelle automobile, cybersécurité, dispositifs médicaux. Méthodes, pièges fréquents, outils.'
+      : 'Field reports on quality and compliance approaches in industry: ASPICE, automotive functional safety, cybersecurity, medical devices. Methods, common pitfalls, tools.',
+  },
+  {
+    id: 'topic-engineering',
+    icon: 'wrench',
+    accent: 'amber',
+    title: lang === 'fr' ? 'Ingénierie logicielle' : 'Software engineering',
+    desc: lang === 'fr' ? 'Architecture, DevOps, observabilité.' : 'Architecture, DevOps, observability.',
+    detail: lang === 'fr'
+      ? 'Choix techniques expliqués : architectures, stacks, patterns DevOps, observabilité (OpenTelemetry), sécurité applicative. Comment construire du logiciel qui dure plus de 3 ans.'
+      : 'Explained technical choices: architectures, stacks, DevOps patterns, observability (OpenTelemetry), application security. How to build software that lasts more than 3 years.',
+  },
+];
+
+const accentBg: Record<string, string> = {
+  teal: 'bg-teal-500/10 ring-teal-400/30 text-teal-300',
+  coral: 'bg-coral-500/10 ring-coral-400/30 text-coral-300',
+  amber: 'bg-amber-500/10 ring-amber-400/30 text-amber-300',
+};
 ---
 
 <BaseLayout
@@ -32,9 +81,103 @@ const allTags = Array.from(new Set(posts.flatMap((p) => p.data.tags)));
       : 'Feedback, methods and advice on compliance, engineering and applied AI.'}
   />
 
-  <Section>
+  <SectionDivider />
+
+  {/* === Rubriques éditoriales — cards cliquables === */}
+  <Section
+    title={lang === 'fr' ? 'Rubriques' : 'Topics'}
+    subtitle={lang === 'fr'
+      ? 'Trois grandes rubriques. Cliquez pour voir ce que vous y trouverez.'
+      : 'Three main topics. Click to see what you’ll find inside.'}
+  >
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {topics.map((tp, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 90}ms`}>
+          <button
+            type="button"
+            data-modal-target={tp.id}
+            class="group block w-full text-left h-full"
+          >
+            <Card class="h-full" interactive spotlight>
+              <div class="p-7 h-full flex flex-col">
+                <div class:list={['inline-flex items-center justify-center w-12 h-12 rounded-xl ring-1 mb-5', accentBg[tp.accent]]}>
+                  <Icon name={tp.icon} size={22} />
+                </div>
+                <h3 class="text-h3 font-semibold text-ink-50 mb-2 tracking-tight">{tp.title}</h3>
+                <p class="text-small text-ink-300 leading-relaxed flex-1">{tp.desc}</p>
+                <span class="mt-5 inline-flex items-center gap-1.5 text-small font-medium text-ink-100 group-hover:underline">
+                  {lang === 'fr' ? 'En savoir plus' : 'Learn more'}
+                  <Icon name="arrow-right" size={14} />
+                </span>
+              </div>
+            </Card>
+          </button>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {topics.map((tp) => (
+    <Modal id={tp.id} title={tp.title} subtitle={tp.desc} size="md">
+      <p class="text-base text-ink-200 leading-relaxed">{tp.detail}</p>
+      <div class="mt-6">
+        <Button href="#all-posts" variant="secondary" icon="arrow-right">
+          {lang === 'fr' ? 'Voir tous les articles' : 'See all articles'}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  {featured && (
+    <>
+      <SectionDivider variant="icon" icon="sparkles" />
+
+      {/* === Article à la une === */}
+      <Section
+        title={lang === 'fr' ? 'À la une' : 'Featured'}
+      >
+        <div class="reveal">
+          <Card class="overflow-hidden" interactive spotlight>
+            <a href={localizeUrl(`/blog/${featured.id}`, lang)} class="block p-8 md:p-12">
+              <div class="grid md:grid-cols-[1fr_auto] gap-8 items-center">
+                <div>
+                  <p class="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full border border-ink-700 bg-ink-950/60 text-xs uppercase tracking-[0.15em] text-ink-300">
+                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse-soft"></span>
+                    {lang === 'fr' ? 'Article récent' : 'Recent article'}
+                  </p>
+                  <h3 class="text-h1 md:text-display font-semibold tracking-tight text-ink-50 leading-tight">
+                    {featured.data.title}
+                  </h3>
+                  <p class="mt-4 text-base text-ink-300 leading-relaxed max-w-2xl">
+                    {featured.data.excerpt}
+                  </p>
+                  <div class="mt-6 flex flex-wrap items-center gap-3">
+                    {featured.data.tags.slice(0, 3).map((tag) => (
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-full border border-ink-700 text-xs text-ink-200">{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                <div class="text-teal-300 hidden md:flex items-center justify-center w-16 h-16 rounded-full bg-teal-400/10 ring-1 ring-teal-400/30">
+                  <Icon name="arrow-right" size={24} />
+                </div>
+              </div>
+            </a>
+          </Card>
+        </div>
+      </Section>
+    </>
+  )}
+
+  <SectionDivider />
+
+  {/* === Liste complète des articles === */}
+  <Section
+    id="all-posts"
+    title={lang === 'fr' ? 'Tous les articles' : 'All articles'}
+    subtitle={lang === 'fr' ? 'Classés par date de publication, le plus récent en haut.' : 'Sorted by publication date, most recent first.'}
+  >
     {allTags.length > 0 && (
-      <div class="mb-8 flex flex-wrap gap-2 text-small items-center">
+      <div class="mb-8 flex flex-wrap gap-2 text-small items-center reveal">
         <span class="text-ink-500 mr-2">Tags :</span>
         {allTags.map((tag) => (
           <span class="px-2.5 py-1 rounded-full border border-ink-700 text-ink-200">{tag}</span>
@@ -42,23 +185,42 @@ const allTags = Array.from(new Set(posts.flatMap((p) => p.data.tags)));
       </div>
     )}
 
-    {posts.length > 0 ? (
+    {others.length > 0 ? (
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((p) => (
-          <PostCard
-            title={p.data.title}
-            excerpt={p.data.excerpt}
-            href={localizeUrl(`/blog/${p.id}`, lang)}
-            publishedAt={p.data.publishedAt}
-            tags={p.data.tags}
-            lang={lang}
-          />
+        {others.map((p, i) => (
+          <div class="reveal" style={`--reveal-delay: ${i * 70}ms`}>
+            <PostCard
+              title={p.data.title}
+              excerpt={p.data.excerpt}
+              href={localizeUrl(`/blog/${p.id}`, lang)}
+              publishedAt={p.data.publishedAt}
+              tags={p.data.tags}
+              lang={lang}
+            />
+          </div>
         ))}
       </div>
-    ) : (
-      <p class="text-base text-ink-300">
-        {lang === 'fr' ? 'Aucun article publié pour le moment.' : 'No article published yet.'}
-      </p>
-    )}
+    ) : posts.length === 0 ? (
+      <Card>
+        <div class="p-10 text-center">
+          <p class="text-base text-ink-300">
+            {lang === 'fr' ? 'Aucun article publié pour le moment.' : 'No article published yet.'}
+          </p>
+        </div>
+      </Card>
+    ) : null}
   </Section>
+
+  <SectionDivider />
+
+  <CTASection
+    title={lang === 'fr' ? 'Une question, un sujet à approfondir ?' : 'A question, a topic to dig into?'}
+    subtitle={lang === 'fr'
+      ? 'Si un sujet vous intéresse, dites-le nous. Nous écrivons sur ce que nos clients nous demandent.'
+      : 'If a topic interests you, let us know. We write about what our clients ask for.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+    secondaryCtaLabel={'FAQ'}
+    secondaryCtaHref={localizeUrl('/faq', lang)}
+  />
 </BaseLayout>

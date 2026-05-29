@@ -4,6 +4,8 @@ import LangSwitcher from './LangSwitcher.astro';
 import Icon from '~/components/ui/Icon.astro';
 import CartBadge from '~/components/islands/CartBadge.tsx';
 import MobileMenu from '~/components/islands/MobileMenu.tsx';
+import CommandPalette from '~/components/islands/CommandPalette.tsx';
+import ThemeToggle from '~/components/islands/ThemeToggle.tsx';
 
 interface Props {
   lang: Lang;
@@ -19,6 +21,28 @@ const navItems = [
   { label: t(lang, 'nav.references'), href: localizeUrl('/references', lang) },
   { label: t(lang, 'nav.blog'), href: localizeUrl('/blog', lang) },
   { label: t(lang, 'nav.about'), href: localizeUrl('/a-propos', lang) },
+];
+
+const cmdkItems = [
+  { id: 'cmd-solutions', label: t(lang, 'nav.solutions'), hint: lang === 'fr' ? 'Logiciels métier' : 'Business software', href: localizeUrl('/solutions', lang), group: lang === 'fr' ? 'Familles' : 'Families', keywords: 'software apps web' },
+  { id: 'cmd-ia', label: t(lang, 'nav.ia'), hint: lang === 'fr' ? 'Agents, RAG, multi-agents' : 'Agents, RAG, multi-agents', href: localizeUrl('/ia', lang), group: lang === 'fr' ? 'Familles' : 'Families', keywords: 'ai llm chatbot rag agent' },
+  { id: 'cmd-templates', label: t(lang, 'nav.templates'), hint: lang === 'fr' ? 'Packs ASPICE / ISO' : 'ASPICE / ISO packs', href: localizeUrl('/templates', lang), group: lang === 'fr' ? 'Familles' : 'Families', keywords: 'aspice iso26262 iso21434 docx' },
+  { id: 'cmd-tarifs', label: lang === 'fr' ? 'Tarifs' : 'Pricing', hint: lang === 'fr' ? 'Grilles & investissement' : 'Plans & investment', href: localizeUrl('/tarifs', lang), group: 'Pages', keywords: 'prix price tarif investment money' },
+  { id: 'cmd-references', label: t(lang, 'nav.references'), hint: lang === 'fr' ? 'Cas clients' : 'Case studies', href: localizeUrl('/references', lang), group: 'Pages', keywords: 'case studies clients' },
+  { id: 'cmd-blog', label: t(lang, 'nav.blog'), hint: lang === 'fr' ? 'Articles & retours d’expérience' : 'Articles & field reports', href: localizeUrl('/blog', lang), group: 'Pages' },
+  { id: 'cmd-method', label: t(lang, 'nav.method'), hint: lang === 'fr' ? 'Cadrage, POC, industrialisation' : 'Scoping, POC, industrialisation', href: localizeUrl('/methodologie', lang), group: 'Pages' },
+  { id: 'cmd-about', label: t(lang, 'nav.about'), href: localizeUrl('/a-propos', lang), group: 'Pages' },
+  { id: 'cmd-team', label: t(lang, 'nav.team'), href: localizeUrl('/equipe', lang), group: 'Pages' },
+  { id: 'cmd-careers', label: lang === 'fr' ? 'Carrières' : 'Careers', hint: lang === 'fr' ? 'Postes ouverts' : 'Open positions', href: localizeUrl('/carrieres', lang), group: 'Pages', keywords: 'jobs hiring carriere' },
+  { id: 'cmd-changelog', label: 'Changelog', hint: lang === 'fr' ? 'Évolutions produit' : 'Product changes', href: localizeUrl('/changelog', lang), group: 'Pages' },
+  { id: 'cmd-status', label: 'Status', hint: lang === 'fr' ? 'Uptime temps réel' : 'Live uptime', href: localizeUrl('/status', lang), group: 'Pages' },
+  { id: 'cmd-faq', label: 'FAQ', href: localizeUrl('/faq', lang), group: lang === 'fr' ? 'Ressources' : 'Resources' },
+  { id: 'cmd-lexique', label: t(lang, 'nav.glossary'), href: localizeUrl('/lexique', lang), group: lang === 'fr' ? 'Ressources' : 'Resources', keywords: 'jargon definitions terms' },
+  { id: 'cmd-compare', label: t(lang, 'nav.compare'), href: localizeUrl('/comparateur-templates', lang), group: lang === 'fr' ? 'Ressources' : 'Resources' },
+  { id: 'cmd-partners', label: t(lang, 'nav.partners'), href: localizeUrl('/partenaires', lang), group: lang === 'fr' ? 'Ressources' : 'Resources' },
+  { id: 'cmd-contact', label: t(lang, 'cta.contact'), href: localizeUrl('/contact', lang), group: 'Actions' },
+  { id: 'cmd-demo', label: t(lang, 'cta.demo'), href: `${localizeUrl('/contact', lang)}?type=demo`, group: 'Actions' },
+  { id: 'cmd-cart', label: t(lang, 'nav.cart'), href: localizeUrl('/panier', lang), group: 'Actions' },
 ];
 
 function isActive(href: string): boolean {
@@ -58,6 +82,17 @@ function isActive(href: string): boolean {
     </nav>
 
     <div class="flex items-center gap-3">
+      <button
+        type="button"
+        onclick="window.dispatchEvent(new CustomEvent('cmdk:open'))"
+        aria-label={lang === 'fr' ? 'Rechercher' : 'Search'}
+        class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 text-sm text-ink-300 border border-ink-700 bg-ink-900/40 hover:bg-ink-800 hover:text-ink-100 rounded-md transition-colors cursor-pointer"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <span class="hidden lg:inline">{lang === 'fr' ? 'Rechercher' : 'Search'}</span>
+        <kbd class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-ink-400 border border-ink-700 bg-ink-950">⌘K</kbd>
+      </button>
+
       <a
         href={localizeUrl('/contact', lang)}
         class="hidden md:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-ink-950 bg-ink-50 hover:bg-ink-100 rounded-md transition-colors"
@@ -75,6 +110,12 @@ function isActive(href: string): boolean {
         <CartBadge client:load />
       </a>
 
+      <ThemeToggle
+        client:idle
+        labelDark={lang === 'fr' ? 'Passer en mode sombre' : 'Switch to dark mode'}
+        labelLight={lang === 'fr' ? 'Passer en mode clair' : 'Switch to light mode'}
+      />
+
       <LangSwitcher lang={lang} path={path} />
 
       <MobileMenu
@@ -89,3 +130,5 @@ function isActive(href: string): boolean {
     </div>
   </div>
 </header>
+
+<CommandPalette client:idle lang={lang} items={cmdkItems} />

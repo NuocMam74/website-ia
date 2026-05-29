@@ -1,0 +1,163 @@
+---
+/**
+ * Modal accessible basé sur <dialog> natif.
+ *
+ * Activation : un trigger (lien/bouton) avec `data-modal-target="<id>"`
+ * ouvre la modale qui porte le même `id`. La fermeture se fait via :
+ *   - ESC ou clic sur le backdrop (géré par le script global)
+ *   - bouton ✕ intégré (data-modal-close)
+ *   - n'importe quel élément interne portant data-modal-close
+ *
+ * Variantes :
+ *   - size : sm / md (default) / lg / xl
+ *   - family : couleur d'accent du liseré supérieur
+ */
+import Icon from './Icon.astro';
+import type { Family } from '~/content.config';
+
+interface Props {
+  id: string;
+  title?: string;
+  subtitle?: string;
+  family?: Family;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  closeLabel?: string;
+}
+
+const {
+  id,
+  title,
+  subtitle,
+  family,
+  size = 'md',
+  closeLabel = 'Fermer',
+} = Astro.props;
+
+const sizeClass: Record<NonNullable<Props['size']>, string> = {
+  sm: 'max-w-md',
+  md: 'max-w-xl',
+  lg: 'max-w-3xl',
+  xl: 'max-w-5xl',
+};
+
+const accentBar: Record<Family, string> = {
+  solutions: 'before:bg-gradient-to-r before:from-teal-400/0 before:via-teal-400 before:to-teal-400/0',
+  ia: 'before:bg-gradient-to-r before:from-coral-400/0 before:via-coral-400 before:to-coral-400/0',
+  templates: 'before:bg-gradient-to-r before:from-amber-400/0 before:via-amber-400 before:to-amber-400/0',
+};
+---
+
+<dialog
+  id={id}
+  data-modal
+  class:list={[
+    'modal-dialog',
+    'm-auto w-[calc(100%-2rem)] p-0 rounded-xl border border-ink-800 bg-ink-900 text-ink-100',
+    'card-shadow backdrop:backdrop-blur-sm',
+    family &&
+      `relative pt-[2px] before:content-[""] before:absolute before:top-0 before:left-4 before:right-4 before:h-[2px] ${accentBar[family]}`,
+    sizeClass[size],
+  ]}
+  aria-labelledby={title ? `${id}-title` : undefined}
+  aria-describedby={subtitle ? `${id}-subtitle` : undefined}
+>
+  <div class="relative">
+    <button
+      type="button"
+      data-modal-close
+      aria-label={closeLabel}
+      class="absolute top-4 right-4 z-10 inline-flex items-center justify-center w-9 h-9 rounded-md text-ink-300 hover:text-ink-50 hover:bg-ink-800 transition-colors"
+    >
+      <Icon name="x" size={18} />
+    </button>
+
+    {(title || subtitle) && (
+      <header class="px-6 md:px-8 pt-7 md:pt-8 pb-5 border-b border-ink-800">
+        {title && (
+          <h2 id={`${id}-title`} class="text-h2 font-semibold text-ink-50 tracking-tight pr-12">
+            {title}
+          </h2>
+        )}
+        {subtitle && (
+          <p id={`${id}-subtitle`} class="mt-2 text-small text-ink-300 leading-relaxed">
+            {subtitle}
+          </p>
+        )}
+      </header>
+    )}
+
+    <div class="px-6 md:px-8 py-6 md:py-7 max-h-[70vh] overflow-y-auto">
+      <slot />
+    </div>
+
+    <slot name="footer" />
+  </div>
+</dialog>
+
+<script>
+  function setupModals() {
+    document.querySelectorAll<HTMLElement>('[data-modal-target]').forEach((trigger) => {
+      if (trigger.dataset.modalBound) return;
+      trigger.dataset.modalBound = '1';
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = trigger.dataset.modalTarget;
+        if (!id) return;
+        const dlg = document.getElementById(id) as HTMLDialogElement | null;
+        if (dlg && typeof dlg.showModal === 'function') {
+          dlg.showModal();
+          document.body.style.overflow = 'hidden';
+        }
+      });
+    });
+
+    document.querySelectorAll<HTMLDialogElement>('dialog[data-modal]').forEach((dlg) => {
+      if (dlg.dataset.modalBound) return;
+      dlg.dataset.modalBound = '1';
+
+      dlg.addEventListener('click', (e) => {
+        const rect = dlg.getBoundingClientRect();
+        const inside =
+          rect.top <= e.clientY &&
+          e.clientY <= rect.bottom &&
+          rect.left <= e.clientX &&
+          e.clientX <= rect.right;
+        const target = e.target as HTMLElement | null;
+        if (target?.closest('[data-modal-close]')) {
+          dlg.close();
+        } else if (!inside) {
+          dlg.close();
+        }
+      });
+
+      dlg.addEventListener('close', () => {
+        document.body.style.overflow = '';
+      });
+    });
+  }
+
+  setupModals();
+  document.addEventListener('astro:page-load', setupModals);
+</script>
+
+<style>
+  .modal-dialog {
+    animation: modal-in 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Backdrop toujours sombre pour dimmer la page (les deux thèmes) */
+  .modal-dialog::backdrop {
+    background-color: rgba(9, 11, 16, 0.72);
+    animation: backdrop-in 240ms ease;
+  }
+  @keyframes modal-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+  @keyframes backdrop-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .modal-dialog, .modal-dialog::backdrop { animation: none; }
+  }
+</style>

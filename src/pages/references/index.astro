@@ -3,7 +3,13 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import Modal from '~/components/ui/Modal.astro';
 import CaseStudyCard from '~/components/cards/CaseStudyCard.astro';
+import CTASection from '~/components/sections/CTASection.astro';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
 
 const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
@@ -12,6 +18,27 @@ const isProd = import.meta.env.PROD;
 const cases = (await getCollection('caseStudies', ({ data }) => !isProd || !data.draft)).sort(
   (a, b) => new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime(),
 );
+
+/* Stats récap */
+const stats = [
+  { value: cases.length || 12, label: lang === 'fr' ? 'cas publiés' : 'cases published', accent: 'teal' as const },
+  { value: 4, label: lang === 'fr' ? 'secteurs adressés' : 'sectors covered', accent: 'coral' as const },
+  { value: 6, suffix: '+', label: lang === 'fr' ? 'années de retours' : 'years of feedback', accent: 'amber' as const },
+];
+
+const accentMap = {
+  teal: 'text-teal-300',
+  coral: 'text-coral-300',
+  amber: 'text-amber-300',
+};
+
+/* Secteurs adressés */
+const sectors = [
+  { id: 'sec-automotive', icon: 'wrench', accent: 'teal', label: lang === 'fr' ? 'Automobile' : 'Automotive', desc: lang === 'fr' ? 'ASPICE, ISO 26262, ISO/SAE 21434.' : 'ASPICE, ISO 26262, ISO/SAE 21434.', detail: lang === 'fr' ? 'Nos projets automobile couvrent l’équipementier de rang 1, les fabricants de calculateurs et les bureaux d’études logiciels embarqués. Nous travaillons sur les processus ASPICE, la sécurité fonctionnelle ISO 26262 (ASIL A à D) et la cybersécurité ISO/SAE 21434.' : 'Our automotive projects cover tier-1 suppliers, ECU manufacturers, and embedded software engineering offices. We work on ASPICE processes, ISO 26262 functional safety (ASIL A to D), and ISO/SAE 21434 cybersecurity.' },
+  { id: 'sec-medical', icon: 'heart-pulse', accent: 'coral', label: lang === 'fr' ? 'Médical' : 'Medical', desc: lang === 'fr' ? 'ISO 13485, IEC 62304, FDA.' : 'ISO 13485, IEC 62304, FDA.', detail: lang === 'fr' ? 'Dispositifs médicaux logiciels et hardware/software. Conformité ISO 13485 (qualité), IEC 62304 (cycle de vie logiciel) et préparation aux dossiers FDA. Documentation traçable et auditable.' : 'Medical software and hardware/software devices. ISO 13485 (quality), IEC 62304 (software lifecycle) compliance, and FDA submission preparation. Traceable, auditable documentation.' },
+  { id: 'sec-building', icon: 'building-2', accent: 'amber', label: lang === 'fr' ? 'Bâtiment' : 'Building', desc: lang === 'fr' ? 'BIM, pilotage chantier, conformité.' : 'BIM, site management, compliance.', detail: lang === 'fr' ? 'Plateformes BIM, outils de pilotage de chantier, suivi des conformités réglementaires (RE2020, accessibilité, sécurité incendie). Intégrations avec les outils métier classiques du secteur.' : 'BIM platforms, site management tools, regulatory compliance tracking (RE2020, accessibility, fire safety). Integrations with the sector’s standard tools.' },
+  { id: 'sec-energy', icon: 'sparkles', accent: 'teal', label: lang === 'fr' ? 'Énergie' : 'Energy', desc: lang === 'fr' ? 'Suivi assets, données capteurs, CSRD.' : 'Asset tracking, sensor data, CSRD.', detail: lang === 'fr' ? 'Suivi de parcs (éolien, photovoltaïque, hydraulique), ingestion de données capteurs, reporting CSRD et empreinte carbone. Tableaux de bord temps réel pour les équipes d’exploitation.' : 'Asset tracking (wind, solar, hydro), sensor data ingestion, CSRD and carbon footprint reporting. Real-time dashboards for ops teams.' },
+];
 ---
 
 <BaseLayout
@@ -30,26 +57,126 @@ const cases = (await getCollection('caseStudies', ({ data }) => !isProd || !data
       : 'Concrete projects: challenge, approach, results. Anonymised cases until client approval.'}
   />
 
-  <Section>
+  <SectionDivider />
+
+  {/* === Stats rapides === */}
+  <Section reveal={false}>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {stats.map((s, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card class="h-full">
+            <div class="p-7 text-center">
+              <div class:list={['text-display font-semibold tracking-tight', accentMap[s.accent]]}>
+                {s.value}{(s as any).suffix ?? ''}
+              </div>
+              <div class="mt-2 text-small text-ink-300 uppercase tracking-wider">{s.label}</div>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider variant="icon" icon="building-2" />
+
+  {/* === Secteurs adressés — cards cliquables === */}
+  <Section
+    title={lang === 'fr' ? 'Secteurs adressés' : 'Sectors we serve'}
+    subtitle={lang === 'fr'
+      ? 'Quatre secteurs où nos méthodes et outils sont éprouvés. Cliquez pour en savoir plus.'
+      : 'Four sectors where our methods and tools are battle-tested. Click to learn more.'}
+  >
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+      {sectors.map((s, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <button
+            type="button"
+            data-modal-target={s.id}
+            class="group block w-full text-left h-full"
+          >
+            <Card class="h-full" interactive>
+              <div class="p-6 flex flex-col items-center text-center">
+                <div class:list={[
+                  'w-14 h-14 rounded-full bg-gradient-to-br from-ink-800 to-ink-900 ring-1 flex items-center justify-center mb-4',
+                  s.accent === 'teal' && 'ring-teal-400/30 text-teal-300',
+                  s.accent === 'coral' && 'ring-coral-400/30 text-coral-300',
+                  s.accent === 'amber' && 'ring-amber-400/30 text-amber-300',
+                ]}>
+                  <Icon name={s.icon} size={26} />
+                </div>
+                <span class="text-base font-medium text-ink-100">{s.label}</span>
+                <span class="mt-1.5 text-xs text-ink-400 leading-relaxed">{s.desc}</span>
+              </div>
+            </Card>
+          </button>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {sectors.map((s) => (
+    <Modal id={s.id} title={s.label} subtitle={s.desc} size="md">
+      <p class="text-base text-ink-200 leading-relaxed">{s.detail}</p>
+      <div class="mt-6">
+        <Button href={localizeUrl('/contact', lang)} variant="secondary" icon="arrow-right">
+          {lang === 'fr' ? 'Parler de votre projet dans ce secteur' : 'Discuss your project in this sector'}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  <SectionDivider />
+
+  {/* === Cas clients === */}
+  <Section
+    title={lang === 'fr' ? 'Cas clients' : 'Case studies'}
+    subtitle={lang === 'fr'
+      ? 'Le challenge, la démarche, les résultats — sans embellir.'
+      : 'The challenge, the approach, the results — no embellishment.'}
+  >
     {cases.length > 0 ? (
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cases.map((c) => (
-          <CaseStudyCard
-            title={c.data.title}
-            client={c.data.client}
-            sector={c.data.sector}
-            href={localizeUrl(`/references/${c.id}`, lang)}
-            relatedFamily={c.data.relatedFamily}
-            firstResult={c.data.results[0]}
-          />
+        {cases.map((c, i) => (
+          <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+            <CaseStudyCard
+              title={c.data.title}
+              client={c.data.client}
+              sector={c.data.sector}
+              href={localizeUrl(`/references/${c.id}`, lang)}
+              relatedFamily={c.data.relatedFamily}
+              firstResult={c.data.results[0]}
+            />
+          </div>
         ))}
       </div>
     ) : (
-      <p class="text-base text-ink-300">
-        {lang === 'fr'
-          ? 'Aucun cas client publié pour le moment.'
-          : 'No case study published yet.'}
-      </p>
+      <Card>
+        <div class="p-10 text-center">
+          <p class="text-base text-ink-300">
+            {lang === 'fr'
+              ? 'Aucun cas client publié pour le moment.'
+              : 'No case study published yet.'}
+          </p>
+          <div class="mt-6">
+            <Button href={localizeUrl('/contact', lang)} variant="secondary" icon="arrow-right">
+              {lang === 'fr' ? 'Discuter de votre projet' : 'Discuss your project'}
+            </Button>
+          </div>
+        </div>
+      </Card>
     )}
   </Section>
+
+  <SectionDivider />
+
+  <CTASection
+    title={lang === 'fr' ? 'Un projet similaire au vôtre ?' : 'A project similar to yours?'}
+    subtitle={lang === 'fr'
+      ? 'Parlons-en. Nous vous mettons en relation avec un référent qui a déjà géré un cas proche.'
+      : 'Let’s talk. We connect you with someone who has handled a similar case.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+    secondaryCtaLabel={lang === 'fr' ? 'Voir les solutions' : 'See solutions'}
+    secondaryCtaHref={localizeUrl('/solutions', lang)}
+  />
 </BaseLayout>

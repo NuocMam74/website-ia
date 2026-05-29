@@ -2,7 +2,10 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
 import Card from '~/components/ui/Card.astro';
+import Modal from '~/components/ui/Modal.astro';
+import Button from '~/components/ui/Button.astro';
 import ContactForm from '~/components/islands/ContactForm.tsx';
 import Icon from '~/components/ui/Icon.astro';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
@@ -42,6 +45,55 @@ const quickLinks = [
   { label: t(lang, 'nav.references'), href: localizeUrl('/references', lang) },
   { label: t(lang, 'nav.method'), href: localizeUrl('/methodologie', lang) },
 ];
+
+/* Types de demande — cards cliquables avec modales descriptives */
+const requestTypes = [
+  {
+    id: 'req-projet',
+    icon: 'wrench',
+    accent: 'teal',
+    title: lang === 'fr' ? 'Projet sur-mesure' : 'Custom project',
+    desc: lang === 'fr' ? 'Logiciel métier ou agent IA pour vos équipes.' : 'Custom software or AI agent for your teams.',
+    detail: lang === 'fr'
+      ? 'Vous avez identifié un besoin métier précis et cherchez un partenaire pour le concevoir et le livrer. Un cadrage court (1 à 3 jours) vous permet d’obtenir une note chiffrée, sans engagement.'
+      : 'You have identified a specific business need and are looking for a partner to design and deliver it. A short scoping (1 to 3 days) gives you a costed note, no commitment.',
+    bullets: lang === 'fr'
+      ? ['Cadrage court chiffré', 'Devis sous 7 jours', 'POC possible en 2-6 semaines']
+      : ['Short costed scoping', 'Quote within 7 days', 'POC possible in 2-6 weeks'],
+  },
+  {
+    id: 'req-demo',
+    icon: 'bot',
+    accent: 'coral',
+    title: lang === 'fr' ? 'Démo IA' : 'AI demo',
+    desc: lang === 'fr' ? 'Voir un agent en action sur un cas réaliste.' : 'See an agent in action on a realistic case.',
+    detail: lang === 'fr'
+      ? 'Démo en visio de 30 minutes sur un cas proche du vôtre. Nous configurons rapidement un agent ou un RAG sur un corpus public, et nous répondons aux questions techniques précises (latence, coûts, sécurité).'
+      : '30-minute video demo on a case close to yours. We quickly configure an agent or RAG on a public corpus, and we answer specific technical questions (latency, costs, security).',
+    bullets: lang === 'fr'
+      ? ['Démo personnalisée 30 min', 'Q&A technique', 'Devis on-premise dispo']
+      : ['Personalised 30-min demo', 'Technical Q&A', 'On-premise quote available'],
+  },
+  {
+    id: 'req-template',
+    icon: 'file-text',
+    accent: 'amber',
+    title: lang === 'fr' ? 'Achat template' : 'Template purchase',
+    desc: lang === 'fr' ? 'Question sur un pack du catalogue.' : 'Question about a catalog pack.',
+    detail: lang === 'fr'
+      ? 'Question avant achat, demande de prise en compte d’une norme spécifique, devis multi-licences ou pack ad-hoc pour un référentiel non couvert. Nous répondons sous 48 heures ouvrées.'
+      : 'Pre-purchase question, request to cover a specific norm, multi-license quote or ad-hoc pack for an uncovered reference. We respond within 48 business hours.',
+    bullets: lang === 'fr'
+      ? ['Réponse sous 48h', 'Pack ad-hoc possible', 'Multi-licences disponible']
+      : ['Reply within 48h', 'Ad-hoc pack possible', 'Multi-license available'],
+  },
+];
+
+const accentRing: Record<string, string> = {
+  teal: 'ring-teal-400/30 text-teal-300 bg-teal-500/10',
+  coral: 'ring-coral-400/30 text-coral-300 bg-coral-500/10',
+  amber: 'ring-amber-400/30 text-amber-300 bg-amber-500/10',
+};
 ---
 
 <BaseLayout
@@ -61,9 +113,72 @@ const quickLinks = [
       : 'Tell us about your need. We get back to you with a first read within 48 business hours.'}
   />
 
-  <Section>
+  <SectionDivider />
+
+  {/* === Types de demande — cards cliquables === */}
+  <Section
+    title={lang === 'fr' ? 'Quel type de demande ?' : 'What kind of request?'}
+    subtitle={lang === 'fr'
+      ? 'Trois cas fréquents — cliquez pour voir ce que nous proposons, ou passez directement au formulaire ci-dessous.'
+      : 'Three common cases — click to see what we offer, or go straight to the form below.'}
+  >
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {requestTypes.map((r, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <button
+            type="button"
+            data-modal-target={r.id}
+            class="group block w-full text-left h-full"
+          >
+            <Card class="h-full" interactive spotlight>
+              <div class="p-7">
+                <div class:list={['inline-flex items-center justify-center w-12 h-12 rounded-xl ring-1 mb-5', accentRing[r.accent]]}>
+                  <Icon name={r.icon} size={22} />
+                </div>
+                <h3 class="text-h3 font-semibold text-ink-50 mb-2 tracking-tight">{r.title}</h3>
+                <p class="text-small text-ink-300 leading-relaxed">{r.desc}</p>
+                <span class="mt-5 inline-flex items-center gap-1.5 text-xs text-ink-400 group-hover:text-ink-100 transition-colors">
+                  {lang === 'fr' ? 'En savoir plus' : 'Learn more'}
+                  <Icon name="arrow-right" size={12} />
+                </span>
+              </div>
+            </Card>
+          </button>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {requestTypes.map((r) => (
+    <Modal id={r.id} title={r.title} subtitle={r.desc} size="md">
+      <p class="text-base text-ink-200 leading-relaxed">{r.detail}</p>
+      <ul class="mt-6 space-y-2.5">
+        {r.bullets.map((b) => (
+          <li class="flex items-start gap-2.5 text-small text-ink-100">
+            <Icon name="check" size={14} class:list={[
+              'mt-1 shrink-0',
+              r.accent === 'teal' && 'text-teal-400',
+              r.accent === 'coral' && 'text-coral-400',
+              r.accent === 'amber' && 'text-amber-400',
+            ]} />
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+      <div class="mt-8">
+        <Button href="#contact-form" variant="primary" icon="arrow-right">
+          {lang === 'fr' ? 'Aller au formulaire' : 'Go to the form'}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  <SectionDivider variant="icon" icon="send" />
+
+  {/* === Formulaire + aside === */}
+  <Section id="contact-form">
     <div class="grid lg:grid-cols-[2fr_1fr] gap-8">
-      {/* === Formulaire dans une Card === */}
+      {/* Formulaire dans une Card */}
       <div class="reveal">
         <Card>
           <div class="p-8 md:p-10">
@@ -78,7 +193,7 @@ const quickLinks = [
         </Card>
       </div>
 
-      {/* === Aside : 3 cards distinctes empilées === */}
+      {/* Aside : cards empilées */}
       <aside class="space-y-6">
         {asideBlocks.map((block, i) => (
           <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
@@ -116,6 +231,36 @@ const quickLinks = [
           </Card>
         </div>
       </aside>
+    </div>
+  </Section>
+
+  <SectionDivider />
+
+  {/* === Réassurance — 3 cards finales === */}
+  <Section
+    title={lang === 'fr' ? 'Ce que vous pouvez attendre' : 'What you can expect'}
+    surface="muted"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {[
+        { icon: 'check', title: lang === 'fr' ? 'Réponse sous 48h' : 'Reply within 48h', desc: lang === 'fr' ? 'Première lecture par un ingénieur, pas un commercial.' : 'First read by an engineer, not a sales rep.' },
+        { icon: 'lock-keyhole', title: lang === 'fr' ? 'NDA possible' : 'NDA available', desc: lang === 'fr' ? 'NDA standard signé avant tout échange de fichiers sensibles.' : 'Standard NDA signed before any sensitive file exchange.' },
+        { icon: 'shield-check', title: lang === 'fr' ? 'Sans engagement' : 'No commitment', desc: lang === 'fr' ? 'Cadrage et estimation gratuits, pas de relance commerciale agressive.' : 'Free scoping and estimate, no aggressive sales follow-up.' },
+      ].map((p, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <Card class="h-full">
+            <div class="p-6 flex items-start gap-4">
+              <div class="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-teal-500/10 ring-1 ring-teal-400/30 text-teal-300 shrink-0">
+                <Icon name={p.icon} size={20} />
+              </div>
+              <div>
+                <h3 class="text-h4 font-semibold text-ink-50 mb-1 tracking-tight">{p.title}</h3>
+                <p class="text-small text-ink-300 leading-relaxed">{p.desc}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      ))}
     </div>
   </Section>
 </BaseLayout>

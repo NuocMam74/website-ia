@@ -1,0 +1,290 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import Modal from '~/components/ui/Modal.astro';
+import FAQAccordion from '~/components/sections/FAQAccordion.astro';
+import CTASection from '~/components/sections/CTASection.astro';
+import ROICalculator from '~/components/islands/ROICalculator.tsx';
+import { t, localizeUrl, type Lang } from '~/lib/i18n';
+
+const lang: Lang = (Astro.url.pathname.startsWith('/en')) ? 'en' : 'fr';
+
+const plans = [
+  {
+    id: 'plan-templates',
+    name: lang === 'fr' ? 'Templates' : 'Templates',
+    family: 'templates' as const,
+    icon: 'file-text',
+    priceFrom: 199,
+    priceUnit: lang === 'fr' ? 'à partir de' : 'from',
+    priceSuffix: '€',
+    tagline: lang === 'fr' ? 'Achat direct, livraison immédiate' : 'Direct purchase, instant delivery',
+    features: lang === 'fr'
+      ? ['Packs ASPICE / ISO 26262 / ISO 21434', 'Templates Polarion / Jira / Excel', 'Procédures + exemples remplis', 'Mises à jour 12 mois', 'Licence interne illimitée']
+      : ['ASPICE / ISO 26262 / ISO 21434 packs', 'Polarion / Jira / Excel templates', 'Procedures + filled examples', '12-month updates', 'Unlimited internal license'],
+    cta: lang === 'fr' ? 'Voir le catalogue' : 'View catalog',
+    href: localizeUrl('/templates', lang),
+    detail: lang === 'fr'
+      ? 'Tous nos packs sont disponibles en achat direct sur le site, avec paiement Stripe sécurisé. Vous recevez l’archive par e-mail dans les 5 minutes. La licence couvre l’usage interne illimité pour votre entreprise.'
+      : 'All our packs are available for direct purchase on the site, with secure Stripe payment. You receive the archive by email within 5 minutes. The license covers unlimited internal use for your company.',
+  },
+  {
+    id: 'plan-projects',
+    name: lang === 'fr' ? 'Projets sur-mesure' : 'Custom projects',
+    family: 'solutions' as const,
+    icon: 'wrench',
+    priceFrom: 25000,
+    priceUnit: lang === 'fr' ? 'à partir de' : 'from',
+    priceSuffix: '€',
+    tagline: lang === 'fr' ? 'Cadrage + POC + industrialisation' : 'Scoping + POC + industrialisation',
+    features: lang === 'fr'
+      ? ['Cadrage chiffré (1-3 jours)', 'POC frugal 2-6 semaines', 'Industrialisation maîtrisée', 'Code source vous appartient', 'Maintenance évolutive optionnelle']
+      : ['Costed scoping (1-3 days)', 'Frugal POC 2-6 weeks', 'Controlled industrialisation', 'You own the source code', 'Optional ongoing maintenance'],
+    cta: t(lang, 'cta.contact'),
+    href: localizeUrl('/contact?type=projet', lang),
+    highlight: true,
+    detail: lang === 'fr'
+      ? 'Un projet sur-mesure démarre par un cadrage court (1 à 3 jours) qui aboutit à une note chiffrée. Pour la majorité des projets, le budget se situe entre 25k€ (POC ciblé) et 250k€ (plateforme complète avec intégrations). Code source vous appartient à 100%.'
+      : 'A custom project starts with a short scoping (1-3 days) leading to a costed note. For most projects, the budget sits between €25k (targeted POC) and €250k (full platform with integrations). You own the source code 100%.',
+  },
+  {
+    id: 'plan-ia',
+    name: lang === 'fr' ? 'Agent IA' : 'AI Agent',
+    family: 'ia' as const,
+    icon: 'bot',
+    priceFrom: 1500,
+    priceUnit: lang === 'fr' ? 'à partir de' : 'from',
+    priceSuffix: '€/mois',
+    tagline: lang === 'fr' ? 'Agent + hosting + monitoring' : 'Agent + hosting + monitoring',
+    features: lang === 'fr'
+      ? ['Agent métier configuré', 'Hosting cloud souverain', 'Monitoring & observabilité', 'Mises à jour modèles', 'Support sous 24h ouvrées']
+      : ['Configured business agent', 'Sovereign cloud hosting', 'Monitoring & observability', 'Model updates', 'Support within 24 business hours'],
+    cta: t(lang, 'cta.demo'),
+    href: localizeUrl('/contact?type=demo', lang),
+    detail: lang === 'fr'
+      ? 'Forfait mensuel incluant l’agent configuré pour votre cas, le hosting sur cloud souverain (OVH / Scaleway), le monitoring, les mises à jour modèles et le support. Setup unique en sus selon complexité (5k€ à 30k€). Option on-premise sur devis.'
+      : 'Monthly plan including the agent configured for your case, sovereign cloud hosting (OVH / Scaleway), monitoring, model updates, and support. One-time setup billed separately based on complexity (€5k to €30k). On-premise option on quote.',
+  },
+];
+
+const includedAll = [
+  { icon: 'shield-check', label: lang === 'fr' ? 'Confidentialité par défaut' : 'Privacy by default' },
+  { icon: 'lock-keyhole', label: lang === 'fr' ? 'NDA signé avant échange' : 'NDA before any exchange' },
+  { icon: 'check', label: lang === 'fr' ? 'Pas de relance commerciale' : 'No sales pressure' },
+  { icon: 'history', label: lang === 'fr' ? 'Revue annuelle gratuite' : 'Free annual review' },
+];
+
+const pricingFaq = [
+  {
+    question: lang === 'fr' ? 'Le cadrage est-il payant ?' : 'Is the scoping paid?',
+    answer: lang === 'fr'
+      ? 'Le premier échange (30 à 45 minutes) est toujours gratuit. Si nous avançons sur un cadrage formel (1 à 3 jours d’atelier + livrable), un forfait fixe de 2 500 à 4 500 € est facturé, déduit du projet si vous nous le confiez.'
+      : 'The first call (30-45 minutes) is always free. If we move to a formal scoping (1-3 days of workshop + deliverable), a fixed €2,500-€4,500 fee applies, deducted from the project if you award it to us.',
+  },
+  {
+    question: lang === 'fr' ? 'Le code source nous appartient-il ?' : 'Do we own the source code?',
+    answer: lang === 'fr'
+      ? 'Oui, à 100 %. Sauf mention explicite (briques internes mutualisées), l’ensemble du code livré devient votre propriété intellectuelle à la facture finale.'
+      : 'Yes, 100%. Unless explicitly mentioned (shared internal building blocks), all delivered code becomes your IP at final invoice.',
+  },
+  {
+    question: lang === 'fr' ? 'Y a-t-il une grille tarifaire détaillée ?' : 'Is there a detailed price list?',
+    answer: lang === 'fr'
+      ? 'Pas pour les projets sur-mesure : chaque cas est différent. Nous avons par contre des taux journaliers publics (TJM ingénieur senior : 950 €, architecte : 1 250 €, expert IA : 1 350 €) communiqués sur demande.'
+      : 'Not for custom projects: each case is different. We do have public daily rates (senior engineer: €950, architect: €1,250, AI expert: €1,350) shared on request.',
+  },
+  {
+    question: lang === 'fr' ? 'On-premise vs cloud, quel impact prix ?' : 'On-premise vs cloud, what price impact?',
+    answer: lang === 'fr'
+      ? 'L’on-premise n’ajoute pas de licence — vous payez votre propre infra. Comptez un setup +20 à 40 % et un maintenance OPS +500 à 1 500 €/mois selon scope.'
+      : 'On-premise adds no license — you pay your own infra. Count a +20-40% setup and a +€500-€1,500/month ops maintenance depending on scope.',
+  },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/tarifs"
+  title={lang === 'fr' ? 'Tarifs & investissement' : 'Pricing & investment'}
+  description={lang === 'fr'
+    ? 'Trois grilles : templates en achat direct, projets sur-mesure, agents IA en forfait mensuel. Transparence sur les ordres de grandeur.'
+    : 'Three pricing tiers: templates for direct purchase, custom projects, monthly AI agent plans. Transparent ballpark figures.'}
+>
+  <Hero
+    variant="page"
+    kicker={lang === 'fr' ? 'Tarifs' : 'Pricing'}
+    title={lang === 'fr' ? 'Ce que ça coûte, en toute transparence' : 'What it costs, transparently'}
+    subtitle={lang === 'fr'
+      ? 'Trois modes d’engagement, des ordres de grandeur clairs. Pas de prix cachés, pas de licences récurrentes obscures.'
+      : 'Three engagement modes, clear ballpark figures. No hidden prices, no obscure recurring licenses.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact', lang)}
+  />
+
+  <SectionDivider />
+
+  {/* === 3 plans === */}
+  <Section
+    title={lang === 'fr' ? 'Trois modes d’engagement' : 'Three engagement modes'}
+    subtitle={lang === 'fr'
+      ? 'Achat direct, projet sur-mesure ou forfait mensuel. Cliquez pour voir les détails.'
+      : 'Direct purchase, custom project, or monthly plan. Click for details.'}
+  >
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {plans.map((plan, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
+          <Card class:list={['h-full', plan.highlight && 'ring-1 ring-teal-400/40']} accent={plan.family} interactive spotlight>
+            <div class="p-7 h-full flex flex-col">
+              {plan.highlight && (
+                <span class="inline-flex self-start items-center gap-1.5 px-2.5 py-0.5 mb-4 rounded-full bg-teal-400/15 text-teal-300 text-[10px] uppercase tracking-wider ring-1 ring-teal-400/30">
+                  <Icon name="sparkles" size={10} />
+                  {lang === 'fr' ? 'Le plus demandé' : 'Most popular'}
+                </span>
+              )}
+              <div
+                class:list={[
+                  'inline-flex items-center justify-center w-12 h-12 rounded-lg mb-5 ring-1',
+                  plan.family === 'solutions' && 'bg-gradient-to-br from-teal-400/30 to-teal-600/20 text-teal-200 ring-teal-400/30',
+                  plan.family === 'ia' && 'bg-gradient-to-br from-coral-400/30 to-coral-600/20 text-coral-200 ring-coral-400/30',
+                  plan.family === 'templates' && 'bg-gradient-to-br from-amber-400/30 to-amber-600/20 text-amber-200 ring-amber-400/30',
+                ]}
+              >
+                <Icon name={plan.icon} size={22} />
+              </div>
+              <h3 class="text-h3 font-semibold text-ink-50 mb-1 tracking-tight">{plan.name}</h3>
+              <p class="text-small text-ink-400 mb-5">{plan.tagline}</p>
+
+              <div class="mb-6">
+                <span class="text-xs uppercase tracking-wider text-ink-400">{plan.priceUnit}</span>
+                <div class="flex items-baseline gap-1 mt-1">
+                  <span class="text-display font-semibold text-ink-50 tracking-tight tabular-nums">{plan.priceFrom.toLocaleString('fr-FR')}</span>
+                  <span class="text-h3 text-ink-300">{plan.priceSuffix}</span>
+                </div>
+              </div>
+
+              <ul class="space-y-2.5 flex-1 mb-6">
+                {plan.features.map((f) => (
+                  <li class="flex items-start gap-2.5 text-small text-ink-200">
+                    <Icon name="check" size={14} class:list={[
+                      'mt-1 shrink-0',
+                      plan.family === 'solutions' && 'text-teal-400',
+                      plan.family === 'ia' && 'text-coral-400',
+                      plan.family === 'templates' && 'text-amber-400',
+                    ]} />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div class="flex flex-col gap-2 mt-auto">
+                <Button href={plan.href} variant="primary" family={plan.family} icon="arrow-right">
+                  {plan.cta}
+                </Button>
+                <button
+                  type="button"
+                  data-modal-target={plan.id}
+                  class="text-xs text-ink-400 hover:text-ink-100 transition-colors py-1.5"
+                >
+                  {lang === 'fr' ? 'Voir le détail tarifaire' : 'See pricing details'}
+                </button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {plans.map((plan) => (
+    <Modal id={plan.id} family={plan.family} title={plan.name} subtitle={plan.tagline} size="lg">
+      <p class="text-base text-ink-200 leading-relaxed">{plan.detail}</p>
+      <ul class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {plan.features.map((f) => (
+          <li class="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-ink-950/60 border border-ink-800">
+            <Icon name="check" size={14} class:list={[
+              'mt-1 shrink-0',
+              plan.family === 'solutions' && 'text-teal-400',
+              plan.family === 'ia' && 'text-coral-400',
+              plan.family === 'templates' && 'text-amber-400',
+            ]} />
+            <span class="text-small text-ink-100">{f}</span>
+          </li>
+        ))}
+      </ul>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <Button href={plan.href} variant="primary" family={plan.family} icon="arrow-right">
+          {plan.cta}
+        </Button>
+        <Button href={localizeUrl('/contact', lang)} variant="ghost">
+          {t(lang, 'cta.contact')}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  <SectionDivider variant="icon" icon="shield-check" />
+
+  {/* === Inclus dans tous nos engagements === */}
+  <Section
+    title={lang === 'fr' ? 'Inclus dans tous nos engagements' : 'Included in every engagement'}
+    surface="muted"
+  >
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {includedAll.map((it, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 70}ms`}>
+          <Card class="h-full">
+            <div class="p-5 flex items-center gap-3">
+              <div class="inline-flex items-center justify-center w-10 h-10 rounded-md bg-teal-500/10 ring-1 ring-teal-400/30 text-teal-300 shrink-0">
+                <Icon name={it.icon} size={18} />
+              </div>
+              <span class="text-small font-medium text-ink-100 leading-snug">{it.label}</span>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider variant="icon" icon="gauge" />
+
+  {/* === ROI Calculator === */}
+  <Section
+    title={lang === 'fr' ? 'Combien ça vous rapporte ?' : 'How much do you save?'}
+    subtitle={lang === 'fr'
+      ? 'Estimation indicative — pas un devis. Ajustez les curseurs pour votre contexte.'
+      : 'Indicative estimate — not a quote. Tune the sliders for your context.'}
+  >
+    <div class="reveal">
+      <ROICalculator client:visible lang={lang} />
+    </div>
+  </Section>
+
+  <SectionDivider />
+
+  {/* === FAQ tarifaire === */}
+  <Section
+    title={lang === 'fr' ? 'Questions sur les tarifs' : 'Pricing questions'}
+  >
+    <div class="max-w-3xl reveal">
+      <FAQAccordion items={pricingFaq} />
+    </div>
+  </Section>
+
+  <SectionDivider />
+
+  <CTASection
+    title={lang === 'fr' ? 'Besoin d’un chiffrage précis ?' : 'Need a precise quote?'}
+    subtitle={lang === 'fr'
+      ? 'Un cadrage court suffit à produire une note chiffrée fiable. Premier échange gratuit.'
+      : 'A short scoping is enough to produce a reliable costed note. First call free.'}
+    ctaLabel={t(lang, 'cta.contact')}
+    ctaHref={localizeUrl('/contact?type=projet', lang)}
+    secondaryCtaLabel={lang === 'fr' ? 'Voir les références' : 'See references'}
+    secondaryCtaHref={localizeUrl('/references', lang)}
+  />
+</BaseLayout>

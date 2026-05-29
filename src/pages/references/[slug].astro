@@ -8,6 +8,7 @@ import Card from '~/components/ui/Card.astro';
 import CTASection from '~/components/sections/CTASection.astro';
 import Chip from '~/components/ui/Chip.astro';
 import Icon from '~/components/ui/Icon.astro';
+import ShareButtons from '~/components/ui/ShareButtons.astro';
 import DashboardCard from '~/components/mockups/DashboardCard.astro';
 import { breadcrumbLd, canonicalUrl } from '~/lib/seo';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
@@ -172,6 +173,10 @@ const url = canonicalUrl(`/references/${entry.id}`, lang);
         </li>
       ))}
     </ol>
+
+    <div class="mt-12 pt-8 border-t border-ink-800 flex justify-center">
+      <ShareButtons url={url} title={entry.data.title} lang={lang} />
+    </div>
   </Section>
 
   <CTASection

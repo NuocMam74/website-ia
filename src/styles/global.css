@@ -7,18 +7,18 @@
    gradient mesh). Sérieux d'ingénierie + qualité perçue élevée.
    ================================================================ */
 @theme {
-  /* === Neutres (échelle inversée → ink-50 = clair, ink-950 = fond) === */
+  /* === Neutres dark — base profonde + cartes surélevées (style Linear) === */
   --color-ink-50:  #FAFAFC; /* texte principal */
   --color-ink-100: #E4E4EA; /* texte secondaire fort */
   --color-ink-200: #C2C2CC; /* texte secondaire */
   --color-ink-300: #9999A4;
   --color-ink-400: #74747F; /* texte muted */
   --color-ink-500: #5C5C66;
-  --color-ink-600: #44444D; /* dividers visibles */
-  --color-ink-700: #2E2F3A; /* borders fortes */
-  --color-ink-800: #1F2029; /* borders subtiles */
-  --color-ink-900: #161821; /* surface cartes */
-  --color-ink-950: #0E1118; /* fond de page (slate-bleu, moins dur que le noir) */
+  --color-ink-600: #4A4D58; /* dividers visibles */
+  --color-ink-700: #363944; /* borders fortes */
+  --color-ink-800: #25282F; /* borders subtiles */
+  --color-ink-900: #1B1D24; /* surface cartes */
+  --color-ink-950: #0B0D12; /* fond de page (presque noir, premium) */
 
   /* === Solutions : cyan électrique === */
   --color-teal-50:  #E6FCFF;
@@ -87,15 +87,15 @@
 }
 
 /* ================================================================
-   Tokens sémantiques (faciles à overrider pour un futur mode clair)
+   Tokens sémantiques (faciles à overrider pour le mode clair)
    ================================================================ */
 :root {
   color-scheme: dark;
 
   --surface-page:   var(--color-ink-950);
   --surface-card:   var(--color-ink-900);
-  --surface-muted:  #0F0F14;
-  --surface-elevated: #1A1A22;
+  --surface-muted:  #15181F; /* légèrement + sombre que la page */
+  --surface-elevated: #262A35; /* + clair que les cartes */
 
   --text-primary:   var(--color-ink-50);
   --text-secondary: var(--color-ink-200);
@@ -113,6 +113,130 @@
   --accent-templates-glow:   rgba(255, 176, 0, 0.20);
 
   --grain: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.015 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+
+  /* Tokens d'effets variables selon thème */
+  --glass-bg: rgba(24, 27, 37, 0.78); /* aligné sur le nouveau ink-950 */
+  --grid-color: rgba(255, 255, 255, 0.045);
+  --dots-color: rgba(255, 255, 255, 0.07);
+  --card-shadow: 0 1px 0 0 rgba(255,255,255,0.05) inset, 0 0 0 1px rgba(255,255,255,0.05), 0 24px 48px -16px rgba(0,0,0,0.55);
+  --gradient-cyan-end: #FFFFFF;
+  --spotlight-color: rgba(255, 255, 255, 0.09);
+}
+
+/* ================================================================
+   Mode clair — palette pro engineering (cool slate + blueprint subtil)
+   Inspirée des dashboards techniques B2B (Linear-light, Stripe).
+   ================================================================ */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* Échelle neutre : cool slate (légère teinte bleutée) */
+  --color-ink-50:  #0F172A; /* texte principal — slate-900 */
+  --color-ink-100: #1E293B; /* secondaire fort — slate-800 */
+  --color-ink-200: #334155; /* secondaire — slate-700 */
+  --color-ink-300: #475569; /* slate-600 */
+  --color-ink-400: #64748B; /* muted — slate-500 */
+  --color-ink-500: #94A3B8; /* slate-400 */
+  --color-ink-600: #CBD5E1; /* dividers — slate-300 */
+  --color-ink-700: #D8DEE7; /* borders fortes */
+  --color-ink-800: #E4E9F0; /* borders subtiles */
+  --color-ink-900: #FFFFFF; /* surface cartes (blanc pur) */
+  --color-ink-950: #F7F8FB; /* fond de page (off-white propre) */
+
+  /* Accents 100-300 : versions sombres pour LISIBILITÉ sur fond clair.
+     Les utilitaires `text-teal-200`, `text-coral-200`, `text-amber-200` etc.
+     deviennent des teintes foncées qui passent sur blanc/F4F6FA. */
+  --color-teal-50:  #ECFEFF; /* tint de fond pour badges */
+  --color-teal-100: #006A7D; /* dark teal */
+  --color-teal-200: #006A7D;
+  --color-teal-300: #008FA8;
+
+  --color-coral-50:  #FFF1F7;
+  --color-coral-100: #8A0F3F;
+  --color-coral-200: #8A0F3F;
+  --color-coral-300: #B81654;
+
+  --color-amber-50:  #FFF8E5;
+  --color-amber-100: #8A5C00;
+  --color-amber-200: #8A5C00;
+  --color-amber-300: #B87B00;
+
+  /* Surfaces sémantiques */
+  --surface-page:    var(--color-ink-950);
+  --surface-card:    var(--color-ink-900);
+  --surface-muted:   #EEF1F6; /* + sombre que la page, pour les sections muted */
+  --surface-elevated: #FFFFFF;
+
+  --text-primary:   var(--color-ink-50);
+  --text-secondary: var(--color-ink-200);
+  --text-muted:     var(--color-ink-400);
+
+  --border-default: var(--color-ink-800);
+  --border-strong:  #CBD5E1;
+  --border-subtle:  rgba(15, 23, 42, 0.06);
+
+  /* Accents primaires (CTA / liens) — un cran + saturés en clair pour le contraste */
+  --accent-solutions:        #008FA8;
+  --accent-ia:               #B81654;
+  --accent-templates:        #B87B00;
+
+  /* Tokens d'effets — adaptés au fond clair */
+  --glass-bg: rgba(244, 246, 250, 0.82);
+  --grid-color: rgba(15, 23, 42, 0.045);
+  --dots-color: rgba(15, 23, 42, 0.07);
+  --card-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 0 0 1px rgba(15, 23, 42, 0.04),
+    0 12px 32px -12px rgba(15, 23, 42, 0.12);
+  --gradient-cyan-end: #0E1118;
+  --spotlight-color: rgba(15, 23, 42, 0.05);
+  --mesh-opacity: 0.06;
+
+  --grain: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.015 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ============================================================
+   AURORA GRADIENT MESH — fond unifié pour les deux thèmes
+   Inspiré Stripe / Linear : 3 blobs colorés très diffus posés
+   sur la surface de la page. Position fixe, pas de scroll.
+   Les intensités s'adaptent au thème via les variables --aurora-*.
+   ============================================================ */
+:root {
+  --aurora-1: rgba(0, 217, 255, 0.18); /* teal — top-right */
+  --aurora-2: rgba(255, 61, 127, 0.12); /* coral — bottom-left */
+  --aurora-3: rgba(255, 176, 0, 0.08);  /* amber — middle */
+}
+:root[data-theme='light'] {
+  --aurora-1: rgba(0, 217, 255, 0.20);
+  --aurora-2: rgba(255, 61, 127, 0.13);
+  --aurora-3: rgba(255, 176, 0, 0.10);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 1100px 700px at 90% 0%, var(--aurora-1), transparent 55%),
+    radial-gradient(ellipse 900px 700px at 5% 100%, var(--aurora-2), transparent 55%),
+    radial-gradient(ellipse 800px 600px at 50% 50%, var(--aurora-3), transparent 65%);
+  filter: blur(30px);
+}
+
+/* Grain très subtil sur l'ensemble du body — ajoute de la profondeur
+   premium sans bruit visible. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: 200px 200px;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
 }
 
 /* ================================================================
@@ -187,27 +311,30 @@
    Utilities sur mesure : motifs, animations, gradient mesh
    ================================================================ */
 @layer utilities {
-  /* Grille blueprint en fond de hero */
+  /* Grille blueprint en fond de hero (s'adapte au thème) */
   .bg-blueprint {
     background-image:
-      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
     background-size: 56px 56px;
     background-position: -1px -1px;
   }
 
-  /* Pointillés style schéma technique */
+  /* Pointillés style schéma technique (s'adapte au thème) */
   .bg-dots {
-    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-image: radial-gradient(var(--dots-color) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
-  /* Gradient mesh discret, signature visuelle du site */
+  /* Gradient mesh discret, signature visuelle du site (l'opacité s'adapte au thème) */
   .bg-mesh {
     background-image:
-      radial-gradient(at 20% 20%, rgba(0, 217, 255, 0.10) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, rgba(255, 61, 127, 0.08) 0px, transparent 50%),
-      radial-gradient(at 70% 80%, rgba(255, 176, 0, 0.08) 0px, transparent 50%);
+      radial-gradient(at 20% 20%, rgba(0, 217, 255, var(--mesh-opacity, 0.10)) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(255, 61, 127, var(--mesh-opacity, 0.08)) 0px, transparent 50%),
+      radial-gradient(at 70% 80%, rgba(255, 176, 0, var(--mesh-opacity, 0.08)) 0px, transparent 50%);
+  }
+  :root[data-theme='light'] .bg-mesh {
+    --mesh-opacity: 0.08;
   }
 
   /* Glow par famille — utilisé sur les CTA primaires et boutons */
@@ -215,16 +342,17 @@
   .glow-coral { box-shadow: 0 0 0 1px rgba(255,61,127,0.3), 0 8px 32px -8px rgba(255,61,127,0.4); }
   .glow-amber { box-shadow: 0 0 0 1px rgba(255,176,0,0.3), 0 8px 32px -8px rgba(255,176,0,0.4); }
 
-  /* Effet glass utilisé pour le header sticky et les modales */
+  /* Effet glass utilisé pour le header sticky et les modales (s'adapte au thème) */
   .glass {
-    background-color: rgba(9, 9, 13, 0.72);
+    background-color: var(--glass-bg);
     backdrop-filter: blur(12px) saturate(140%);
     -webkit-backdrop-filter: blur(12px) saturate(140%);
   }
 
-  /* Gradient text — pour des accents typographiques sur le hero */
+  /* Gradient text — pour des accents typographiques sur le hero
+     (le 3e stop suit le thème pour rester lisible) */
   .text-gradient-cyan {
-    background: linear-gradient(135deg, #00D9FF 0%, #66E5FF 50%, #FFFFFF 100%);
+    background: linear-gradient(135deg, #00D9FF 0%, #66E5FF 50%, var(--gradient-cyan-end) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -236,12 +364,9 @@
     color: transparent;
   }
 
-  /* Card avec ombre et bordure dégradée par famille */
+  /* Card avec ombre et bordure dégradée (s'adapte au thème) */
   .card-shadow {
-    box-shadow:
-      0 1px 0 0 rgba(255,255,255,0.04) inset,
-      0 0 0 1px rgba(255,255,255,0.04),
-      0 24px 48px -16px rgba(0,0,0,0.6);
+    box-shadow: var(--card-shadow);
   }
 
   /* Hover-lift réutilisable */
@@ -280,7 +405,7 @@
     border-radius: inherit;
     background: radial-gradient(
       320px circle at var(--mx, 50%) var(--my, 50%),
-      rgba(255, 255, 255, 0.08),
+      var(--spotlight-color),
       transparent 40%
     );
     opacity: 0;
@@ -391,4 +516,44 @@
   .marquee-track { animation: none; }
   ::view-transition-old(root),
   ::view-transition-new(root) { animation: none; }
+}
+
+/* ================================================================
+   Print : page lisible et économe en encre (cas clients, articles)
+   ================================================================ */
+@media print {
+  :root {
+    color-scheme: light;
+    --color-ink-50: #111;
+    --color-ink-100: #1F1F1F;
+    --color-ink-200: #2E2E2E;
+    --color-ink-300: #4A4A4A;
+    --color-ink-400: #666;
+    --color-ink-500: #777;
+    --color-ink-600: #999;
+    --color-ink-700: #BBB;
+    --color-ink-800: #DDD;
+    --color-ink-900: #FFF;
+    --color-ink-950: #FFF;
+  }
+  body { background: #fff !important; color: #111 !important; }
+  /* Cacher la chrome inutile à l'impression */
+  header[transition\:persist],
+  footer,
+  .cmdk-panel,
+  dialog[data-modal],
+  .marquee,
+  .reveal { opacity: 1 !important; transform: none !important; }
+  header, footer, [data-modal-target], [aria-label="Préférences cookies"] { display: none !important; }
+
+  a { color: inherit; text-decoration: underline; }
+  a[href]::after { content: ' (' attr(href) ')'; font-size: 0.85em; color: #555; }
+  /* Pas d'URL après les ancres de page */
+  a[href^="#"]::after, a[href^="javascript:"]::after { content: ''; }
+
+  .card-shadow, .glass { box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: #fff !important; }
+  .bg-blueprint, .bg-dots, .bg-mesh { background-image: none !important; }
+
+  h1, h2, h3 { page-break-after: avoid; }
+  img, table, pre { page-break-inside: avoid; }
 }

@@ -3,8 +3,14 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/Hero.astro';
 import Section from '~/components/ui/Section.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Card from '~/components/ui/Card.astro';
+import Icon from '~/components/ui/Icon.astro';
+import Button from '~/components/ui/Button.astro';
+import Modal from '~/components/ui/Modal.astro';
 import OfferCard from '~/components/cards/OfferCard.astro';
 import EmptyState from '~/components/ui/EmptyState.astro';
+import CTASection from '~/components/sections/CTASection.astro';
 import LayeredFilters from '~/components/islands/LayeredFilters.tsx';
 import { t, localizeUrl, type Lang } from '~/lib/i18n';
 import { CAPABILITIES } from '~/content.config';
@@ -15,23 +21,18 @@ const products = (await getCollection('aiProducts')).sort(
   (a, b) => a.data.order - b.data.order,
 );
 
-/* Mapping use cases → tags normalisés (utilisés pour le sous-filtre) */
 const useCaseTags: Record<string, string> = {
-  // Knowledge / docs
   'Veille normative': 'knowledge',
   'Capitalisation': 'knowledge',
   'Analyse documentaire': 'knowledge',
   'Recherche de procédure': 'knowledge',
   'Support interne': 'support',
   'Onboarding': 'support',
-  // Automation
   'Génération de dossiers': 'automation',
   'Automatisation de process': 'automation',
   'Contrôles croisés': 'automation',
-  // Création
   'Rédaction de livrables': 'creation',
   'Préparation de revues': 'creation',
-  // Compliance (cas spécifique)
   'Analyse de conformité': 'compliance',
 };
 
@@ -47,8 +48,6 @@ const primaryOptions = [
   })),
 ];
 
-/* Pour chaque cas d'usage normalisé, on calcule les capacités où il est
- * présent → permet au sous-filtre de se restreindre dynamiquement. */
 const useCaseCapabilityMap = new Map<string, Set<string>>();
 products.forEach((p) => {
   const tags = normalizeUseCases(p.data.useCases);
@@ -69,6 +68,86 @@ const secondaryOptions = [
       label: t(lang, `usecase.${k}`),
       domains: Array.from(useCaseCapabilityMap.get(k) ?? []),
     })),
+];
+
+/* Capacités IA — cards cliquables avec modales détaillées */
+const capabilities = [
+  {
+    id: 'cap-agents',
+    icon: 'bot',
+    title: lang === 'fr' ? 'Agents métier' : 'Business agents',
+    desc: lang === 'fr'
+      ? 'Des agents IA spécialisés par rôle, avec leurs outils, leur mémoire et leurs garde-fous.'
+      : 'AI agents specialised by role, with their tools, memory and guardrails.',
+    features: lang === 'fr' ? ['Skills personnalisés', 'Mémoire long-terme', 'Outils MCP/API', 'Garde-fous'] : ['Custom skills', 'Long-term memory', 'MCP/API tools', 'Guardrails'],
+    detail: lang === 'fr'
+      ? 'Un agent métier dispose d’un rôle clair, d’outils qu’il sait utiliser (recherche, calcul, écriture de fichiers, appels API), et d’une mémoire long-terme pour personnaliser ses réponses au fil des conversations. Chaque action est tracée et auditable, avec des garde-fous pour empêcher les sorties de cadre.'
+      : 'A business agent has a clear role, tools it knows how to use (search, computation, file writing, API calls), and a long-term memory to personalise answers across conversations. Every action is traced and auditable, with guardrails to prevent off-scope behaviour.',
+  },
+  {
+    id: 'cap-rag',
+    icon: 'file-search',
+    title: lang === 'fr' ? 'RAG documentaire' : 'Document RAG',
+    desc: lang === 'fr'
+      ? 'Recherche sémantique sur vos corpus volumineux, avec réponses sourcées.'
+      : 'Semantic search on large corpora, with grounded answers.',
+    features: ['pgvector / Qdrant', lang === 'fr' ? 'Citations exactes' : 'Exact citations', 'On-premise OK', lang === 'fr' ? 'Recherche hybride' : 'Hybrid search'],
+    detail: lang === 'fr'
+      ? 'Indexation de vos documents (PDF, Word, Confluence, SharePoint), recherche hybride (vectorielle + lexicale), réponses LLM grounded sur les passages retrouvés, citations cliquables. Tout reste dans votre périmètre — pas d’envoi vers un fournisseur tiers.'
+      : 'Index your documents (PDF, Word, Confluence, SharePoint), hybrid search (vector + lexical), LLM answers grounded on retrieved passages, clickable citations. Everything stays in your perimeter — no third-party transmission.',
+  },
+  {
+    id: 'cap-orchestration',
+    icon: 'network',
+    title: lang === 'fr' ? 'Orchestration multi-agents' : 'Multi-agent orchestration',
+    desc: lang === 'fr'
+      ? 'Plusieurs agents qui collaborent sur des workflows complexes.'
+      : 'Multiple agents collaborating on complex workflows.',
+    features: ['LangGraph', 'Temporal', lang === 'fr' ? 'Retry & rollback' : 'Retry & rollback', lang === 'fr' ? 'Validation humaine' : 'Human-in-the-loop'],
+    detail: lang === 'fr'
+      ? 'Un workflow complexe (analyse, rédaction, revue, validation) est décomposé en agents spécialisés qui collaborent via un orchestrateur. Reprise sur erreur, contrôles intermédiaires, validation humaine quand c’est nécessaire — le tout observable de bout en bout.'
+      : 'A complex workflow (analysis, drafting, review, validation) is decomposed into specialised agents collaborating through an orchestrator. Error recovery, intermediate checks, human validation where needed — all end-to-end observable.',
+  },
+  {
+    id: 'cap-private',
+    icon: 'sparkles',
+    title: lang === 'fr' ? 'Modèles privés' : 'Private models',
+    desc: lang === 'fr'
+      ? 'Modèles open-source self-hosted, ou clouds privés. Vos données ne sortent pas.'
+      : 'Self-hosted open-source models, or private clouds. Your data stays in.',
+    features: ['Llama 3', 'Mistral', 'vLLM / Ollama', lang === 'fr' ? 'Cloud souverain' : 'Sovereign cloud'],
+    detail: lang === 'fr'
+      ? 'Déploiement on-premise ou cloud souverain (OVH, Scaleway, Outscale). Modèles open-source servis avec vLLM ou Ollama, monitoring, scaling automatique. Coût maîtrisé, conformité simplifiée, pas de dépendance à un fournisseur unique.'
+      : 'On-premise or sovereign cloud (OVH, Scaleway, Outscale) deployment. Open-source models served with vLLM or Ollama, monitoring, automatic scaling. Controlled costs, simplified compliance, no single-vendor lock-in.',
+  },
+];
+
+/* Cas d'usage IA — cards transverses */
+const useCases = [
+  {
+    icon: 'file-search',
+    accent: 'coral',
+    title: lang === 'fr' ? 'Recherche documentaire' : 'Document search',
+    desc: lang === 'fr' ? 'Poser une question, obtenir une réponse sourcée sur 10 000 docs.' : 'Ask a question, get a grounded answer over 10,000 docs.',
+  },
+  {
+    icon: 'clipboard-list',
+    accent: 'coral',
+    title: lang === 'fr' ? 'Génération de dossiers' : 'Document generation',
+    desc: lang === 'fr' ? 'Brouillons de livrables conformes à partir de votre référentiel.' : 'Draft deliverables compliant with your reference base.',
+  },
+  {
+    icon: 'message-square-text',
+    accent: 'coral',
+    title: lang === 'fr' ? 'Support interne' : 'Internal support',
+    desc: lang === 'fr' ? 'Chatbot qui répond aux questions répétitives des équipes.' : 'Chatbot answering repetitive team questions.',
+  },
+  {
+    icon: 'shield-check',
+    accent: 'coral',
+    title: lang === 'fr' ? 'Analyse de conformité' : 'Compliance analysis',
+    desc: lang === 'fr' ? 'Détection de gaps réglementaires sur des corpus volumineux.' : 'Detect regulatory gaps in large corpora.',
+  },
 ];
 ---
 
@@ -94,7 +173,112 @@ const secondaryOptions = [
     secondaryCtaHref={localizeUrl('/contact', lang)}
   />
 
-  <Section>
+  <SectionDivider />
+
+  {/* === Capacités IA — cards cliquables === */}
+  <Section
+    title={lang === 'fr' ? 'Les capacités IA que nous maîtrisons' : 'The AI capabilities we master'}
+    subtitle={lang === 'fr'
+      ? 'Pas de boîte noire. Cliquez sur une capacité pour voir comment nous l’assemblons en production.'
+      : 'No black box. Click a capability to see how we assemble it in production.'}
+    family="ia"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {capabilities.map((c, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 80}ms`}>
+          <button
+            type="button"
+            data-modal-target={c.id}
+            class="group h-full w-full text-left p-7 bg-ink-900 border border-ink-800 rounded-xl hover-lift hover:border-coral-400/40 transition-all cursor-pointer"
+          >
+            <div class="flex items-start gap-5">
+              <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-coral-400/20 to-coral-600/10 ring-1 ring-coral-400/30 text-coral-200 shrink-0 group-hover:scale-105 transition-transform">
+                <Icon name={c.icon} size={22} />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-start justify-between gap-3">
+                  <h3 class="text-h3 font-semibold text-ink-50 tracking-tight">{c.title}</h3>
+                  <span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-coral-300/80 mt-1.5 shrink-0">
+                    {lang === 'fr' ? 'Détails' : 'Details'}
+                    <Icon name="arrow-right" size={12} />
+                  </span>
+                </div>
+                <p class="mt-2 text-small text-ink-300 leading-relaxed">{c.desc}</p>
+                <div class="mt-4 flex flex-wrap gap-1.5">
+                  {c.features.map((f) => (
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-ink-800 text-coral-200 border border-coral-400/20">
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </button>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  {capabilities.map((c) => (
+    <Modal id={c.id} family="ia" title={c.title} subtitle={c.desc} size="lg">
+      <p class="text-base text-ink-200 leading-relaxed">{c.detail}</p>
+
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {c.features.map((f) => (
+          <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-ink-950/60 border border-ink-800">
+            <Icon name="check" size={14} class="text-coral-300 shrink-0" />
+            <span class="text-small text-ink-100 font-mono">{f}</span>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <Button href={localizeUrl('/contact?type=demo', lang)} variant="primary" family="ia" icon="arrow-right">
+          {t(lang, 'cta.demo')}
+        </Button>
+        <Button href={localizeUrl('/contact', lang)} variant="ghost">
+          {t(lang, 'cta.contact')}
+        </Button>
+      </div>
+    </Modal>
+  ))}
+
+  <SectionDivider variant="icon" icon="bot" />
+
+  {/* === Cas d'usage transverses === */}
+  <Section
+    title={lang === 'fr' ? 'Cas d’usage transverses' : 'Cross-functional use cases'}
+    subtitle={lang === 'fr'
+      ? 'Quatre familles de cas d’usage où l’IA produit une valeur mesurable, vite.'
+      : 'Four families of use cases where AI delivers measurable value, fast.'}
+    surface="muted"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      {useCases.map((u, i) => (
+        <div class="reveal" style={`--reveal-delay: ${i * 70}ms`}>
+          <Card class="h-full" interactive>
+            <div class="p-6">
+              <div class="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-coral-500/10 ring-1 ring-coral-400/30 text-coral-300 mb-4">
+                <Icon name={u.icon} size={20} />
+              </div>
+              <h3 class="text-h4 font-semibold text-ink-50 mb-2 tracking-tight">{u.title}</h3>
+              <p class="text-small text-ink-300 leading-relaxed">{u.desc}</p>
+            </div>
+          </Card>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <SectionDivider />
+
+  {/* === Catalogue filtré === */}
+  <Section
+    title={lang === 'fr' ? 'Nos produits IA' : 'Our AI products'}
+    subtitle={lang === 'fr'
+      ? 'Filtrez par capacité et par cas d’usage pour trouver le produit adapté à votre besoin.'
+      : 'Filter by capability and use case to find the right product for your need.'}
+  >
     <div class="mb-10">
       <LayeredFilters
         client:idle
@@ -136,4 +320,17 @@ const secondaryOptions = [
       />
     </div>
   </Section>
+
+  <SectionDivider />
+
+  <CTASection
+    title={lang === 'fr' ? 'Prêt à essayer un agent IA ?' : 'Ready to try an AI agent?'}
+    subtitle={lang === 'fr'
+      ? 'Demandez une démo : nous configurons un agent sur un cas réaliste en 30 minutes.'
+      : 'Request a demo: we configure an agent on a realistic use case in 30 minutes.'}
+    ctaLabel={t(lang, 'cta.demo')}
+    ctaHref={localizeUrl('/contact?type=demo', lang)}
+    secondaryCtaLabel={t(lang, 'cta.contact')}
+    secondaryCtaHref={localizeUrl('/contact', lang)}
+  />
 </BaseLayout>

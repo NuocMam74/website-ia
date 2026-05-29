@@ -97,11 +97,16 @@ const jsonLd: object[] = [
   <Section title={t(lang, 'detail.howItWorks')} family="ia">
     <ol class="grid md:grid-cols-3 gap-6 list-none p-0">
       {entry.data.howItWorks.map((step, i) => (
-        <li class="reveal" style={`--reveal-delay: ${i * 100}ms`}>
-          <Card interactive spotlight class="h-full relative">
-            <div class="absolute -top-3 left-6 w-8 h-8 rounded-full bg-coral-400 text-ink-950 flex items-center justify-center text-small font-bold ring-4 ring-ink-950">
-              {step.step}
-            </div>
+        <li class="reveal relative pt-4" style={`--reveal-delay: ${i * 100}ms`}>
+          {/* Badge positionné sur le <li> (overflow visible) pour éviter le clip
+              du card (overflow-hidden). */}
+          <span
+            class="absolute top-0 left-6 z-10 w-9 h-9 rounded-full bg-coral-400 text-ink-950 flex items-center justify-center text-small font-bold shadow-[0_0_0_4px_var(--surface-page)]"
+            aria-hidden="true"
+          >
+            {step.step}
+          </span>
+          <Card interactive spotlight class="h-full">
             <div class="p-7 pt-9 h-full">
               <h3 class="text-h4 font-semibold text-ink-50 mb-2 tracking-tight">{step.title}</h3>
               <p class="text-small text-ink-200 leading-relaxed">{step.desc}</p>
